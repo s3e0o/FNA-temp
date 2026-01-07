@@ -192,3 +192,4 @@ address p {
 .back-link:hover {
   text-decoration: underline;
 }
+@import "tailwindcss";

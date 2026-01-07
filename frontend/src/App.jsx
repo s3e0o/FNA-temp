@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectionHealthHome from './pages/services/protection-health/ProtectionHealthHome.jsx';
 import LifeProtection from './pages/services/protection-health/LifeProtection.jsx';
@@ -8,9 +8,14 @@ import Savings from './pages/services/savings-investments/Savings.jsx';
 import Education from './pages/services/savings-investments/Education.jsx';
 import Retirement from './pages/services/savings-investments/Retirement.jsx';
 import './App.css';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 function App() {
+  const [count, setCount] = useState(0)
+
   return (
+    
     <Router>
       <div className="App">
         <Routes>

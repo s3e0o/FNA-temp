@@ -1,1 +1,195 @@
+/* Questionnaire Styles */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+header h1 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #000;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+/* Services Grid */
+.services-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.service-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 32px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.service-card:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.card-content p {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #3b82f6;
+}
+
+/* Questionnaire Form */
+.questionnaire-form {
+  margin: 40px 0;
+}
+
+.question-group {
+  margin-bottom: 32px;
+}
+
+.question-group h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.question-text {
+  font-size: 16px;
+  color: #4b5563;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.number-input {
+  width: 200px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 40px 0;
+}
+
+.submit-btn {
+  background-color: #10b981;
+  color: white;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #059669;
+}
+
+/* Contacts and Footer */
+.contacts-section,
+.quick-links,
+.copyright-footer {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.contacts-section h2,
+.quick-links h2,
+.copyright-footer h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+address p {
+  font-size: 16px;
+  color: #4b5563;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.footer-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+/* Navigation */
+.navigation {
+  text-align: center;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.back-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
 @import "tailwindcss";

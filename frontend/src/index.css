@@ -1,68 +1,179 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Axiforma";
+  src: url("./assets/fonts/Kastelov - Axiforma Bold.otf") format("opentype");
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
 }
 
-a {
+@font-face {
+  font-family: "Axiforma Light";
+  src: url("./assets/fonts/Kastelov - Axiforma Light.otf") format("opentype");
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  font-style: normal;
 }
-a:hover {
-  color: #535bf2;
+
+@font-face {
+  font-family: "Axiforma";
+  src: url("./assets/fonts/Kastelov - Axiforma Regular.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Axiforma";
+  src: url("./assets/fonts/Kastelov - Axiforma Thin.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Axiforma Italic";
+  src: url("./assets/fonts/Kastelov - Axiforma Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Staatlitches";
+  src: url("./assets/fonts/Staatliches-Regular.ttf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
 }
 
 body {
-  margin: 0;
+  font-family: "Axiforma", sans-serif;
+}
+.login-btn {
+  border: 2px solid #ffffff;
+  border-radius: 10px; /* pill shape */
+  padding: 8px 20px;
+  font-family: "Axiforma";
+  src: url("./assets/fonts/Kastelov - Axiforma Bold.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.login-btn:hover {
+  background-color: #ffffff;
+  color: #1e293b; /* slate-800 */
+}
+/* Keep underline OFF for login button */
+.login-btn::after {
+  display: none;
+}
+
+/* Divider line */
+.footer-divider {
+  height: 4px;
+  background-color: #F4B43C;
+}
+
+/* Main footer */
+.footer {
+  background-color: #003266;
+  color: white;
+  padding: 40px 60px;
+  font-family: 'Staatlitches', sans-serif;
+  letter-spacing: 0.08em; 
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.5fr;
+  gap: 40px;
+}
+
+/* Columns */
+.footer-column h4{
+  font-size: 25px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  font-family: 'Staatlitches', sans-serif;
+  
+}
+
+.footer-column a {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'Axiforma Light', sans-serif;
+}
+.footer-column p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'Axiforma',italic;
+}
+/* Hover accent */
+.footer-column a:hover {
+  color: #F4B43C;
+}
+
+/* Social icons */
+.social-icons {
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  gap: 14px;
+  margin-top: 16px;
+  font-size: 20px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.social-icons svg {
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.social-icons svg:hover {
+  transform: translateY(-2px);
+  color: #F4B43C;
+}
+
+/* Copyright text block */
+.footer-text p {
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.95;
+  font-family: 'Axiforma Light', sans-serif;
+  font-style: italic;
+
+}
+
+/* Bottom strip */
+.footer-bottom {
+  background-color: #003266;
+  color: #ffffff;
+  text-align: center;
+  font-size: 13px;
+  padding: 14px 20px;
+  font-family: 'Axiforma';
+
+}
+
+/* 📱 Mobile responsive */
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    text-align: left;
   }
-  a:hover {
-    color: #747bff;
+
+  .footer {
+    padding: 40px 30px;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+.header-font {
+  font-family: 'Axiforma', sans-serif;
+  letter-spacing: 0.08em; 
 }

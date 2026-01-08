@@ -20,26 +20,53 @@ function HealthServices() {
             Help us understand your health coverage needs
           </p> */}
         </header>
+        <div className="flex items-center justify-center mb-10">
+          {/* Step 1 */}
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-blue-700 text-white flex items-center justify-center font-semibold">
+              1
+            </div>
+            <span className="text-sm text-blue-700 mt-2">Question 1</span>
+          </div>
+
+          {/* Line */}
+          <div className="w-32 h-1 bg-blue-300 mx-4" />
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center font-semibold">
+              2
+            </div>
+            <span className="text-sm text-blue-400 mt-2">Question 2</span>
+          </div>
+        </div>
 
         <form className="space-y-8">
           <div>
             {/* <h2 className="text-lg font-Axiforma Light text-[#395998] mb-2">
               Question 1
             </h2> */}
-            <p className=" mb-3 text-lg font-Axiforma Light text-[#003266] text-align-center">
-              What is your current health insurance coverage?
+            <p className="text-lg text-[#003266] max-w-2xl mx-auto mb-8 leading-relaxed">
+              How much do you need for your health fund (i.e. an amount that you are
+              comfortable with in case of serious illness)?
             </p>
-            <input
-              type="text"
-              value={healthQuestion1}
-              onChange={(e) => setHealthQuestion1(e.target.value)}
-              placeholder="Enter details"
-              className="w-full rounded-md border border-gray-300 px-4 py-3
-                         focus:outline-none focus:ring-2 focus:ring-[#003266]"
-            />
-          </div>
 
-          {/* <div>
+              <div className="flex justify-center mb-14">
+          <div className="relative w-80">
+             <input
+              type="number"
+              placeholder="0.00"
+              className="w-full pl-10 pr-4 py-3 rounded-lg shadow-md border border-gray-200
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+            />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 text-lg">
+              ₱
+            </span>
+          </div>
+        </div>
+        </div>
+
+               {/* <div>
             <h2 className="text-lg font-medium text-gray-800 mb-2">
               Question 2
             </h2>
@@ -56,7 +83,6 @@ function HealthServices() {
             />
           </div> */}
 
-          <hr className="border-gray-200" />
 
           <button
             type="submit"

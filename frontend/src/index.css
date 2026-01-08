@@ -177,3 +177,63 @@ body {
   font-family: 'Axiforma', sans-serif;
   letter-spacing: 0.08em; 
 }
+
+.fna-page {
+  /* min-height: calc(100vh - 160px);  */
+    padding: 170px 0 70px; /* top | bottom */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background: linear-gradient(
+    90deg,
+    #f4f6f8 50%,
+    #c9d3dc 50%
+  ); */
+}
+
+.fna-card {
+  background: #003366;
+  color: white;
+  width: 750px;
+  height: 300px;
+  padding: 50px 50px;
+  border-radius: 10px;
+  text-align: center;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.fna-card h2 {
+  font-weight: 1000;
+  margin-bottom: 16px;
+  margin-top: 12px;
+  font-size: 24px;
+}
+
+.fna-card p {
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+.fna-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.fna-actions button {
+  width: 150px;
+  padding: 5px 0;
+  border-radius: 6px;
+  border: 3px solid white;
+  background: transparent;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.fna-actions button:hover {
+  background: white;
+  color: #003366;
+}

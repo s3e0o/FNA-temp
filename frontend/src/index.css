@@ -42,6 +42,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./assets/fonts/Kastelov - Axiforma SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
 body {
   font-family: "Axiforma", sans-serif;
   background-image: url("./assets/images/fna_background.png");

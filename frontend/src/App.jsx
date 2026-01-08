@@ -19,10 +19,7 @@ function App() {
       <Footer />
     </>
   );
-
-
   return (
-    
     <Router>
       <div className="App">
         <Routes>

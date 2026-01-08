@@ -15,7 +15,11 @@ const Footer = () => {
           {/* CONTACTS */}
           <div className="footer-column">
             <h4>CONTACTS</h4>
-            <a href="https://maps.app.goo.gl/M7P7CEF7vAbK3ZES7">
+            <a
+              href="https://maps.app.goo.gl/M7P7CEF7vAbK3ZES7"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               The Upper Class Tower Quezon Avenue,<br />
               Quezon City, Metro Manila
             </a>

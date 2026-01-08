@@ -7,6 +7,7 @@ import SavingsInvestmentsHome from './pages/services/savings-investments/Savings
 import Savings from './pages/services/savings-investments/Savings.jsx';
 import Education from './pages/services/savings-investments/Education.jsx';
 import Retirement from './pages/services/savings-investments/Retirement.jsx';
+import FNAHomePage from './pages/FNAHomePage.jsx';
 import './App.css';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -33,6 +34,10 @@ function App() {
           <Route path="/services/savings-investments/savings" element={<Savings />} />
           <Route path="/services/savings-investments/education" element={<Education />} />
           <Route path="/services/savings-investments/retirement" element={<Retirement />} />
+
+          {/* FNA HomePage*/}
+          <Route path="/FNA/Homepage" element={<FNAHomePage />} />
+          <Route path="/" element={<FNAHomePage />} />
           
           {/* Fallback 404 */}
           <Route path="*" element={<NotFound />} />

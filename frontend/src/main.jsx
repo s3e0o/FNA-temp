@@ -11,19 +11,21 @@ import LifeProtection from "./pages/services/protection-health/LifeProtection.js
 import HealthServices from "./pages/services/protection-health/HealthServices.jsx";
 import SavingsInvestmentsHome from "./pages/services/savings-investments/SavingsInvestmentsHome.jsx";
 import Savings from "./pages/services/savings-investments/Savings.jsx";
+import FNAHomePage from "./pages/FNAHomePage.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<ProtectionHealthHome />} />
+        <Route path="/" element={<FNAHomePage />} />
+        <Route path="/FNA/Homepage" element={<FNAHomePage />} />
         <Route path="/services/protection-health/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/savings" element={<Savings />} />
         <Route path="/services/protection-health/LifeProtection" element={<LifeProtection />} />
         <Route path="/services/protection-health/health-services/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/Retirement" element={<SavingsInvestmentsHome />} />
-      </Routes>
+      </Routes>  
       <Footer />
     </BrowserRouter>
   </React.StrictMode>

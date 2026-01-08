@@ -44,7 +44,10 @@
 
 body {
   font-family: "Axiforma", sans-serif;
-}
+  background-image: url("./assets/images/fna_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;}
 .login-btn {
   border: 2px solid #ffffff;
   border-radius: 10px; /* pill shape */

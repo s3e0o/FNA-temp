@@ -1,4 +1,4 @@
-import {FaLinkedin, FaInstagram, FaFacebook, FaTwitter, FaSpotify, FaYoutube} from "react-icons/fa";
+import {FaLinkedin, FaInstagram, FaFacebook, FaSpotify, FaYoutube} from "react-icons/fa";
 import React from 'react';
 import '../index.css';
 import { Link } from 'react-router-dom'
@@ -36,7 +36,6 @@ const Footer = () => {
               <FaLinkedin />
               <FaInstagram />
               <FaFacebook />
-              <FaTwitter />
               <FaSpotify />
               <FaYoutube />
             </div>

@@ -4,7 +4,6 @@ import { BiLogoReact } from 'react-icons/bi'
 import logo from '../assets/images/CFS Logo.png'  
 import '../index.css'
 
-
 const navLink =
   "relative px-5 py-3 text-lg font-light text-white transition duration-300 " +
   "hover:text-[#F4B43C] " +
@@ -57,7 +56,6 @@ const Navbar = () => {
                             transition-colors duration-100 hover:bg-[#003266] hover:text-white">
                         Life Protection
                     </Link>
-
             </div>
           </div>
                 <Link to="/careers" className={navLink}>Careers</Link>

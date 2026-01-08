@@ -61,8 +61,9 @@ body {
 
 /* Hover effect */
 .login-btn:hover {
-  background-color: #ffffff;
-  color: #1e293b; /* slate-800 */
+  background-color: #003266;
+  color: #F4B43C; /* slate-800 */
+  border: 2px solid #F4B43C;
 }
 /* Keep underline OFF for login button */
 .login-btn::after {

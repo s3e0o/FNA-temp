@@ -16,12 +16,12 @@ const navLink =
 const Navbar = () => {
     return (
         <header className='header-font fixed top-0 w-full bg-[#003266] z-50 shadow-lg'>
-            <nav className='max-w-7xl mx-auto flex items-center justify-between py-6 px-6 pl-[3px]'>
+            <nav className='max-w-7xl mx-auto flex items-center justify-between py-4.5 px-6 pl-[3px]'>
                 <Link to="/" className='flex items-center gap-3 text-blue-400'>
                     <img
                         src={logo}
                         alt="Caelum Financial Solutions Logo"
-                        className="h-15 w-auto"
+                        className="h-10 w-auto"
                     />
                 </Link>
                 <div className="flex items-center gap-8">

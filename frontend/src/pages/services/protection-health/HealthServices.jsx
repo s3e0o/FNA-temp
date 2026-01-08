@@ -6,24 +6,27 @@ function HealthServices() {
   const [healthQuestion2, setHealthQuestion2] = useState("");
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-32 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
+      <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8
+                bg-[url('/src/assets/images/short-cfs-b.png')]
+                bg-cover bg-center
+                bg-white/80 bg-blend-lighten">
 
         <header className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-[#003266]">
-            Health Services
+          <h1 className="text-3xl font-Axiforma text-[#003266]">
+            Health 
           </h1>
-          <p className="mt-2 text-gray-600">
+          {/* <p className="mt-2 text-gray-600">
             Help us understand your health coverage needs
-          </p>
+          </p> */}
         </header>
 
         <form className="space-y-8">
           <div>
-            <h2 className="text-lg font-medium text-gray-800 mb-2">
+            {/* <h2 className="text-lg font-Axiforma Light text-[#395998] mb-2">
               Question 1
-            </h2>
-            <p className="text-gray-600 mb-3">
+            </h2> */}
+            <p className=" mb-3 text-lg font-Axiforma Light text-[#003266] text-align-center">
               What is your current health insurance coverage?
             </p>
             <input
@@ -36,7 +39,7 @@ function HealthServices() {
             />
           </div>
 
-          <div>
+          {/* <div>
             <h2 className="text-lg font-medium text-gray-800 mb-2">
               Question 2
             </h2>
@@ -51,7 +54,7 @@ function HealthServices() {
               className="w-full rounded-md border border-gray-300 px-4 py-3
                          focus:outline-none focus:ring-2 focus:ring-[#003266]"
             />
-          </div>
+          </div> */}
 
           <hr className="border-gray-200" />
 

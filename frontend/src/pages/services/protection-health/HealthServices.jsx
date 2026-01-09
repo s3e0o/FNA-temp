@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 function HealthServices() {
@@ -10,11 +10,11 @@ function HealthServices() {
 
   const validateInputs = () => {
     const newErrors = {};
-    if (!healthQuestion1.trim()) {
-      newErrors.question1 = "Please enter an amount for your health fund.";
+    if (!healthQuestion1.trim() || isNaN(parseFloat(healthQuestion1))) {
+      newErrors.question1 = "Please enter a valid amount for your health fund.";
     }
-    if (!healthQuestion2.trim()) {
-      newErrors.question2 = "Please enter a monthly amount.";
+    if (!healthQuestion2.trim() || isNaN(parseFloat(healthQuestion2)) || parseFloat(healthQuestion2) === 0) {
+      newErrors.question2 = "Please enter a valid monthly amount greater than 0.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -28,9 +28,7 @@ function HealthServices() {
         setCurrentStep(3);
       }
     } else if (currentStep === 3) {
-  
       setSubmitted(true);
-   
     }
   };
 
@@ -41,46 +39,87 @@ function HealthServices() {
     }
   };
 
+
+  const computeResult = () => {
+    const A = parseFloat(healthQuestion1);
+    const B = parseFloat(healthQuestion2);
+    if (B === 0) return 0; 
+    return (A / (12 * B)).toFixed(2); 
+  };
+
+  const handleImportPDF = () => {
+    alert("PDF exported successfully!");
+  };
+
   if (submitted) {
-  
+    const result = computeResult();
     return (
       <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
-        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-          <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">HEALTH</h1>
-          <p className="text-lg text-[#003266] text-center">
-            Here are your results.
+        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8
+                bg-[url('/src/assets/images/short-cfs-b.png')]
+                bg-cover bg-center
+                bg-white/97 bg-blend-lighten max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+          <button
+            onClick={handleImportPDF}
+            className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-[#e0a32f] transition duration-200"
+          >
+            Import to PDF
+          </button>
+          
+          <header className="mb-8 text-center">
+            <h1 className="text-3xl font-Axiforma text-[#003266]">
+              HEALTH 
+            </h1>
+          </header>
+          <p className="text-lg text-[#003266] text-center padding-6 mt-6">
+            THANK YOU FOR YOUR INPUT
+            {/* <br />
+            Health Fund Amount (A): ₱{healthQuestion1}
             <br />
-            Health Fund Amount: ₱{healthQuestion1}
-            <br />
-            Monthly Contribution: ₱{healthQuestion2}
+            Monthly Contribution (B): ₱{healthQuestion2}
+            <br />*/}
+             <br /> 
+             </p>
+             <p className="text-lg text-[#003266] text-center padding-4 mt-6">
+            This represents the number of years to reach your health fund goal.
           </p>
-          <div className="text-center mt-8">
-            <Link to="/services" className="bg-[#003266] text-white px-10 py-3 rounded-md font-medium text-lg">
-              Back to Services
-            </Link>
+            <div className="flex justify-center mb-14">
+                <div className="w-10 pl-8 pr-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg padding-6 mt-6 text-center text-[#003266] text-lg
+                relative w-80">
+            <strong>
+              {result} year/s</strong>
+             </div>
+            </div>
+          <div className="mt-10 flex items-center justify-between">
+            <button
+              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Book an Appointment
+            </button>
+            <button
+              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              View Recommendations
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  useEffect(() => {
-      document.title = "Financial Needs Analysis | Health Services";
-    }, []);
-
   return (
-    <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
+    <div className="top-fixed min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
       <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8
                 bg-[url('/src/assets/images/short-cfs-b.png')]
                 bg-cover bg-center
-                bg-white/97 bg-blend-lighten ">
+                bg-white/97 bg-blend-lighten">
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-Axiforma text-[#003266]">
             HEALTH 
           </h1>
         </header>
         <div className="flex justify-center mb-10">
-          <div className="relative flex items-center w-[540px]"> 
+          <div className="relative flex items-center w-[540px]">
             <div className="absolute left-10 right-1 top-6 h-[2px] bg-[#8FA6BF]" />
 
             <div className="relative z-10 flex flex-col items-center">
@@ -122,12 +161,15 @@ function HealthServices() {
           </div>
         </div>
 
-        <form className="space-y-8">
+        <form className="space-y-8 top-fixed bottom-fixed">
           {currentStep === 1 && (
             <div>
-              <p className="text-lg text-[#003266] max-w-2xl mx-auto mb-8 leading-relaxed">
-                How much do you need for your health fund 
-                (i.e. an amount that you are comfortable with in case of serious illness)?
+              <p className="text-lg text-[#003266] max-w-2xl mx-auto mb-8 leading-relaxed text-center">
+                 <br />
+                    How much do you need for your health fund
+                  <br />
+                    (i.e. an amount that you are comfortable with in case of serious illness)?
+                  <br />
               </p>
               <div className="flex justify-center mb-14">
                 <div className="relative w-80">
@@ -141,12 +183,13 @@ function HealthServices() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">₱</span>
                 </div>
               </div>
+              {errors.question1 && <p className="text-red-500 text-center">{errors.question1}</p>}
             </div>
           )}
 
           {currentStep === 2 && (
             <div>
-              <p className="text-lg text-[#003266] max-w-2xl mx-auto mb-8 leading-relaxed">
+              <p className="text-lg text-[#003266] max-w-2xl mx-auto mb-8 leading-relaxed text-center">
                 How much are you willing to set aside monthly for your health fund?
               </p>
               <div className="flex justify-center mb-14">
@@ -170,13 +213,15 @@ function HealthServices() {
               <h2 className="text-2xl font-Axiforma text-[#003266] text-center mb-8">Review Your Answers</h2>
               <div className="space-y-4 max-w-2xl mx-auto">
                 <div>
-                  <p className="text-lg text-[#003266]"><strong>Question 1:</strong> How much do you need for your health fund?</p>
-                  <p className="text-lg text-[#003266]">Answer: ₱{healthQuestion1}</p>
+                  <p className="text-lg text-[#003266]"><strong>Question 1:</strong> How much do you need for your health fund? <u>₱{healthQuestion1}</u></p>
                 </div>
                 <div>
-                  <p className="text-lg text-[#003266]"><strong>Question 2:</strong> How much are you willing to set aside monthly?</p>
-                  <p className="text-lg text-[#003266]">Answer: ₱{healthQuestion2}</p>
+                  <p className="text-lg text-[#003266]"><strong>Question 2:</strong> How much are you willing to set aside monthly? <u>₱{healthQuestion2}</u></p>
                 </div>
+                {/* <div>
+                  <p className="text-lg text-[#003266]"><strong>Calculated Result (A ÷ (12 × B)):</strong> {computeResult()}</p>
+                  <p className="text-sm text-[#8FA6BF]">This represents the estimated number of years to reach your health fund goal.</p>
+                </div> */}
               </div>
             </div>
           )}
@@ -188,14 +233,14 @@ function HealthServices() {
               onClick={handleBack}
               className="bg-[#003266] text-white px-10 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Previous
+               Previous
             </button>
           ) : (
             <Link
               to="/services/protection-health"
-              className="relative px-3 py-1 text-lg font-light text-[#003266] transition duration-300 after:absolute after:left-1/2 after:-bottom-1 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-16"
+              className="relative px-6 py-1 text-lg font-light text-[#003266] transition duration-300 after:absolute after:left-1/2 after:-bottom-1 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-16"
             >
-              Back
+               Back
             </Link>
           )}
 
@@ -203,7 +248,7 @@ function HealthServices() {
             onClick={handleNext}
             className="bg-[#003266] text-white px-10 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            {currentStep === 3 ?  "See Results" : "Next"}
+            {currentStep === 3 ? "Submit" : "Next " }
           </button>
         </div>
       </div>

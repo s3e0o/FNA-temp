@@ -26,7 +26,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-8">
                 <Link to="/about" className={navLink}>About Caelum</Link>
             <div className="relative group">
-                    <Link to="/services" className={navLink}>Services</Link>
+                    <Link to="/services/services-deets/OurServices" className={navLink}>Services</Link>
                         <div className="absolute left-1/2 top-full mt-3 w-64 
                             -translate-x-1/2 rounded-md 
                             bg-gray-200/80 backdrop-blur-md shadow-lg

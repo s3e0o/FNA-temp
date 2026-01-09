@@ -1,37 +1,9 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Axiforma";
-  src: url("./assets/fonts/Kastelov - Axiforma Bold.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Axiforma Light";
-  src: url("./assets/fonts/Kastelov - Axiforma Light.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Axiforma";
-  src: url("./assets/fonts/Kastelov - Axiforma Regular.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Axiforma";
-  src: url("./assets/fonts/Kastelov - Axiforma Thin.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Axiforma Italic";
-  src: url("./assets/fonts/Kastelov - Axiforma Italic.otf") format("opentype");
-  font-weight: 700;
+  font-family: 'Axiforma';
+  src: url('./assets/fonts/Kastelov - Axiforma SemiBold.otf') format('opentype');
+  font-weight: 600;
   font-style: normal;
 }
 
@@ -42,19 +14,16 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: 'Axiforma';
-  src: url('./assets/fonts/Kastelov - Axiforma SemiBold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-}
+
 
 body {
   font-family: "Axiforma", sans-serif;
   background-image: url("./assets/images/fna_background.png");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;}
+  background-repeat: no-repeat;
+  background-attachment: fixed;}
+
 .login-btn {
   border: 2px solid #ffffff;
   border-radius: 10px; 

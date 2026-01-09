@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function LifeProtection() {
@@ -10,6 +10,10 @@ function LifeProtection() {
     // Calculate logic here
     console.log({ yearsProviding, numberInput });
   };
+
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Life Protection ";
+    }, []);
 
   return (
     <div className="container">

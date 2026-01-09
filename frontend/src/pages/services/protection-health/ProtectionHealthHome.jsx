@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import { Link } from 'react-router-dom';
 
 function ProtectionHealthHome() {
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Protection & Health ";
+    }, []);
+
   return (
     <div className="container">
       <header>

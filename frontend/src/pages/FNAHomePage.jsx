@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 
 const FNAHomePage = () => {
+
+  useEffect(() => {
+    document.title = "Home Page | Financial Needs Analysis";
+  }, []);
+
   return (
     <>
       <Navbar />

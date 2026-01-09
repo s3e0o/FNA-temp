@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function Savings() {
@@ -9,6 +9,10 @@ function Savings() {
     // Add your calculation logic here
     console.log('Monthly savings goal:', monthlySavingsGoal);
   };
+
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Savings ";
+    }, []);
 
   return (
     <div className="container">

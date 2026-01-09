@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function HealthServices() {
@@ -64,6 +64,10 @@ function HealthServices() {
     );
   }
 
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Health Services";
+    }, []);
+
   return (
     <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
       <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8
@@ -77,7 +81,7 @@ function HealthServices() {
         </header>
         <div className="flex justify-center mb-10">
           <div className="relative flex items-center w-[540px]"> 
-            <div className="absolute left-0 right-0 top-6 h-[2px] bg-[#8FA6BF]" />
+            <div className="absolute left-10 right-1 top-6 h-[2px] bg-[#8FA6BF]" />
 
             <div className="relative z-10 flex flex-col items-center">
               <div className={`w-12 h-12 rounded-full ${currentStep === 1 ? 'bg-[#003266]' : currentStep > 1 ? 'bg-[#003266]' : 'bg-[#B7C5D6]'} flex items-center justify-center`}>
@@ -184,14 +188,14 @@ function HealthServices() {
               onClick={handleBack}
               className="bg-[#003266] text-white px-10 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
             >
-              ← Previous
+              Previous
             </button>
           ) : (
             <Link
               to="/services/protection-health"
-              className="relative px-1 py-3 text-lg font-light text-[#003266] transition duration-300 after:absolute after:left-1/2 after:-bottom-1 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-16"
+              className="relative px-3 py-1 text-lg font-light text-[#003266] transition duration-300 after:absolute after:left-1/2 after:-bottom-1 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-16"
             >
-              ← Back
+              Back
             </Link>
           )}
 
@@ -199,7 +203,7 @@ function HealthServices() {
             onClick={handleNext}
             className="bg-[#003266] text-white px-10 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            {currentStep === 3 ?  "See Results" : "Next →"}
+            {currentStep === 3 ?  "See Results" : "Next"}
           </button>
         </div>
       </div>

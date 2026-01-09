@@ -24,7 +24,6 @@ const FNAHomePage = () => {
         </div>
       </main>
 
-      <Footer />
     </>
   );
 };

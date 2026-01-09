@@ -3,6 +3,12 @@ import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 
 const FNAHomePage = () => {
+
+  // Browser tab title (copy paste this in other pages too)
+  useEffect(() => {
+      document.title = "Home Page | Financial Needs Analysis";
+    }, []);
+
   return (
     <>
       <Navbar />

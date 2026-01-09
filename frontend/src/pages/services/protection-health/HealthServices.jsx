@@ -5,6 +5,10 @@ function HealthServices() {
   const [healthQuestion1, setHealthQuestion1] = useState("");
   const [healthQuestion2, setHealthQuestion2] = useState("");
 
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Health Services";
+    }, []);
+
   return (
     <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
       <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8

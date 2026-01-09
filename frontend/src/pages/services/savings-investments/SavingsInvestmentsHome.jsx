@@ -2,6 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function SavingsInvestmentsHome() {
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Savings & Investments ";
+    }, []);
+
   return (
     <div className="container">
       <header>

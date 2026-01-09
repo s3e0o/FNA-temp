@@ -7,7 +7,7 @@ import SavingsInvestmentsHome from './pages/services/savings-investments/Savings
 import Savings from './pages/services/savings-investments/Savings.jsx';
 import Education from './pages/services/savings-investments/Education.jsx';
 import Retirement from './pages/services/savings-investments/Retirement.jsx';
-import FNAHomePage from './pages/FNAHomePage.jsx';
+import FNAHomePage from './pages/services/financial-needs-analysis/FNAHomePage.jsx';
 import './App.css';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -20,7 +20,10 @@ function App() {
       <Footer />
     </>
   );
+
+
   return (
+    
     <Router>
       <div className="App">
         <Routes>

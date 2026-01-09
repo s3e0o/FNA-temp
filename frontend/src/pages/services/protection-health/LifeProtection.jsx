@@ -11,6 +11,10 @@ function LifeProtection() {
     console.log({ yearsProviding, numberInput });
   };
 
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Life Protection ";
+    }, []);
+
   return (
     <div className="container">
       <header>

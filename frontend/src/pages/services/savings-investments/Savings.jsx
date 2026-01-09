@@ -10,6 +10,10 @@ function Savings() {
     console.log('Monthly savings goal:', monthlySavingsGoal);
   };
 
+  useEffect(() => {
+      document.title = "Financial Needs Analysis | Savings ";
+    }, []);
+
   return (
     <div className="container">
       <header>

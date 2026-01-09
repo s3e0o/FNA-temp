@@ -17,7 +17,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <Navbar />
-
       <Routes>
         <Route path="/" element={<FNAHomePage />} />
         <Route path="/FNA/Homepage" element={<FNAHomePage />} />
@@ -27,7 +26,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/services/protection-health/health-services/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/Retirement" element={<SavingsInvestmentsHome />} />
       </Routes>  
-
       <Footer />
     </BrowserRouter>
   </React.StrictMode>

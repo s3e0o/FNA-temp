@@ -42,12 +42,22 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./assets/fonts/Kastelov - Axiforma SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
 body {
   font-family: "Axiforma", sans-serif;
-}
+  background-image: url("./assets/images/fna_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;}
 .login-btn {
   border: 2px solid #ffffff;
-  border-radius: 10px; /* pill shape */
+  border-radius: 10px; 
   padding: 8px 20px;
   font-family: "Axiforma";
   src: url("./assets/fonts/Kastelov - Axiforma Bold.otf") format("opentype");
@@ -128,7 +138,7 @@ body {
   display: flex;
   gap: 14px;
   margin-top: 16px;
-  font-size: 20px;
+  font-size: 28px;
 }
 
 .social-icons svg {

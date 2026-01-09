@@ -1,33 +1,40 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
+import life from "../../../assets/images/life-protection.jpg";
+import education from "../../../assets/images/education.jpg";
+import health from "../../../assets/images/health.jpg";
+import savings from "../../../assets/images/savings.jpg";
+import retirement from "../../../assets/images/retirement.jpg";
+
 const services = [
   {
     title: "LIFE PROTECTION",
     desc: "To protect your family’s quality of life in case of uncertainties.",
-    image: "/assets/images/life-protection.jpg",
+    image: life,
   },
   {
     title: "EDUCATION",
     desc: "To plan for your children’s education.",
-    image: "/assets/images/education.jpg",
+    image: education,
   },
   {
     title: "HEALTH",
     desc: "To safeguard yourself from financial burden caused by serious illness.",
-    image: "/assets/images/health.jpg",
+    image: health,
   },
   {
     title: "SAVINGS",
     desc: "To maximize the potential of your savings.",
-    image: "/assets/images/savings.jpg",
+    image: savings,
   },
   {
     title: "RETIREMENT",
     desc: "To maintain your lifestyle after retirement.",
-    image: "/assets/images/retirement.jpg",
+    image: retirement,
   },
 ];
+
 
 export default function OurServices() {
 

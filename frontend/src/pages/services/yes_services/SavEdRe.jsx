@@ -1,48 +1,34 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
-import life from "../../../assets/images/life-protection.jpg";
 import education from "../../../assets/images/education.jpg";
-import health from "../../../assets/images/health.jpg";
 import savings from "../../../assets/images/savings.jpg";
 import retirement from "../../../assets/images/retirement.jpg";
 
 const services = [
   {
-    title: "LIFE PROTECTION",
-    desc: "To protect your family’s quality of life in case of uncertainties.",
-    image: life,
-    link: "/FNA/life-protection/details",
-  },
-  {
     title: "EDUCATION",
-    desc: "To plan for your children’s education.",
+    desc: "To plan for your children's education.",
     image: education,
-    link: "/FNA/education/details",
-  },
-  {
-    title: "HEALTH",
-    desc: "To safeguard yourself from financial burden caused by serious illness.",
-    image: health,
-    link: "/FNA/health/details",
+    link: "#",
   },
   {
     title: "SAVINGS",
     desc: "To maximize the potential of your savings.",
     image: savings,
-    link: "/FNA/savings/details",
+    link: "#",
   },
   {
     title: "RETIREMENT",
     desc: "To maintain your lifestyle after retirement.",
     image: retirement,
-    link: "/FNA/retirement/details",
+    link: "#",
   },
 ];
 
-export default function OurServices() {
+export default function SavEdRe() {
   useEffect(() => {
-    document.title = "Our Services | Financial Needs Analysis";
+    document.title = "Savings, Education & Retirement | Financial Needs Analysis";
   }, []);
 
   return (
@@ -64,12 +50,12 @@ export default function OurServices() {
         Our Services
       </h1>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+      {/* Cards - Centered for 3 items */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-8">
         {services.map((service, index) => (
           <div
             key={index}
-            className="relative h-[420px] rounded-xl overflow-hidden shadow-xl
+            className="relative h-[420px] w-full max-w-[260px] rounded-xl overflow-hidden shadow-xl
                        group cursor-pointer transition-all duration-300 ease-out
                        hover:-translate-y-2 hover:shadow-2xl"
           >
@@ -98,16 +84,15 @@ export default function OurServices() {
                 {service.desc}
               </p>
 
-              {/* Learn More */}
-              <Link
-                to={service.link}
+              {/* Take the test (without link) */}
+              <div
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
-                           hover:text-[#F4B43C] cursor-pointer"
+                           cursor-default"
               >
-                Learn More →
-              </Link>
+                Take the test →
+              </div>
             </div>
           </div>
         ))}

@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 
 const FNAHomePage = () => {
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Home Page | Financial Needs Analysis";
@@ -17,9 +19,20 @@ const FNAHomePage = () => {
           <h2>Hello, [Name]</h2>
           <p>Have you figured out your financial needs?</p>
 
-          <div className="fna-actions">
-            <button>Yes</button>
-            <button>No</button>
+          <div className="fna-actions flex gap-4 justify-center">
+            <button
+              onClick={() => navigate("/FNA/Yes")}
+              className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+            >
+              Yes
+            </button>
+
+            <button
+              onClick={() => navigate("/FNA/OurServices")}
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              No
+            </button>
           </div>
         </div>
       </main>

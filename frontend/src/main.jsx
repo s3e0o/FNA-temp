@@ -34,12 +34,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/services/savings-investments/Retirement" element={<SavingsInvestmentsHome />} />
         <Route path="/services/savings-investments/ProtectionHealthHome" element={<ProtectionHealthHome />} />
         <Route path="/services/yes_services/LifeProHealth" element={<LifeProHealth />} /> 
-        <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} /> 
+        <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} />     
 
         {/* If user chose no */}
         {/* <Route path="/services/savings-investments/education" element={<Education />} />
         <Route path="/services/savings-investments/retirement" element={<Retirement />} /> */}   
-        <Route path="/FNA/OurServices" element={<OurServices />} />    
+        <Route path="/FNA/OurServices" element={<OurServices />} />
         <Route path="/FNA/life-protection/details" element={<LifeProtectionDeets />} />
         <Route path="/FNA/health/details" element={<HealthDeets />} />
       </Routes>  

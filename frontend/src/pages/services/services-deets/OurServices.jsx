@@ -12,26 +12,31 @@ const services = [
     title: "LIFE PROTECTION",
     desc: "To protect your family’s quality of life in case of uncertainties.",
     image: life,
+    link: "/FNA/life-protection/details",
   },
   {
     title: "EDUCATION",
     desc: "To plan for your children’s education.",
     image: education,
+    link: "/FNA/education/details",
   },
   {
     title: "HEALTH",
     desc: "To safeguard yourself from financial burden caused by serious illness.",
     image: health,
+    link: "/FNA/health/details",
   },
   {
     title: "SAVINGS",
     desc: "To maximize the potential of your savings.",
     image: savings,
+    link: "/FNA/savings/details",
   },
   {
     title: "RETIREMENT",
     desc: "To maintain your lifestyle after retirement.",
     image: retirement,
+    link: "/FNA/retirement/details",
   },
 ];
 
@@ -46,10 +51,10 @@ export default function OurServices() {
       <Link
         to="/FNA/HomePage"
         className="relative inline-block text-[#395998] font-medium mb-5 mt-10
-                    after:content-[''] after:absolute after:left-0 after:-bottom-1
-                    after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                    after:transition-all after:duration-300
-                    hover:after:w-full"
+                   after:content-[''] after:absolute after:left-0 after:-bottom-1
+                   after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                   after:transition-all after:duration-300
+                   hover:after:w-full"
       >
         ← Back
       </Link>
@@ -76,10 +81,10 @@ export default function OurServices() {
                          group-hover:scale-105"
             />
 
-            {/* Light overlay */}
+            {/* Overlay */}
             <div className="absolute inset-0 bg-black/10"></div>
 
-            {/* Text container */}
+            {/* Text */}
             <div
               className="absolute bottom-0 left-0 right-0 bg-black/60 p-6
                          h-[175px] transition-all duration-300
@@ -95,15 +100,14 @@ export default function OurServices() {
 
               {/* Learn More */}
               <Link
-                to="/FNA/life-protection/details"   
+                to={service.link}
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
-                          opacity-0 translate-y-2 transition-all duration-300
-                          group-hover:opacity-100 group-hover:translate-y-0
-                          hover:text-[#F4B43C] cursor-pointer"
+                           opacity-0 translate-y-2 transition-all duration-300
+                           group-hover:opacity-100 group-hover:translate-y-0
+                           hover:text-[#F4B43C] cursor-pointer"
               >
                 Learn More →
               </Link>
-
             </div>
           </div>
         ))}

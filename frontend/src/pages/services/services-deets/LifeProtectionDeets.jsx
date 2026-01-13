@@ -68,11 +68,15 @@ export default function LifeProtectionDeets() {
                                 : "w-full scale-100 translate-x-0"
                             }`}
             >
-                <h1 className="text-3xl font-semibold mb-3">
+                <h1 className="text-3xl font-semibold mb-3 transition-all duration-500 ease-in-out
+                                  opacity-0 translate-y-2
+                                  animate-[titleFade_0.5s_ease-in-out_forwards]">
                 LIFE PROTECTION
                 </h1>
 
-                <p className="text-sm text-gray-200 mb-8">
+                <p className="text-sm text-gray-200 mb-8 transition-all duration-500 ease-in-out
+                                  opacity-0 translate-y-2
+                                  animate-[titleFade_0.5s_ease-in-out_forwards]">
                 To protect your family’s quality of life in case of uncertainties.
                 </p>
 
@@ -106,12 +110,16 @@ export default function LifeProtectionDeets() {
                 >
 
                 {/* Info Card */}
-                <div className="bg-[#0b3a6e] text-white rounded-xl p-8 shadow-xl">
-                <h2 className="text-xl font-semibold mb-4">
+                <div key={active} className="bg-[#0b3a6e] text-white rounded-xl p-8 shadow-xl">
+                <h2 className="text-xl font-semibold mb-4 transition-all duration-500 ease-in-out
+                                  opacity-0 translate-y-2
+                                  animate-[textFade_0.5s_ease-in-out_forwards]">
                     {active === "what" ? "What is it?" : "Why it matters?"}
                 </h2>
 
-                <p className="text-sm text-gray-200 leading-relaxed">
+                <p className="text-sm text-gray-200 leading-relaxed transition-all duration-500 ease-in-out
+                                  opacity-0 translate-y-2
+                                  animate-[textFade_0.5s_ease-in-out_forwards]">
                     {active === "what"
                     ? "A financial safety net that protects your family if something unexpected happens."
                     : "Life protection ensures your loved ones can maintain their lifestyle and financial security."}

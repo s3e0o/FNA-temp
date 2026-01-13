@@ -15,6 +15,8 @@ import FNAHomePage from "./pages/FNAHomePage.jsx";
 // import Education from "./pages/services/savings-investments/Education.jsx";
 // import Retirement from "./pages/services/savings-investments/Retirement.jsx";
 import OurServices from "./pages/services/services-deets/OurServices.jsx";
+import LifeProHealth from "./pages/services/lifeprohealth/LifeProHealth.jsx";
+import SavEdRe from "./pages/services/sav-ed-re/SavEdRe.jsx";
 import LifeProtectionDeets from "./pages/services/services-deets/LifeProtectionDeets";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -33,8 +35,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         {/* If user chose no */}
         {/* <Route path="/services/savings-investments/education" element={<Education />} />
-        <Route path="/services/savings-investments/retirement" element={<Retirement />} /> */}
+        <Route path="/services/savings-investments/retirement" element={<Retirement />} /> */}   
         <Route path="FNA/OurServices" element={<OurServices />} />
+        <Route path="/services/lifeprohealth/LifeProHealth" element={<LifeProHealth />} /> 
+        <Route path="/services/sav-ed-re/SavEdRe" element={<SavEdRe />} />     
         <Route path="/FNA/life-protection/details" element={<LifeProtectionDeets />} />
       </Routes>  
       <Footer />

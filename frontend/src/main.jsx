@@ -18,6 +18,7 @@ import OurServices from "./pages/services/services-deets/OurServices.jsx";
 import LifeProHealth from "./pages/services/lifeprohealth/LifeProHealth.jsx";
 import SavEdRe from "./pages/services/sav-ed-re/SavEdRe.jsx";
 import LifeProtectionDeets from "./pages/services/services-deets/LifeProtectionDeets";
+import HealthDeets from "./pages/services/services-deets/HealthDeets.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -36,10 +37,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         {/* If user chose no */}
         {/* <Route path="/services/savings-investments/education" element={<Education />} />
         <Route path="/services/savings-investments/retirement" element={<Retirement />} /> */}   
-        <Route path="FNA/OurServices" element={<OurServices />} />
+        <Route path="/FNA/OurServices" element={<OurServices />} />
         <Route path="/services/lifeprohealth/LifeProHealth" element={<LifeProHealth />} /> 
         <Route path="/services/sav-ed-re/SavEdRe" element={<SavEdRe />} />     
         <Route path="/FNA/life-protection/details" element={<LifeProtectionDeets />} />
+        <Route path="/FNA/health/details" element={<HealthDeets />} />
       </Routes>  
       <Footer />
     </BrowserRouter>

@@ -94,13 +94,16 @@ export default function OurServices() {
               </p>
 
               {/* Learn More */}
-              <div
+              <Link
+                to="/FNA/life-protection/details"   
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
-                           opacity-0 translate-y-2 transition-all duration-300
-                           group-hover:opacity-100 group-hover:translate-y-0"
+                          opacity-0 translate-y-2 transition-all duration-300
+                          group-hover:opacity-100 group-hover:translate-y-0
+                          hover:text-[#F4B43C] cursor-pointer"
               >
                 Learn More →
-              </div>
+              </Link>
+
             </div>
           </div>
         ))}

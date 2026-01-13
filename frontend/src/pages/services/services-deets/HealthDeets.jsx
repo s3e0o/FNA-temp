@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import life from "../../../assets/images/life-protection.jpg";
+import health from "../../../assets/images/health.jpg";
 
-export default function LifeProtectionDeets() {
+export default function HealthDeets() {
   const [active, setActive] = useState(null); // null | "what" | "why"
 
   useEffect(() => {
-    document.title = "Life Protection Service Details | Financial Needs Analysis";
+    document.title = "Health Service Details | Financial Needs Analysis";
   }, []);
 
   return (
@@ -30,7 +30,7 @@ export default function LifeProtectionDeets() {
         {/* LEFT ARROW */}
         <div className="hidden lg:flex justify-center">
           <Link
-            to="/FNA/education"
+            to="/FNA/life-protection/details"
             className="flex items-center justify-center w-12 h-12 rounded-full
                        bg-white shadow-lg text-[#0b3a6e] text-2xl font-bold
                        hover:bg-[#0b3a6e] hover:text-white transition-all"
@@ -46,8 +46,8 @@ export default function LifeProtectionDeets() {
             {/* IMAGE */}
             <div className="relative z-10 w-full h-[320px] lg:h-[360px]">
               <img
-                src={life}
-                alt="Life Protection"
+                src={health}
+                alt="Health Services"
                 className="w-full h-full rounded-xl shadow-xl object-cover"
               />
             </div>
@@ -69,11 +69,11 @@ export default function LifeProtectionDeets() {
                             }`}
             >
                 <h1 className="text-3xl font-semibold mb-3">
-                LIFE PROTECTION
+                HEALTH
                 </h1>
 
                 <p className="text-sm text-gray-200 mb-8">
-                To protect your family’s quality of life in case of uncertainties.
+                To plan for our children’s education.
                 </p>
 
                 <div className="space-y-4">
@@ -100,7 +100,7 @@ export default function LifeProtectionDeets() {
             {/* SIDE INFO CARD */}
             {active && (
                 <div
-                    className="absolute top-0 right-0 w-[50%] mt-9 flex flex-col gap-4
+                    className="absolute top-0 right-0 w-[50%] mt-5 flex flex-col gap-4
                             transition-all duration-700 ease-in-out
                             translate-x-0 opacity-100"
                 >
@@ -113,18 +113,20 @@ export default function LifeProtectionDeets() {
 
                 <p className="text-sm text-gray-200 leading-relaxed">
                     {active === "what"
-                    ? "A financial safety net that protects your family if something unexpected happens."
-                    : "Life protection ensures your loved ones can maintain their lifestyle and financial security."}
+                    ? "A health plan that covers medical expenses such as hospitalization, critical illness, or long-term care."
+                    : "Medical costs are extremely expensive. Health protection prevents financial burden during illness."}
                 </p>
                 </div>
 
                 {/* Take the test (separate) */}
-                <button
-                className="w-full bg-[#0b3a6e] border border-[#003266] text-white py-3 rounded-lg shadow-lg
-                            hover:bg-[#F4B43C] transition cursor-pointer"
+                <Link
+                  to="/services/protection-health/health-services/HealthServices"  
+                  className="w-full bg-[#0b3a6e] border border-[#003266] text-white py-3 rounded-lg shadow-lg
+                            hover:bg-[#F4B43C] transition cursor-pointer text-center"
                 >
-                Take the test
-                </button>
+                  Take the test
+                </Link>
+
             </div>
             )}
 
@@ -136,7 +138,7 @@ export default function LifeProtectionDeets() {
         {/* RIGHT ARROW */}
         <div className="hidden lg:flex justify-center">
           <Link
-            to="/FNA/health/details"
+            to="/FNA/health"
             className="flex items-center justify-center w-12 h-12 rounded-full
                        bg-white shadow-lg text-[#0b3a6e] text-2xl font-bold
                        hover:bg-[#0b3a6e] hover:text-white transition-all"

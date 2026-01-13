@@ -84,7 +84,7 @@ export default function LifeProHealth() {
                            group-hover:opacity-100 group-hover:translate-y-0
                            cursor-default"
               >
-                Learn More →
+                Take the test →
               </div>
             </div>
           </div>

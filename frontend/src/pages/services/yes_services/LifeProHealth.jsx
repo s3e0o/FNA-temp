@@ -15,7 +15,7 @@ const services = [
     title: "HEALTH",
     desc: "To safeguard yourself from financial burden caused by serious illness.",
     image: health,
-    link: "#",
+    link: "/services/protection-health/HealthServices",
   },
 ];
 

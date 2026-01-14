@@ -16,7 +16,7 @@ const services = [
     title: "SAVINGS",
     desc: "To maximize the potential of your savings.",
     image: savings,
-    link: "#",
+    link: "/services/savings-investments/Savings",
   },
   {
     title: "RETIREMENT",
@@ -85,14 +85,15 @@ export default function SavEdRe() {
               </p>
 
               {/* Take the test (without link) */}
-              <div
+              <Link
+                to={service.link}
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
                            cursor-default"
               >
                 Take the test →
-              </div>
+              </Link>
             </div>
           </div>
         ))}

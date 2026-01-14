@@ -24,7 +24,7 @@ function Retirement() {
   const resultRef = useRef(null);
 
   useEffect(() => {
-    document.title = "Financial Needs Analysis | Retirement";
+    document.title = "Retirement | Financial Needs Analysis";
   }, []);
 
   const validateCurrentStep = () => {

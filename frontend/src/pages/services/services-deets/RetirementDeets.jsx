@@ -30,7 +30,7 @@ export default function RetirementDeets() {
         {/* LEFT ARROW */}
         <div className="hidden lg:flex justify-center">
           <Link
-            to="/FNA/life-protection/details"
+            to="/FNA/savings/details"
             className="flex items-center justify-center w-12 h-12 rounded-full
                        bg-white shadow-lg text-[#0b3a6e] text-2xl font-bold
                        hover:bg-[#0b3a6e] hover:text-white transition-all"
@@ -146,7 +146,7 @@ export default function RetirementDeets() {
         {/* RIGHT ARROW */}
         <div className="hidden lg:flex justify-center">
           <Link
-            to="/FNA/education"
+            to="/FNA/life-protection/details"
             className="flex items-center justify-center w-12 h-12 rounded-full
                        bg-white shadow-lg text-[#0b3a6e] text-2xl font-bold
                        hover:bg-[#0b3a6e] hover:text-white transition-all"

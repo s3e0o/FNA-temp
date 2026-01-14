@@ -24,7 +24,7 @@ function Savings() {
   const [appointmentErrors, setAppointmentErrors] = useState({});
 
   useEffect(() => {
-    document.title = "Financial Needs Analysis | Savings";
+    document.title = "Savings | Financial Needs Analysis";
   }, []);
 
   const inflationMultipliers = [

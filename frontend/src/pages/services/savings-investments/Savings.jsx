@@ -63,11 +63,16 @@ function Savings() {
     }
   };
 
-  const computeResult = () => {
-    const yearIndex = parseInt(years) - 1;
-    const multiplier = inflationMultipliers[yearIndex] || Math.pow(1.04, years);
-    return (parseFloat(cost) * multiplier).toFixed(2);
-  };
+const computeResult = () => {
+  const yearIndex = parseInt(years) - 1;
+  const multiplier =
+    inflationMultipliers[yearIndex] || Math.pow(1.04, years);
+
+  return Number(parseFloat(cost) * multiplier).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
 
   const handleDreamChange = (e) => {
     const value = e.target.value;
@@ -77,6 +82,7 @@ function Savings() {
       setDreams([...dreams, value]);
     }
   };
+  const [otherDream, setOtherDream] = useState("");
 
   const handleExportPDF = async () => {
     if (!resultRef.current) return;
@@ -90,6 +96,14 @@ function Savings() {
     pdf.addImage(imgData, "PNG", 5, 5, width, height);
     pdf.save("Savings-Planning-Result.pdf");
   };
+const formatNumber = (value) => {
+  if (!value) return "";
+  return Number(value).toLocaleString();
+};
+
+const parseNumber = (value) => {
+  return value.replace(/,/g, "");
+};
 
   const handleBookAppointment = () => setShowAppointmentForm(true);
   const handleAppointmentChange = (e) => {
@@ -210,26 +224,40 @@ function Savings() {
             ))}
           </div>
         </div>
-
-        <form className="space-y-8">
-          {currentStep === 1 && (
+<form className="space-y-8">
+  {currentStep === 1 && (
   <div className="text-center">
-    <p className="text-lg text-[#003266] mb-6 font-semibold">What are you saving up for?</p>
+    <p className="text-lg text-[#003266] mb-6 font-semibold">
+      What are you saving for?
+    </p>
 
     <div className="grid grid-cols-2 gap-4 w-80 mx-auto">
       {["House", "Car", "Business", "Other"].map(option => (
         <label
           key={option}
-          className="flex items-center bg-white border rounded-lg px-4 py-3 shadow hover:shadow-md cursor-pointer"
+          className={`flex items-center bg-white border rounded-lg px-4 py-3 shadow cursor-pointer ${
+            dreams[0] === option ? "border-[#003266]" : ""
+          } ${option === "Other" ? "col-span-2" : ""}`}
         >
           <input
-            type="checkbox"
-            value={option}
-            checked={dreams.includes(option)}
-            onChange={handleDreamChange}
+            type="radio"
+            name="dream"
+            checked={dreams[0] === option}
+            onChange={() => setDreams([option])}
             className="mr-3 w-5 h-5 accent-[#003266]"
           />
-          <span className="text-[#003266]">{option}</span>
+
+          <span className="text-[#003266] mr-2">{option}</span>
+
+          {option === "Other" && dreams[0] === "Other" && (
+            <input
+              type="text"
+              placeholder="Please specify"
+              value={otherDream}
+              onChange={(e) => setOtherDream(e.target.value)}
+              className="flex-1 border rounded px-2 py-1"
+            />
+          )}
         </label>
       ))}
     </div>
@@ -269,7 +297,12 @@ function Savings() {
                 </div>
                 <div className="flex justify-between items-center border p-4 rounded">
                   <span>Cost (₱):</span>
-                  <input type="number" value={cost} onChange={(e)=>setCost(e.target.value)} className="border rounded px-2 py-1" />
+                  <input
+                        type="text"
+                        value={formatNumber(cost)}
+                        onChange={(e) => setCost(parseNumber(e.target.value))}
+                        className="w-80 p-3 border rounded-lg"
+                      />
                 </div>
               </div>
               <p className="text-sm text-gray-500 mt-4">You can edit any field before final submission.</p>

@@ -10,7 +10,7 @@ const services = [
     title: "EDUCATION",
     desc: "To plan for your children's education.",
     image: education,
-    link: "#",
+    link: "/services/savings-investments/Education",
   },
   {
     title: "SAVINGS",

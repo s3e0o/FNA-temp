@@ -10,7 +10,7 @@ import LifeProtection from "./pages/services/protection-health/LifeProtection.js
 import HealthServices from "./pages/services/protection-health/HealthServices.jsx";
 import Savings from "./pages/services/savings-investments/Savings.jsx";
 import FNAHomePage from "./pages/FNAHomePage.jsx";
-// import Education from "./pages/services/savings-investments/Education.jsx";
+import Education from "./pages/services/savings-investments/Education.jsx";
 // import Retirement from "./pages/services/savings-investments/Retirement.jsx";
 import OurServices from "./pages/services/services-deets/OurServices.jsx";
 import LifeProHealth from "./pages/services/yes_services/LifeProHealth.jsx";
@@ -36,6 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/services/savings-investments/Savings" element={<Savings />} />
         <Route path="/services/protection-health/LifeProtection" element={<LifeProtection />} />
         <Route path="/services/protection-health/health-services/HealthServices" element={<HealthServices />} />
+        <Route path="/services/savings-investments/Education" element={<Education />} />
         <Route path="/services/yes_services/LifeProHealth" element={<LifeProHealth />} /> 
         <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} />     
 

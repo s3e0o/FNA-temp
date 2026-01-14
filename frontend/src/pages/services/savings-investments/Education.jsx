@@ -267,13 +267,13 @@ function Education() {
 
           <div className="mt-10 flex justify-between">
           <Link to="/FNA/AppointmentForm">
-            <button className="bg-[#003266] text-white px-6 py-3 rounded-md">
+            <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
               Book an Appointment
             </button>
           </Link>
 
           <Link to="/FNA/OurServices">
-            <button className="bg-[#003266] text-white px-6 py-3 rounded-md">
+            <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
               View Recommendations
             </button>
           </Link>

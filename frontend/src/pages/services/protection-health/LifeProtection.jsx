@@ -193,90 +193,90 @@ function LifeProtection() {
 
   if (submitted) {
     const result = computeResult();
-    if (showAppointmentForm) {
-      return (
-        <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">Appointment Form</h1>
-            <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-              <div>
-                <label className="block text-lg text-[#003266] mb-2">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={appointmentData.name}
-                  onChange={handleAppointmentChange}
-                  className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                  placeholder="Enter your full name"
-                />
-                {appointmentErrors.name && <p className="text-red-500 mt-1">{appointmentErrors.name}</p>}
-              </div>
-              <div>
-                <label className="block text-lg text-[#003266] mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={appointmentData.email}
-                  onChange={handleAppointmentChange}
-                  className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                  placeholder="Enter your email"
-                />
-                {appointmentErrors.email && <p className="text-red-500 mt-1">{appointmentErrors.email}</p>}
-              </div>
-              <div>
-                <label className="block text-lg text-[#003266] mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={appointmentData.phone}
-                  onChange={handleAppointmentChange}
-                  className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                  placeholder="Enter your phone number"
-                />
-                {appointmentErrors.phone && <p className="text-red-500 mt-1">{appointmentErrors.phone}</p>}
-              </div>
-              <div>
-                <label className="block text-lg text-[#003266] mb-2">Preferred Date</label>
-                <input
-                  type="date"
-                  name="date"
-                  value={appointmentData.date}
-                  onChange={handleAppointmentChange}
-                  className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                />
-                {appointmentErrors.date && <p className="text-red-500 mt-1">{appointmentErrors.date}</p>}
-              </div>
-              <div>
-                <label className="block text-lg text-[#003266] mb-2">Preferred Time</label>
-                <input
-                  type="time"
-                  name="time"
-                  value={appointmentData.time}
-                  onChange={handleAppointmentChange}
-                  className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                />
-                {appointmentErrors.time && <p className="text-red-500 mt-1">{appointmentErrors.time}</p>}
-              </div>
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setShowAppointmentForm(false)}
-                  className="bg-gray-500 text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
-                >
-                 Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      );
-    }
+    // if (showAppointmentForm) {
+    //   return (
+    //     <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
+    //       <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
+    //         <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">Appointment Form</h1>
+    //         <form onSubmit={handleAppointmentSubmit} className="space-y-6">
+    //           <div>
+    //             <label className="block text-lg text-[#003266] mb-2">Full Name</label>
+    //             <input
+    //               type="text"
+    //               name="name"
+    //               value={appointmentData.name}
+    //               onChange={handleAppointmentChange}
+    //               className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+    //               placeholder="Enter your full name"
+    //             />
+    //             {appointmentErrors.name && <p className="text-red-500 mt-1">{appointmentErrors.name}</p>}
+    //           </div>
+    //           <div>
+    //             <label className="block text-lg text-[#003266] mb-2">Email</label>
+    //             <input
+    //               type="email"
+    //               name="email"
+    //               value={appointmentData.email}
+    //               onChange={handleAppointmentChange}
+    //               className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+    //               placeholder="Enter your email"
+    //             />
+    //             {appointmentErrors.email && <p className="text-red-500 mt-1">{appointmentErrors.email}</p>}
+    //           </div>
+    //           <div>
+    //             <label className="block text-lg text-[#003266] mb-2">Phone Number</label>
+    //             <input
+    //               type="tel"
+    //               name="phone"
+    //               value={appointmentData.phone}
+    //               onChange={handleAppointmentChange}
+    //               className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+    //               placeholder="Enter your phone number"
+    //             />
+    //             {appointmentErrors.phone && <p className="text-red-500 mt-1">{appointmentErrors.phone}</p>}
+    //           </div>
+    //           <div>
+    //             <label className="block text-lg text-[#003266] mb-2">Preferred Date</label>
+    //             <input
+    //               type="date"
+    //               name="date"
+    //               value={appointmentData.date}
+    //               onChange={handleAppointmentChange}
+    //               className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+    //             />
+    //             {appointmentErrors.date && <p className="text-red-500 mt-1">{appointmentErrors.date}</p>}
+    //           </div>
+    //           <div>
+    //             <label className="block text-lg text-[#003266] mb-2">Preferred Time</label>
+    //             <input
+    //               type="time"
+    //               name="time"
+    //               value={appointmentData.time}
+    //               onChange={handleAppointmentChange}
+    //               className="w-full px-4 py-3 rounded-lg shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+    //             />
+    //             {appointmentErrors.time && <p className="text-red-500 mt-1">{appointmentErrors.time}</p>}
+    //           </div>
+    //           <div className="flex items-center justify-between">
+    //             <button
+    //               type="button"
+    //               onClick={() => setShowAppointmentForm(false)}
+    //               className="bg-gray-500 text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 hover:bg-gray-600"
+    //             >
+    //               Cancel
+    //             </button>
+    //             <button
+    //               type="submit"
+    //               className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
+    //             >
+    //              Submit
+    //             </button>
+    //           </div>
+    //         </form>
+    //       </div>
+    //     </div>
+    //   );
+    // }
      return (
       <div className="min-h-auto bg-gray-100 pt-32 px-4 top-0 pb-16">
         <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8
@@ -307,18 +307,29 @@ function LifeProtection() {
             </div>
           </div>
           <div className="mt-10 flex items-center justify-between">
-            <button
-            onClick={handleBookAppointment}
-              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
+
+            <Link
+              to="/FNA/AppointmentForm"
+              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg 
+                        transition-all duration-200 border-2 border-transparent 
+                        hover:border-[#003266] hover:bg-white hover:text-[#003266] 
+                        hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
             >
               Book an Appointment
-            </button>
-            <button
-              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg transition-all duration-200 border-2 border-transparent hover:border-[#003266] hover:bg-white hover:text-[#003266] hover:-translate-y-0.5 hover:shadow-lg"
+            </Link>
+
+            <Link
+              to="/FNA/OurServices"
+              className="bg-[#003266] text-white px-6 py-3 rounded-md font-medium text-lg 
+                        transition-all duration-200 border-2 border-transparent 
+                        hover:border-[#003266] hover:bg-white hover:text-[#003266] 
+                        hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
             >
               View Recommendations
-            </button>
+            </Link>
+
           </div>
+
         </div>
       </div>
     );

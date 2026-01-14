@@ -19,6 +19,7 @@ import LifeProHealth from "./pages/services/yes_services/LifeProHealth.jsx";
 import SavEdRe from "./pages/services/yes_services/SavEdRe.jsx";
 import LifeProtectionDeets from "./pages/services/services-deets/LifeProtectionDeets";
 import HealthDeets from "./pages/services/services-deets/HealthDeets.jsx";
+import AppointmentForm from "./pages/AppointmentForm.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -27,6 +28,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/" element={<FNAHomePage />} />
         <Route path="/FNA/Homepage" element={<FNAHomePage />} />
+        <Route path="/FNA/AppointmentForm" element={<AppointmentForm />} />
+
+        {/* If user chose yes */}
         <Route path="/services/protection-health/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/savings" element={<Savings />} />
         <Route path="/services/protection-health/LifeProtection" element={<LifeProtection />} />
@@ -36,12 +40,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/services/yes_services/LifeProHealth" element={<LifeProHealth />} /> 
         <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} />     
 
-        {/* If user chose no */}
-        {/* <Route path="/services/savings-investments/education" element={<Education />} />
-        <Route path="/services/savings-investments/retirement" element={<Retirement />} /> */}   
+        {/* If user chose no */} 
         <Route path="/FNA/OurServices" element={<OurServices />} />
         <Route path="/FNA/life-protection/details" element={<LifeProtectionDeets />} />
         <Route path="/FNA/health/details" element={<HealthDeets />} />
+
       </Routes>  
       <Footer />
     </BrowserRouter>

@@ -20,6 +20,9 @@ import SavEdRe from "./pages/services/yes_services/SavEdRe.jsx";
 import LifeProtectionDeets from "./pages/services/services-deets/LifeProtectionDeets";
 import HealthDeets from "./pages/services/services-deets/HealthDeets.jsx";
 import AppointmentForm from "./pages/AppointmentForm.jsx";
+import EducationDeets from "./pages/services/services-deets/EducationDeets.jsx";
+import RetirementDeets from "./pages/services/services-deets/RetirementDeets.jsx";
+import SavingsDeets from "./pages/services/services-deets/SavingsDeets.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -44,9 +47,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/FNA/OurServices" element={<OurServices />} />
         <Route path="/FNA/life-protection/details" element={<LifeProtectionDeets />} />
         <Route path="/FNA/health/details" element={<HealthDeets />} />
+        <Route path="/FNA/education/details" element={<EducationDeets />} />
+        <Route path="/FNA/retirement/details" element={<RetirementDeets />} />
+        <Route path="/FNA/savings/details" element={<SavingsDeets />} />
 
       </Routes>  
-      <Footer />
+      <Footer /> 
     </BrowserRouter>
   </React.StrictMode>
 );

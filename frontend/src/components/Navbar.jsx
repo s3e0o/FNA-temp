@@ -47,7 +47,7 @@ const Navbar = () => {
                         Education
                     </Link>
 
-                    <Link to="/services/savings-investment/Retirement"className="block px-6 py-3 text-center text-gray-800 rounded-md
+                    <Link to="/services/savings-investments/Retirement"className="block px-6 py-3 text-center text-gray-800 rounded-md
                             transition-colors duration-100 hover:bg-[#003266] hover:text-white">
                         Retirement
                     </Link>

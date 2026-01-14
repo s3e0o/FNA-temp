@@ -127,12 +127,13 @@ export default function LifeProtectionDeets() {
                 </div>
 
                 {/* Take the test (separate) */}
-                <button
-                className="w-full bg-[#0b3a6e] border border-[#003266] text-white py-3 rounded-lg shadow-lg
-                            hover:bg-[#F4B43C] transition cursor-pointer"
-                >
-                Take the test
-                </button>
+                <Link
+                    to="/services/protection-health/LifeProtection"
+                    className="w-full bg-[#0b3a6e] border border-[#003266] text-white py-3 rounded-lg shadow-lg
+                              hover:bg-[#F4B43C] transition cursor-pointer text-center"
+                  >
+                    Take the test
+                  </Link>
             </div>
             )}
 

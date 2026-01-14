@@ -403,9 +403,9 @@ export default function AppointmentForm() {
                 checked={formData.consent}
                 onChange={handleChange}
                 onBlur={() => validateField("consent", formData.consent)}
-                className="mt-1 h-5 w-5 text-[#3a5a99] rounded focus:ring-[#3a5a99] border-gray-300"
+                className="mt-1 h-5 w-5 text-[#3a5a99] rounded focus:ring-[#3a5a99] border-gray-300 cursor-pointer"
               />
-              <label htmlFor="consent" className="text-sm text-gray-700 leading-relaxed">
+              <label htmlFor="consent" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
                 I understand that personal information will be needed to complete my Financial Needs Analysis. I authorize Caelum Financial Solution to use and process my personal information, including contacting me regarding insurance and related services.
               </label>
             </div>
@@ -418,7 +418,7 @@ export default function AppointmentForm() {
                 disabled={isSubmitting}
                 className={`${
                   isSubmitting ? "bg-gray-400" : "bg-[#0a2e5c] hover:bg-[#0d3a75]"
-                } text-white font-semibold px-8 py-3.5 rounded-lg text-base shadow-md transition duration-200 w-full max-w-xs`}
+                } text-white font-semibold px-8 py-3.5 rounded-lg text-base shadow-md transition duration-200 w-full max-w-xs cursor-pointer`}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>

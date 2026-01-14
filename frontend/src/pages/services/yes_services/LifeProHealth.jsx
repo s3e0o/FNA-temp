@@ -9,7 +9,7 @@ const services = [
     title: "LIFE PROTECTION",
     desc: "To protect your family's quality of life in case of uncertainties.",
     image: life,
-    link: "#",
+    link: "/services/protection-health/LifeProtection",
   },
   {
     title: "HEALTH",
@@ -77,15 +77,16 @@ export default function LifeProHealth() {
                 {service.desc}
               </p>
 
-              {/* Learn More (without link) */}
-              <div
+              {/* Learn More */}
+              <Link
+                to={service.link}
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
                            cursor-default"
               >
                 Take the test →
-              </div>
+              </Link>
             </div>
           </div>
         ))}

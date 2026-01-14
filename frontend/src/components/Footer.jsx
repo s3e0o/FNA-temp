@@ -24,8 +24,8 @@ const Footer = () => {
               Quezon City, Metro Manila
             </a>
 
-            <a href="mailto:admin@caelumfinancialsolutions.com">
-              admin@caelumfinancialsolutions.com
+            <a href="mailto:admin@caelumfinancials.onmicrosoft.com">
+              admin@caelumfinancials.onmicrosoft.com
             </a>
             
             <a href="tel:09654654844">

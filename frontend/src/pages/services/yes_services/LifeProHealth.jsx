@@ -28,14 +28,14 @@ export default function LifeProHealth() {
     <div className="px-12 py-20">
       {/* Back */}
       <Link
-        to="/FNA/HomePage"
+        to="/FNA/door"
         className="relative inline-block text-[#395998] font-medium mb-5 mt-10
                    after:content-[''] after:absolute after:left-0 after:-bottom-1
                    after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
                    after:transition-all after:duration-300
                    hover:after:w-full"
       >
-        ← Back
+        ← Back to Choose Your Door
       </Link>
 
       {/* Title */}
@@ -80,10 +80,10 @@ export default function LifeProHealth() {
               {/* Learn More */}
               <Link
                 to={service.link}
-                className="mt-4 text-sm font-medium text-white flex items-center gap-1
+                className="mt-4 text-sm font-medium text-white hover:text-[#F4B43C] flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
-                           cursor-default"
+                           cursor-default cursor-pointer"
               >
                 Take the test →
               </Link>

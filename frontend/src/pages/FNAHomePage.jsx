@@ -21,7 +21,7 @@ const FNAHomePage = () => {
 
           <div className="fna-actions flex gap-4 justify-center">
             <button
-              onClick={() => navigate("/FNA/Yes")}
+              onClick={() => navigate("/FNA/door")}
               className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
             >
               Yes

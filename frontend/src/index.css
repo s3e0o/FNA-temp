@@ -1,9 +1,23 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Axiforma';
+  font-family: 'Axiforma Regular';
+  src: url('./assets/fonts/Kastelov - Axiforma Regular.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma SemiBold';
   src: url('./assets/fonts/Kastelov - Axiforma SemiBold.otf') format('opentype');
   font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma Light';
+  src: url('./assets/fonts/Kastelov - Axiforma Light.otf') format('opentype');
+  /* font-weight: 600; */
   font-style: normal;
 }
 
@@ -298,7 +312,7 @@ body {
 .pyd-door {
   width: 100%;
   height: 100%;
-  background: rgba(57, 89, 152, 0.85); /* semi-transparent door */
+  background: rgba(57, 89, 152); /* semi-transparent door */
   border: 5px solid rgba(255, 255, 255, 0.9);
   transform-origin: left center;
   transition: transform 0.8s cubic-bezier(.4, 0, .2, 1);
@@ -362,3 +376,10 @@ body {
   pointer-events: none;
 }
 /* ===== End Pick Your Door Styles ===== */
+
+
+/* Corporate FNA Questionnaire Content*/
+.corp-q p {
+  font-family: 'Axiforma Light';
+  letter-spacing: 0.05em; 
+}

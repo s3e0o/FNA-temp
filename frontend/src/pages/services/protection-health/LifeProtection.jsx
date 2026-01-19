@@ -451,12 +451,12 @@ function LifeProtection() {
 
         <div className="mt-10 flex justify-between">
           {currentStep > 1 ? (
-            <button onClick={handleBack} className="bg-[#003266] text-white px-10 py-3 rounded-md">Previous</button>
+            <button onClick={handleBack} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">Previous</button>
           ) : (
-            <Link to="/services/protection-health" className="text-[#003266]">Back</Link>
+            <Link to="/services/yes_services/LifeProHealth" className="text-[#003266] cursor-pointer">Back</Link>
           )}
 
-          <button onClick={handleNext} className="bg-[#003266] text-white px-10 py-3 rounded-md">{currentStep===4?"Submit":"Next"}</button>
+          <button onClick={handleNext} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">{currentStep===4?"Submit":"Next"}</button>
         </div>
       </div>
     </div>

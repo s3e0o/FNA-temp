@@ -87,10 +87,10 @@ export default function SavEdRe() {
               {/* Take the test (without link) */}
               <Link
                 to={service.link}
-                className="mt-4 text-sm font-medium text-white flex items-center gap-1
+                className="mt-4 text-sm font-medium text-white hover:text-[#F4B43C] flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
-                           cursor-default"
+                           cursor-pointer"
               >
                 Take the test →
               </Link>

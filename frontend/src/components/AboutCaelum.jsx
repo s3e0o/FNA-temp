@@ -8,7 +8,7 @@ import "../index.css";
 
 const AboutCaelum = () => {
   return (
-    <main className="w-full">
+    <main className="w-full mt-15">
      <section className="bg-white py-20 px-6">
   <div className="max-w-6xl mx-auto grid gap-10 md:grid-cols-3 items-start">
     

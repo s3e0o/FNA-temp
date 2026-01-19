@@ -49,7 +49,6 @@ function App() {
     </Router>
   );
 }
-
 function NotFound() {
   return (
     <div style={{ padding: '40px', textAlign: 'center' }}>

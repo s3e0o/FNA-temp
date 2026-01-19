@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
+import AboutCaelum from "./components/AboutCaelum.jsx";
 
 import LifeProtection from "./pages/services/protection-health/LifeProtection.jsx";
 import HealthServices from "./pages/services/protection-health/HealthServices.jsx";
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<FNAHomePage />} />
         <Route path="/FNA/Homepage" element={<FNAHomePage />} />
         <Route path="/FNA/AppointmentForm" element={<AppointmentForm />} />
+        <Route path="/about" element={<AboutCaelum />} />
 
         {/* If user chose yes */}
         <Route path="/services/protection-health/HealthServices" element={<HealthServices />} />

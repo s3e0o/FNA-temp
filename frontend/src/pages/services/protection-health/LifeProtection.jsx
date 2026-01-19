@@ -102,6 +102,7 @@ function LifeProtection() {
     }
   };
 
+  // Calculate minimum amount needed for life protection
   const computeResult = () => {
     const years = parseInt(lifeQuestion1);
     const totalMonthly = totalExpenses;
@@ -110,12 +111,10 @@ function LifeProtection() {
     // Total needed for all years = monthly expenses × 12 months × years
     const totalNeeded = totalMonthly * 12 * years;
     
-    // Subtract existing coverage
-    const remainingNeeded = Math.max(0, totalNeeded - existingCoverage);
+    // Subtract existing coverage to get minimum amount needed
+    const minimumAmountNeeded = Math.max(0, totalNeeded - existingCoverage);
     
-    // Calculate how many years to save if saving totalMonthly each month
-    if (totalMonthly === 0) return 0;
-    return (remainingNeeded / (12 * totalMonthly)).toFixed(2);
+    return minimumAmountNeeded.toFixed(2);
   };
 
   const handleExportPDF = async () => {
@@ -219,12 +218,12 @@ function LifeProtection() {
           <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">LIFE PROTECTION</h1>
 
           <p className="text-lg text-[#003266] text-center mt-6">
-            This represents the number of years to reach your life protection goal.
+            This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
           </p>
 
           <div className="flex justify-center mb-14 mt-6">
             <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-              {result} year/s
+              ₱{result}
             </div>
           </div>
 

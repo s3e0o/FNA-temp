@@ -248,3 +248,117 @@ body {
   @apply w-full rounded-md border border-gray-200 px-4 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700;
 }
 
+/* ===== Pick Your Door Styles ===== */
+.pyd-body {
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-family: Axiforma, sans-serif;
+}
+
+.pyd-container {
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.pyd-door-frame {
+  width: 200px;
+  height: 320px;
+  border: 6px solid #ccc;
+  background: #395998;
+  perspective: 1000px;
+  margin: 0 auto 30px;
+  position: relative;
+}
+
+.pyd-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: right;
+  color: white;
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.pyd-door-frame:hover .pyd-message {
+  opacity: 1;
+}
+
+.pyd-door {
+  width: 100%;
+  height: 100%;
+  background: rgba(57, 89, 152, 0.85); /* semi-transparent door */
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  transform-origin: left center;
+  transition: transform 0.8s cubic-bezier(.4, 0, .2, 1);
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+  box-shadow: inset -10px 0 20px rgba(0,0,0,0.25);
+}
+
+
+.pyd-door::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.pyd-door-frame:hover .pyd-door {
+  transform: rotateY(-90deg);
+}
+
+.pyd-container h3 {
+  color: #395998;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.pyd-doors {
+  display: flex;
+  gap: 80px;
+}
+
+/* Image behind the door */
+.pyd-door-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+  z-index: 1;
+  filter: brightness(0.9) contrast(1.05);
+}
+
+.pyd-door-image.active {
+  opacity: 1;
+}
+
+.pyd-door-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.10);
+  z-index: 1;
+  pointer-events: none;
+}
+/* ===== End Pick Your Door Styles ===== */

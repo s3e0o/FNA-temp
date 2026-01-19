@@ -22,6 +22,7 @@ import AppointmentForm from "./pages/AppointmentForm.jsx";
 import EducationDeets from "./pages/services/services-deets/EducationDeets.jsx";
 import RetirementDeets from "./pages/services/services-deets/RetirementDeets.jsx";
 import SavingsDeets from "./pages/services/services-deets/SavingsDeets.jsx";
+import Door from "./pages/services/yes_services/Door.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -34,14 +35,21 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/about" element={<AboutCaelum />} />
 
         {/* If user chose yes */}
+        <Route path="/FNA/door" element={<Door />} />
+
+        {/* Services 1 */}
+        <Route path="/services/yes_services/LifeProHealth" element={<LifeProHealth />} /> 
+        
+        {/* Services 2 */}
+        <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} />    
+
+        {/* Services Questionnaire */}
         <Route path="/services/protection-health/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/Savings" element={<Savings />} />
         <Route path="/services/protection-health/LifeProtection" element={<LifeProtection />} />
-        <Route path="/services/protection-health/health-services/HealthServices" element={<HealthServices />} />
         <Route path="/services/savings-investments/Education" element={<Education />} />
         <Route path="/services/savings-investments/Retirement" element={<Retirement />} />
-        <Route path="/services/yes_services/LifeProHealth" element={<LifeProHealth />} /> 
-        <Route path="/services/yes_services/SavEdRe" element={<SavEdRe />} />     
+        
 
         {/* If user chose no */} 
         <Route path="/FNA/OurServices" element={<OurServices />} />

@@ -35,14 +35,14 @@ export default function SavEdRe() {
     <div className="px-12 py-20">
       {/* Back */}
       <Link
-        to="/FNA/HomePage"
+        to="/FNA/door"
         className="relative inline-block text-[#395998] font-medium mb-5 mt-10
                    after:content-[''] after:absolute after:left-0 after:-bottom-1
                    after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
                    after:transition-all after:duration-300
                    hover:after:w-full"
       >
-        ← Back
+        ← Back to Choose Your Door
       </Link>
 
       {/* Title */}

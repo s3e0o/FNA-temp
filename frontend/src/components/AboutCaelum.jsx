@@ -2,11 +2,14 @@
 // React.js component – uses your existing project structure
 // Header and Footer are NOT included
 
-import React from "react";
+import React, {useEffect} from "react";
 import "../index.css";
 // import CaelumLogo from "../assets/images/cfb-removebg-preview.png";
 
 const AboutCaelum = () => {
+  useEffect(() => {
+      document.title = "About Us | Caelum Financial Solutions";
+    }, []);
   return (
     <main className="w-full mt-15">
      <section className="bg-white py-20 px-6">

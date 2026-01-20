@@ -56,7 +56,7 @@ export default function OurServices() {
                    after:transition-all after:duration-300
                    hover:after:w-full"
       >
-        Back to Home
+        ← Back to Home
       </Link>
 
       {/* Title */}
@@ -106,7 +106,7 @@ export default function OurServices() {
                            group-hover:opacity-100 group-hover:translate-y-0
                            hover:text-[#F4B43C] cursor-pointer"
               >
-                Learn More 
+                Learn More →
               </Link>
             </div>
           </div>

@@ -22,6 +22,12 @@ function Education() {
 
   const resultRef = useRef(null);
 
+  const formatCurrency = (value) => {
+    return value.toLocaleString('en-PH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
   // School options with annual fees
   const schoolOptions = [
     { name: "UP", fee: 75000 },
@@ -98,28 +104,48 @@ function Education() {
   };
 
   const computeResult = () => {
-    const yearsUntilCollege = getYearsUntilCollege();
+    const childAgeNum = parseInt(childAge);
+    const yearsUntilCollege = Math.max(0, 18 - childAgeNum);
     const annualFee = getAnnualFee();
     const alreadySaved = parseFloat(savedAmount) || 0;
-    
-    // Assume 4-year college program
-    const totalCollegeYears = 4;
-    const totalFeeToday = annualFee * totalCollegeYears;
-    
-    // Inflation multiplier (assuming 4% annual inflation)
-    const inflationMultiplier = Math.pow(1.04, yearsUntilCollege);
-    
-    // Future value adjusted for inflation
-    const futureValue = totalFeeToday * inflationMultiplier;
-    
-    // Subtract what's already saved
+
+    // Official multiplier table from PDF: "4 yr Education @ 8% p.a."
+    const multiplierTable = {
+      0: 1.0000, // no inflation if starting now
+      1: 1.2167,
+      2: 1.3140,
+      3: 1.4191,
+      4: 1.5326,
+      5: 1.6552,
+      6: 1.7877,
+      7: 1.9307,
+      8: 2.0851,
+      9: 2.2519,
+      10: 2.4321,
+      11: 2.6267,
+      12: 2.8368,
+      13: 3.0637,
+      14: 3.3088,
+      15: 3.5735,
+      16: 3.8594,
+      17: 4.1682,
+      18: 4.5016,
+      19: 4.8618,
+      20: 5.2507,
+    };
+
+    const multiplier = multiplierTable[yearsUntilCollege] || 1.0; // fallback to 1.0
+
+    // Formula from PDF: [(B × 4) × multiplier] – C
+    const totalNeededToday = annualFee * 4;
+    const futureValue = totalNeededToday * multiplier;
     const remainingNeeded = Math.max(0, futureValue - alreadySaved);
-    
+
     return {
       yearsUntilCollege,
       annualFee,
-      totalFeeToday,
-      futureValue,
+      totalNeededToday,
+      futureValue,        // This is the "Total amount needed for 4-year college"
       alreadySaved,
       remainingNeeded
     };
@@ -234,6 +260,77 @@ function Education() {
     return (
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+
+          {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
+          <div
+            ref={resultRef}
+            style={{
+              position: 'absolute',
+              left: '-9999px',
+              width: '210mm',
+              minHeight: '297mm',
+              padding: '20mm',
+              boxSizing: 'border-box',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontSize: '12pt',
+              color: '#000',
+              backgroundColor: '#fff',
+            }}
+          >
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
+              <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>EDUCATION</h2>
+            </div>
+
+            {/* Goal Statement */}
+            <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
+              To plan for your child’s 4-year college education based on current savings and future needs.
+            </div>
+
+            {/* Inputs Section */}
+            <div style={{ marginBottom: '24px' }}>
+              <p><strong>1.</strong> Child’s age: <u>&nbsp;&nbsp;{childAge || '—'} years&nbsp;&nbsp;</u></p>
+              <p><strong>2.</strong> Selected school: <u>&nbsp;&nbsp;{selectedSchool === 'Other' ? `Other (₱${parseFloat(customSchoolFee).toLocaleString('en-PH', { minimumFractionDigits: 2 })})` : selectedSchool || '—'}&nbsp;&nbsp;</u></p>
+              <p><strong>3.</strong> Amount already saved: ₱<u>&nbsp;&nbsp;{parseFloat(savedAmount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
+            </div>
+
+            {/* Results Section */}
+            {submitted && (() => {
+              const result = computeResult();
+              const monthlySavings = computeMonthlySavings();
+              return (
+                <div style={{ marginBottom: '24px' }}>
+                  <p><strong>Years until college:</strong> {result.yearsUntilCollege} years</p>
+                  <p><strong>Total amount needed for 4-year college (future value):</strong> ₱{result.futureValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                  <p><strong>Remaining amount to save:</strong> ₱{result.remainingNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                  <p><strong>Recommended monthly savings (5% annual return):</strong> ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                </div>
+              );
+            })()}
+
+            {/* Footer Disclaimer */}
+            <div style={{
+              position: 'absolute',
+              bottom: '20mm',
+              left: '20mm',
+              right: '20mm',
+              fontSize: '9pt',
+              borderTop: '1px solid #000',
+              paddingTop: '8px',
+              color: '#555'
+            }}>
+              <p style={{ margin: '4px 0' }}>
+                <em>*Assumes 8% annual education cost inflation and 5% annual investment return. Actual results may vary.</em>
+              </p>
+              <p style={{ margin: '4px 0' }}>
+                <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
+              </p>
+              <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
+                Caelum Financial Solutions
+              </p>
+            </div>
+          </div>
           <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm">Export to PDF</button>
 
           <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">EDUCATION</h1>
@@ -253,14 +350,21 @@ function Education() {
             <div className="text-center">
               <p className="text-lg text-[#003266] mb-2">Total amount needed for 4-year college:</p>
               <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{result.futureValue.toFixed(2)}
+                ₱{formatCurrency(result.futureValue)}
               </div>
             </div>
 
             <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Monthly savings needed:</p>
+              <p className="text-lg text-[#003266] mb-2">Remaining amount needed to save:</p>
               <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{monthlySavings.toFixed(2)}
+                ₱{formatCurrency(result.remainingNeeded)}
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-lg text-[#003266] mb-2">Monthly savings needed (5% annual return):</p>
+              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                ₱{formatCurrency(monthlySavings)}
               </div>
             </div>
           </div>

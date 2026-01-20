@@ -156,6 +156,73 @@ function HealthServices() {
     return (
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+
+          {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
+          <div
+            ref={resultRef}
+            style={{
+              position: 'absolute',
+              left: '-9999px',
+              width: '210mm',
+              minHeight: '297mm',
+              padding: '20mm',
+              boxSizing: 'border-box',
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              fontSize: '12pt',
+              color: '#000',
+              backgroundColor: '#fff',
+            }}
+          >
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
+              <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>HEALTH</h2>
+            </div>
+
+            {/* Goal Statement */}
+            <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
+              To build a health fund for serious illness or medical emergencies
+            </div>
+
+            {/* Inputs Section */}
+            <div style={{ marginBottom: '24px' }}>
+              <p><strong>A.</strong> How much do you need for your health fund? ₱<u>&nbsp;&nbsp;{parseFloat(healthQuestion1).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
+              <p><strong>B.</strong> How much are you willing to set aside monthly for your health fund? ₱<u>&nbsp;&nbsp;{parseFloat(healthQuestion2).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
+            </div>
+
+            {/* Calculation Result */}
+            <div style={{ marginBottom: '20px' }}>
+              <p>
+                This is the number of years it will take to reach your health fund goal based on your monthly contribution.
+              </p>
+              <p style={{ marginTop: '12px' }}>
+                <strong>Formula:</strong> A ÷ (12 × B) = {healthQuestion1} ÷ (12 × {healthQuestion2}) ={' '}
+                <strong>{result} year(s)</strong>
+              </p>
+            </div>
+
+            {/* Footer Disclaimer */}
+            <div style={{
+              position: 'absolute',
+              bottom: '20mm',
+              left: '20mm',
+              right: '20mm',
+              fontSize: '9pt',
+              borderTop: '1px solid #000',
+              paddingTop: '8px',
+              color: '#555'
+            }}>
+              <p style={{ margin: '4px 0' }}>
+                <em>*Assumes consistent monthly contributions with no investment growth. Actual time may vary if returns are earned.</em>
+              </p>
+              <p style={{ margin: '4px 0' }}>
+                <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
+              </p>
+              <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
+                Caelum Financial Solutions
+              </p>
+            </div>
+          </div>
           <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm">Export to PDF</button>
 
           <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">HEALTH</h1>

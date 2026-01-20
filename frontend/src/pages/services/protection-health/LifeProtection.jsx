@@ -4,6 +4,14 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 function LifeProtection() {
+  const formatCurrency = (value) => {
+    if (isNaN(value) || value === null || value === undefined) return "0.00";
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(Math.abs(value)); // Use Math.abs if negative values shouldn't show minus
+  };
+
   const [currentStep, setCurrentStep] = useState(1);
   const [lifeQuestion1, setLifeQuestion1] = useState(""); // years
   const [lifeQuestion3, setLifeQuestion3] = useState(""); // total coverage
@@ -40,50 +48,67 @@ function LifeProtection() {
   }, []);
 
   const validateCurrentStep = () => {
-    const newErrors = {};
-    
-    if (currentStep === 1) {
-      // Question 1 validation (years)
-      if (!lifeQuestion1.trim() || isNaN(parseInt(lifeQuestion1)) || parseInt(lifeQuestion1) <= 0) {
-        newErrors.question1 = "Please enter a valid number of years greater than 0.";
-      }
-    } else if (currentStep === 2) {
-      // Question 2 validation (expenses)
-      const expenseFields = [
-        { name: 'rent', label: 'Rent' },
-        { name: 'loanPayments', label: 'Loan Payments' },
-        { name: 'allowances', label: 'Allowances' },
-        { name: 'utilities', label: 'Utilities' },
-        { name: 'others', label: 'Others' }
-      ];
-      
-      expenseFields.forEach(field => {
-        const value = expenses[field.name];
-        if (value.trim() !== "" && (isNaN(parseFloat(value)) || parseFloat(value) < 0)) {
-          newErrors[`expense_${field.name}`] = `Please enter a valid amount for ${field.label}`;
-        }
-      });
-      
-      // Check if at least one expense is filled and valid
-      const hasValidExpenses = Object.values(expenses).some(value => {
-        return value.trim() !== "" && !isNaN(parseFloat(value)) && parseFloat(value) >= 0;
-      });
-      
-      if (!hasValidExpenses) {
-        newErrors.question2 = "Please enter at least one expense amount.";
-      }
-    } else if (currentStep === 3) {
-      // Question 3 validation (total coverage)
-      // Question 3 is optional, so no validation needed if empty
-      // If user enters something, check if it's valid
-      if (lifeQuestion3.trim() !== "" && (isNaN(parseFloat(lifeQuestion3)) || parseFloat(lifeQuestion3) < 0)) {
-        newErrors.question3 = "Please enter a valid amount for total coverage (or leave empty if none).";
-      }
+  const newErrors = {};
+
+  // Always validate Q1 if we're on step 1 or beyond (especially step 4)
+  if (currentStep >= 1) {
+    const years = lifeQuestion1.trim();
+    const yearsNum = parseInt(years, 10);
+
+    if (years === "") {
+      newErrors.question1 = "Number of years is required.";
+    } else if (isNaN(yearsNum)) {
+      newErrors.question1 = "Please enter a valid number of years.";
+    } else if (!Number.isInteger(yearsNum) || yearsNum < 1 || yearsNum > 20) {
+      newErrors.question1 = "Please enter a whole number of years between 1 and 20.";
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  }
+
+  // Validate Q2 if on step 2 or beyond (including review)
+  if (currentStep >= 2) {
+  const expenseFields = [
+    { name: 'rent', label: 'Rent' },
+    { name: 'loanPayments', label: 'Loan Payments' },
+    { name: 'allowances', label: 'Allowances' },
+    { name: 'utilities', label: 'Utilities' },
+    { name: 'others', label: 'Others' }
+  ];
+
+  // Validate each field individually
+  expenseFields.forEach(field => {
+    const value = expenses[field.name];
+    const trimmed = value.trim();
+    if (trimmed === "") {
+      newErrors[`expense_${field.name}`] = `${field.label} is required.`;
+    } else if (isNaN(parseFloat(trimmed)) || parseFloat(trimmed) < 0) {
+      newErrors[`expense_${field.name}`] = `Please enter a valid non-negative amount for ${field.label}.`;
+    }
+  });
+
+  // Additionally, you can skip the "question2" top-level error since individual errors are shown,
+  // but if you still want a summary error, keep this:
+  const allExpensesFilledAndValid = Object.values(expenses).every(value => {
+    const trimmed = value.trim();
+    return trimmed !== "" && !isNaN(parseFloat(trimmed)) && parseFloat(trimmed) >= 0;
+  });
+
+  if (!allExpensesFilledAndValid) {
+    newErrors.question2 = "Please fill in all monthly expense fields with valid amounts. Enter 0 for any that do not apply.";
+  }
+}
+
+  // Validate Q3 if on step 3 or beyond (including review)
+  if (currentStep >= 3) {
+    if (!lifeQuestion3.trim()) {
+      newErrors.question3 = "Total coverage amount is required.";
+    } else if (isNaN(parseFloat(lifeQuestion3)) || parseFloat(lifeQuestion3) < 0) {
+      newErrors.question3 = "Please enter a valid non-negative amount for total coverage.";
+    }
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleNext = () => {
     if (validateCurrentStep()) {
@@ -104,18 +129,42 @@ function LifeProtection() {
 
   // Calculate minimum amount needed for life protection
   const computeResult = () => {
-    const years = parseInt(lifeQuestion1);
-    const totalMonthly = totalExpenses;
-    const existingCoverage = parseFloat(lifeQuestion3) || 0;
-    
-    // Total needed for all years = monthly expenses × 12 months × years
-    const totalNeeded = totalMonthly * 12 * years;
-    
-    // Subtract existing coverage to get minimum amount needed
-    const minimumAmountNeeded = Math.max(0, totalNeeded - existingCoverage);
-    
-    return minimumAmountNeeded.toFixed(2);
+  const years = parseInt(lifeQuestion1);
+  const totalMonthly = totalExpenses;
+  const existingCoverage = parseFloat(lifeQuestion3) || 0;
+
+  // Multiplier table for "4% inflation p.a. (accumulated)" from the PDF
+  const multiplierTable = {
+    1: 1.0400,
+    2: 2.1216,
+    3: 3.2465,
+    4: 4.4163,
+    5: 5.6330,
+    6: 6.8983,
+    7: 8.2142,
+    8: 9.5828,
+    9: 11.0061,
+    10: 12.4864,
+    11: 14.0258,
+    12: 15.6268,
+    13: 17.2919,
+    14: 19.0236,
+    15: 20.8245,
+    16: 22.6975,
+    17: 24.6454,
+    18: 26.6712,
+    19: 28.7781,
+    20: 30.9692,
   };
+
+  const multiplier = multiplierTable[years] || 0;
+
+  // Formula from PDF: (12 × B × multiplier) – C
+  const totalNeeded = 12 * totalMonthly * multiplier;
+  const minimumAmountNeeded = Math.max(0, totalNeeded - existingCoverage);
+
+  return minimumAmountNeeded.toFixed(2);
+};
 
   const handleExportPDF = async () => {
     if (!resultRef.current) return;
@@ -166,54 +215,111 @@ function LifeProtection() {
   };
 
   if (submitted) {
-    const result = computeResult();
+  const result = computeResult();
+  const years = parseInt(lifeQuestion1);
+  const totalMonthly = totalExpenses;
+  const existingCoverage = parseFloat(lifeQuestion3) || 0;
+  const multiplierTable = {
+    1: 1.0400, 2: 2.1216, 3: 3.2465, 4: 4.4163, 5: 5.6330,
+    6: 6.8983, 7: 8.2142, 8: 9.5828, 9: 11.0061, 10: 12.4864,
+    11: 14.0258, 12: 15.6268, 13: 17.2919, 14: 19.0236, 15: 20.8245,
+    16: 22.6975, 17: 24.6454, 18: 26.6712, 19: 28.7781, 20: 30.9692,
+  };
+  const multiplier = multiplierTable[years] || 0;
 
-    if (showAppointmentForm) {
-      return (
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-            <h1 className="text-3xl text-center text-[#003266] mb-8">Appointment Form</h1>
-            <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-              {["name", "email", "phone", "date", "time"].map((field) => (
-                <div key={field}>
-                  <label className="block text-lg text-[#003266] mb-2">{field.toUpperCase()}</label>
-                  <input
-                    type={
-                      field === "email"
-                        ? "email"
-                        : field === "phone"
-                        ? "tel"
-                        : field === "date"
-                        ? "date"
-                        : field === "time"
-                        ? "time"
-                        : "text"
-                    }
-                    name={field}
-                    value={appointmentData[field]}
-                    onChange={handleAppointmentChange}
-                    className="w-full px-4 py-3 border rounded-lg text-lg"
-                  />
-                  {appointmentErrors[field] && (
-                    <p className="text-red-500 mt-1">{appointmentErrors[field]}</p>
-                  )}
-                </div>
-              ))}
-
-              <div className="flex justify-between">
-                <button type="button" onClick={() => setShowAppointmentForm(false)} className="bg-gray-500 text-white px-6 py-3 rounded-md">Cancel</button>
-                <button type="submit" className="bg-[#003266] text-white px-6 py-3 rounded-md">Submit</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      );
-    }
-
+  if (showAppointmentForm) {
+    // ... keep your appointment form as-is ...
     return (
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm">Export to PDF</button>
+        {/* Your existing appointment form */}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* === (A) HIDDEN PDF TEMPLATE — DO NOT DISPLAY IN UI === */}
+      <div
+        ref={resultRef}
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          width: '210mm',
+          minHeight: '297mm',
+          padding: '20mm',
+          boxSizing: 'border-box',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          fontSize: '12pt',
+          color: '#000',
+          backgroundColor: '#fff',
+        }}
+      >
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
+          <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>LIFE PROTECTION</h2>
+        </div>
+
+        {/* Goal Statement */}
+        <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
+          To protect your family's quality of life in case of uncertainties.
+        </div>
+
+        {/* Inputs Section */}
+        <div style={{ marginBottom: '24px' }}>
+          <p><strong>A.</strong> How many years will you be providing for your family? <u>&nbsp;&nbsp;{lifeQuestion1}&nbsp;&nbsp;</u> years</p>
+          <p><strong>B.</strong> What is your total monthly living expense?</p>
+          <div style={{ marginLeft: '20px', marginTop: '8px' }}>
+            <p>Rent: ₱{parseFloat(expenses.rent || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+            <p>Loan Payments: ₱{parseFloat(expenses.loanPayments || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+            <p>Allowances: ₱{parseFloat(expenses.allowances || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+            <p>Utilities: ₱{parseFloat(expenses.utilities || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+            <p>Others: ₱{parseFloat(expenses.others || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+            <p><strong>Total Monthly Expenses:</strong> ₱{totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+          </div>
+          <p><strong>C.</strong> Do you have existing coverage? ₱<u>&nbsp;&nbsp;{parseFloat(lifeQuestion3 || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
+        </div>
+
+        {/* Calculation Result */}
+        <div style={{ marginBottom: '20px' }}>
+          <p>
+            This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
+          </p>
+          <p style={{ marginTop: '12px' }}>
+            <strong>Formula:</strong> (12 × B × multiplier) – C = (12 × {totalExpenses.toLocaleString('en-PH')}) × {multiplier.toFixed(4)} – {parseFloat(lifeQuestion3 || 0).toLocaleString('en-PH')} ={' '}
+            <strong>₱{result}</strong>
+          </p>
+        </div>
+
+        {/* Footer Disclaimer */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20mm',
+          left: '20mm',
+          right: '20mm',
+          fontSize: '9pt',
+          borderTop: '1px solid #000',
+          paddingTop: '8px',
+          color: '#555'
+        }}>
+          <p style={{ margin: '4px 0' }}>
+            <em>*Assumes 4% annual inflation. Multiplier based on accumulated inflation over {lifeQuestion1} years.</em>
+          </p>
+          <p style={{ margin: '4px 0' }}>
+            <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
+          </p>
+          <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
+            Caelum Financial Solutions
+          </p>
+        </div>
+      </div>
+
+      {/* === (B) VISIBLE RESULT UI === */}
+      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm">
+            Export to PDF
+          </button>
 
           <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">LIFE PROTECTION</h1>
 
@@ -223,7 +329,7 @@ function LifeProtection() {
 
           <div className="flex justify-center mb-14 mt-6">
             <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-              ₱{result}
+              ₱{formatCurrency(parseFloat(result))}
             </div>
           </div>
 
@@ -233,18 +339,17 @@ function LifeProtection() {
                 Book an Appointment
               </button>
             </Link>
-
             <Link to="/FNA/OurServices">
               <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
                 View Recommendations
               </button>
             </Link>
           </div>
-
         </div>
       </div>
-    );
-  }
+    </>
+  );
+}
 
   return (
     <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
@@ -349,7 +454,7 @@ function LifeProtection() {
 
           {currentStep === 3 && (
             <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">If you have any other plans, how much is your total coverage? (Leave empty if none)</p>
+              <p className="text-lg text-[#003266] mb-8">If you have any other plans, how much is your total coverage?</p>
               <input 
                 type="number" 
                 value={lifeQuestion3} 

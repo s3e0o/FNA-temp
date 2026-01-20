@@ -23,6 +23,7 @@ import EducationDeets from "./pages/services/services-deets/EducationDeets.jsx";
 import RetirementDeets from "./pages/services/services-deets/RetirementDeets.jsx";
 import SavingsDeets from "./pages/services/services-deets/SavingsDeets.jsx";
 import Door from "./pages/services/yes_services/Door.jsx";
+import SavingsResult from "./components/SavingsResult.jsx";
 import Q1 from "./pages/corporate/Q1.jsx";
 // import Q2 from "./pages/corporate/Q2.jsx";
 // import Q3 from "./pages/corporate/Q3.jsx";
@@ -66,6 +67,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/fna/corporate/Q1" element={<Q1 />} />
         {/* <Route path="/fna/corporate/Q2" element={<Q2 />} />
         <Route path="/fna/corporate/Q3" element={<Q3 />} /> */}
+
+        {/* Components for FNA Results PDF Export */}
+        <Route path="/FNA/savings-result" element={<SavingsResult />} />
       </Routes>  
       <Footer /> 
     </BrowserRouter>

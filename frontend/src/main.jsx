@@ -26,7 +26,7 @@ import Door from "./pages/services/yes_services/Door.jsx";
 
 import Questions from "./pages/corporate/Questions.jsx";
 
-import HomePage from "./pages/corporate/HomePage";
+import HomePage from "./pages/corporate/HomePage.jsx";
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -72,7 +72,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         
         {/* FNA Corporate - Financial Wellness Assessment */}
-        <Route path="/financial-assessment" element={<HomePage />} />
+        <Route path="/fna/corporate/financial-assessment" element={<HomePage />} />
 
       </Routes>  
       <Footer /> 

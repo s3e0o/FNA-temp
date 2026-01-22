@@ -377,9 +377,6 @@ body {
 }
 /* ===== End Pick Your Door Styles ===== */
 
-<<<<<<< HEAD
-
-
 /* Corporate FNA Questionnaire Content*/
 .questions-container {
   font-family: 'Axiforma', sans-serif;
@@ -540,28 +537,30 @@ body {
   .option-item {
     padding: 12px;
   }
-=======
-/* ========== FNA CORPORATE PAGE ========== */
+
+}
+
+/* ========== FNA CORPORATE HOMEPAGE ========== */
 
 .fna-corporate-page {
   font-family: 'Axiforma', sans-serif;
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 10rem 3rem 7rem; 
+  padding: 4rem 3rem 2rem;
 }
 
 /* Hero Section */
 .hero-section {
-  max-width: 1400px; /* Significantly increased */
-  margin: 0 auto 0.50rem; /* Much larger bottom margin */
+  max-width: 1400px;
+  margin: 0 auto 2rem;
 }
 
 .hero-title {
-  font-size: 4.5rem; /* Increased from 5rem */
+  font-size: 4.5rem;
   font-weight: 900;
   line-height: 1.1;
-  margin-bottom: 3rem; /* Increased */
-  margin-top: 1rem; /* Increased */
+  margin-bottom: 2rem;
+  margin-top: 8rem;
   letter-spacing: -0.02em;
 }
 
@@ -576,34 +575,35 @@ body {
 .hero-description {
   font-size: 1.5rem;
   color: #4a5568;
-  max-width: 900px; 
+  max-width: 900px;
   line-height: 1.6;
-  margin-bottom: 4rem; 
+  margin-bottom: 3rem;
 }
 
 /* hero-actions layout */
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 3rem; 
+  gap: 2rem;
   flex-wrap: wrap;
-  margin-bottom: 3rem; 
+  margin-bottom: 2rem;
 }
 
 .assessment-btn {
   background: #003366;
   color: white;
-  padding: 1rem 3rem !important; 
-  border-radius: 24px !important;
-  font-size: 1.2rem; 
+  padding: 1rem 3rem;
+  border-radius: 24px;
+  font-size: 1.2rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem; /* Changed from 0rem to 0.5rem for spacing */
+  gap: 0.5rem;
   transition: all 0.3s ease;
   font-family: 'Axiforma', sans-serif;
   border: none;
   cursor: pointer;
+  margin-bottom: 5rem;
 }
 
 .assessment-btn:hover {
@@ -628,6 +628,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  margin-bottom: 5rem;
 }
 
 .time-icon {
@@ -635,7 +636,6 @@ body {
   height: 27px;
   flex-shrink: 0;
 }
-
 
 /* Stats */
 .inline-stats {
@@ -647,6 +647,7 @@ body {
   width: 85%;
   max-width: 1100px;
   padding: 1rem 0;
+  margin-bottom: 5rem;
 }
 
 .stat-box {
@@ -679,19 +680,19 @@ body {
 /* Sections Common */
 .why-section,
 .how-it-works-section {
-  max-width: none; /* Remove max-width constraint */
+  max-width: none;
   width: 100%;
-  margin: 8rem auto;
-  padding: 4rem 2rem;
+  margin: 3rem auto;
+  padding: 2rem;
   text-align: center;
 }
 
-.section-title {
+.homepage-section-title {
   font-size: 3rem;
   font-weight: 700;
   color: #000000;
+  text-align: center;
   margin-bottom: 1.5rem;
-  text-align: center; /* Ensure title is centered */
 }
 
 .section-description {
@@ -701,10 +702,11 @@ body {
   margin: 0 auto;
   text-align: center;
   padding: 0 1rem;
-  max-width: 1000px; 
-  margin-top: 2rem;
-  margin-bottom: 3rem;
+  max-width: 1000px;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
 }
+
 /* Features Section */
 .features-container {
   display: flex;
@@ -741,7 +743,7 @@ body {
 
 .feature-box:hover .feature-icon {
   transform: scale(1.1);
-  stroke: #F4B43C; /* Change icon color on hover */
+  stroke: #F4B43C;
 }
 
 .feature-box:hover .feature-title {
@@ -797,18 +799,17 @@ body {
 
 /* How It Works Section */
 .how-it-works-section {
-  padding: 4rem 1rem;
+  padding: 2rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
-  margin-bottom: 0.50rem;
 }
 
-.how-it-works-section .section-title {
-  font-size: 2.5rem;
+.how-it-works-section .homepage-section-title {
+  font-size: 3rem;
   font-weight: 800;
   color: #000000;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   font-family: 'Axiforma', sans-serif;
 }
 
@@ -818,7 +819,7 @@ body {
   justify-content: space-between;
   align-items: stretch;
   gap: 2rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .step {
@@ -860,16 +861,15 @@ body {
   font-weight: 400;
 }
 
-/* Step Connector - Remove or update */
+/* Step Connector */
 .step-connector {
   position: relative;
 }
 
-/* If you want to keep connectors but make them work with new layout */
 .step-connector::after {
   content: '';
   position: absolute;
-  top: 1.5rem; /* Adjusted for new layout */
+  top: 1.5rem;
   right: -1rem;
   width: 2rem;
   height: 2px;
@@ -888,13 +888,14 @@ body {
   }
   
   .step-connector::after {
-    display: none; /* Hide connectors on mobile */
+    display: none;
   }
 }
-/* CTA Section wrapper */
+
+/* CTA Section */
 .cta-section {
   width: 100%;
-  padding: 4rem 2rem;
+  padding: 3rem 2rem;
   text-align: center;
 }
 
@@ -929,5 +930,4 @@ body {
 
 .begin-journey-btn:hover .btn-arrow {
   transform: translateX(4px);
->>>>>>> 65f0588 (Update HomePage with features section, hover effects, and styling improvements)
 }

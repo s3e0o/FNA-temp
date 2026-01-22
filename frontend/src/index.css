@@ -378,8 +378,165 @@ body {
 /* ===== End Pick Your Door Styles ===== */
 
 
+
 /* Corporate FNA Questionnaire Content*/
-.corp-q p {
-  font-family: 'Axiforma Light';
-  letter-spacing: 0.05em; 
+.questions-container {
+  font-family: 'Axiforma', sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.logo {
+  height: 40px;
+  object-fit: contain;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  margin: 15px 0;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  transition: width 0.3s ease;
+}
+
+.question-section {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  margin: 20px 0;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.section-title::before {
+  content: "📋";
+  margin-right: 8px;
+}
+
+.sub-title {
+  font-size: 14px;
+  color: #007bff;
+  margin-bottom: 20px;
+  font-style: italic;
+  font-weight: 250;
+}
+
+.question-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.option-item:hover {
+  background: #f0f0f0;
+}
+
+.option-item input[type="radio"] {
+  margin-right: 12px;
+  accent-color: #007bff;
+  width: 20px;
+  height: 20px;
+}
+
+.option-label {
+  font-size: 16px;
+  flex-grow: 1;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.btn-prev,
+.btn-continue {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-prev {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn-prev:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-continue {
+  background: #007bff;
+  color: white;
+}
+
+.btn-continue:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .questions-container {
+    padding: 10px;
+  }
+
+  .question-title {
+    font-size: 20px;
+  }
+
+  .option-item {
+    padding: 12px;
+  }
 }

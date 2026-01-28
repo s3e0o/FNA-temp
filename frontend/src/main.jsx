@@ -23,11 +23,8 @@ import EducationDeets from "./pages/services/services-deets/EducationDeets.jsx";
 import RetirementDeets from "./pages/services/services-deets/RetirementDeets.jsx";
 import SavingsDeets from "./pages/services/services-deets/SavingsDeets.jsx";
 import Door from "./pages/services/yes_services/Door.jsx";
-<<<<<<< HEAD
 import Questions from "./pages/corporate/Questions.jsx";
-=======
 import HomePage from "./pages/corporate/HomePage";
->>>>>>> 65f0588 (Update HomePage with features section, hover effects, and styling improvements)
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -64,17 +61,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/FNA/retirement/details" element={<RetirementDeets />} />
         <Route path="/FNA/savings/details" element={<SavingsDeets />} />
 
-<<<<<<< HEAD
         {/* Corporate FNA */}
         <Route path="/fna/corporate/questions" element={<Questions />} />
+        <Route path="/fna/corporate/homepage" element={<HomePage />} />
 
         {/* Components for FNA Results PDF Export */}
-=======
-        
-        {/* FNA Corporate - Financial Wellness Assessment */}
-        <Route path="/financial-assessment" element={<HomePage />} />
-
->>>>>>> 65f0588 (Update HomePage with features section, hover effects, and styling improvements)
       </Routes>  
       <Footer /> 
     </BrowserRouter>

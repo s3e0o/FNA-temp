@@ -1,7 +1,11 @@
 // Questions.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Questions = () => {
+  useEffect(() => {
+        document.title = "Corporate FNA Survey | Financial Needs Analysis";
+      }, []);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
 

@@ -36,7 +36,7 @@ const Door = () => {
 
   return (
     <div className="pyd-body">
-      <div className="text-left mb-10">
+      <div className="text-left mb-10 mr-15">
         <h1 className="text-2xl md:text-3xl font-bold text-[#0a2e5c]">
           Choose Your Door
         </h1>

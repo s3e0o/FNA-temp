@@ -316,8 +316,18 @@ function LifeProtection() {
 
       {/* === (B) VISIBLE RESULT UI === */}
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Link
+          to="/FNA/door"
+          className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+                      after:content-[''] after:absolute after:left-0 after:-bottom-1
+                      after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                      after:transition-all after:duration-300
+                      hover:after:w-full"
+        >
+          ← Back to Doors
+        </Link>
         <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm">
+          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">
             Export to PDF
           </button>
 

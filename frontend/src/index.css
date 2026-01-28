@@ -377,9 +377,6 @@ body {
 }
 /* ===== End Pick Your Door Styles ===== */
 
-<<<<<<< HEAD
-
-
 /* Corporate FNA Questionnaire Content*/
 .questions-container {
   font-family: 'Axiforma', sans-serif;
@@ -540,7 +537,7 @@ body {
   .option-item {
     padding: 12px;
   }
-=======
+}
 /* ========== FNA CORPORATE PAGE ========== */
 
 .fna-corporate-page {
@@ -929,5 +926,4 @@ body {
 
 .begin-journey-btn:hover .btn-arrow {
   transform: translateX(4px);
->>>>>>> 65f0588 (Update HomePage with features section, hover effects, and styling improvements)
 }

@@ -1,9 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 const HomePage = () => {
   const handleBeginJourney = () => {
     console.log('Starting assessment...');
   };
+
+  useEffect(() => {
+      document.title = "Corporate FNA | Financial Needs Analysis";
+    }, []);
 
   return (
     <div className="fna-corporate-page">

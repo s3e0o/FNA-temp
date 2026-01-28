@@ -177,6 +177,16 @@ const parseNumber = (value) => {
 
     return (
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Link
+          to="/FNA/door"
+          className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+                      after:content-[''] after:absolute after:left-0 after:-bottom-1
+                      after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                      after:transition-all after:duration-300
+                      hover:after:w-full"
+        >
+          ← Back to Doors
+        </Link>
         <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
       {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
         <div

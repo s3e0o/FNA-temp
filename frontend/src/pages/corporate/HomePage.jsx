@@ -58,8 +58,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="why-assessment-section">
-        <h2 className="section-title">Why Take the Assessment?</h2>
+      <section className="why-section">
+        <h2 className="homepage-section-title">Why Take the Assessment?</h2>
         <p className="section-description">Our comprehensive quiz evaluates multiple dimensions of your financial life to provide a complete picture of your financial wellness.</p>
         
         <div className="features-container">
@@ -94,7 +94,7 @@ const HomePage = () => {
       </section>
 
       <section className="how-it-works-section">
-        <h2 className="section-title header-font">How It Works</h2>
+        <h2 className="homepage-section-title header-font">How It Works</h2>
         
         <div className="steps-grid">
           <div className="step step-connector">

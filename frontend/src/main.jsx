@@ -61,11 +61,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/FNA/retirement/details" element={<RetirementDeets />} />
         <Route path="/FNA/savings/details" element={<SavingsDeets />} />
 
+
         {/* Corporate FNA */}
         <Route path="/fna/corporate/questions" element={<Questions />} />
         <Route path="/fna/corporate/homepage" element={<HomePage />} />
+        
+        {/* FNA Corporate - Financial Wellness Assessment */}
+        <Route path="/financial-assessment" element={<HomePage />} />
 
-        {/* Components for FNA Results PDF Export */}
       </Routes>  
       <Footer /> 
     </BrowserRouter>

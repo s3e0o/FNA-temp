@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import HealthResultPDF from "../../../components/pdf/HealthResultPDF.jsx"; // adjust path as needed
 
 function HealthServices() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -9,15 +10,6 @@ function HealthServices() {
   const [healthQuestion2, setHealthQuestion2] = useState("");
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
-  const [appointmentData, setAppointmentData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-  });
-  const [appointmentErrors, setAppointmentErrors] = useState({});
 
   const resultRef = useRef(null);
 
@@ -80,188 +72,62 @@ function HealthServices() {
     pdf.save("Health-Services-Result.pdf");
   };
 
-  const handleBookAppointment = () => setShowAppointmentForm(true);
-  
-  const handleAppointmentChange = (e) => {
-    const { name, value } = e.target;
-    setAppointmentData({ ...appointmentData, [name]: value });
-  };
-  
-  const validateAppointment = () => {
-    const newErrors = {};
-    if (!appointmentData.name.trim()) newErrors.name = "Name is required.";
-    if (!appointmentData.email.trim() || !/\S+@\S+\.\S+/.test(appointmentData.email))
-      newErrors.email = "Valid email is required.";
-    if (!appointmentData.phone.trim()) newErrors.phone = "Phone number is required.";
-    if (!appointmentData.date) newErrors.date = "Preferred date is required.";
-    if (!appointmentData.time) newErrors.time = "Preferred time is required.";
-    setAppointmentErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  const handleAppointmentSubmit = (e) => {
-    e.preventDefault();
-    if (validateAppointment()) {
-      alert("Appointment booked successfully!");
-      setShowAppointmentForm(false);
-      setAppointmentData({ name: "", email: "", phone: "", date: "", time: "" });
-    }
-  };
-
   if (submitted) {
     const result = computeResult();
 
-    if (showAppointmentForm) {
-      return (
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-            <h1 className="text-3xl text-center text-[#003266] mb-8">Appointment Form</h1>
-            <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-              {["name", "email", "phone", "date", "time"].map((field) => (
-                <div key={field}>
-                  <label className="block text-lg text-[#003266] mb-2">{field.toUpperCase()}</label>
-                  <input
-                    type={
-                      field === "email"
-                        ? "email"
-                        : field === "phone"
-                        ? "tel"
-                        : field === "date"
-                        ? "date"
-                        : field === "time"
-                        ? "time"
-                        : "text"
-                    }
-                    name={field}
-                    value={appointmentData[field]}
-                    onChange={handleAppointmentChange}
-                    className="w-full px-4 py-3 border rounded-lg text-lg"
-                  />
-                  {appointmentErrors[field] && (
-                    <p className="text-red-500 mt-1">{appointmentErrors[field]}</p>
-                  )}
-                </div>
-              ))}
-
-              <div className="flex justify-between">
-                <button type="button" onClick={() => setShowAppointmentForm(false)} className="bg-gray-500 text-white px-6 py-3 rounded-md">Cancel</button>
-                <button type="submit" className="bg-[#003266] text-white px-6 py-3 rounded-md">Submit</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        <Link
-            to="/FNA/door"
-            className="relative inline-block text-[#395998] font-medium mb-5 ml-10
-                        after:content-[''] after:absolute after:left-0 after:-bottom-1
-                        after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                        after:transition-all after:duration-300
-                        hover:after:w-full"
-          >
-            ← Back to Doors
-          </Link>
-        <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-
-          {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
-          <div
-            ref={resultRef}
-            style={{
-              position: 'absolute',
-              left: '-9999px',
-              width: '210mm',
-              minHeight: '297mm',
-              padding: '20mm',
-              boxSizing: 'border-box',
-              fontFamily: 'Arial, Helvetica, sans-serif',
-              fontSize: '12pt',
-              color: '#000',
-              backgroundColor: '#fff',
-            }}
-          >
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
-              <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>HEALTH</h2>
-            </div>
-
-            {/* Goal Statement */}
-            <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
-              To build a health fund for serious illness or medical emergencies
-            </div>
-
-            {/* Inputs Section */}
-            <div style={{ marginBottom: '24px' }}>
-              <p><strong>A.</strong> How much do you need for your health fund? ₱<u>&nbsp;&nbsp;{parseFloat(healthQuestion1).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-              <p><strong>B.</strong> How much are you willing to set aside monthly for your health fund? ₱<u>&nbsp;&nbsp;{parseFloat(healthQuestion2).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-            </div>
-
-            {/* Calculation Result */}
-            <div style={{ marginBottom: '20px' }}>
-              <p>
-                This is the number of years it will take to reach your health fund goal based on your monthly contribution.
-              </p>
-              <p style={{ marginTop: '12px' }}>
-                <strong>Formula:</strong> A ÷ (12 × B) = {healthQuestion1} ÷ (12 × {healthQuestion2}) ={' '}
-                <strong>{result} year(s)</strong>
-              </p>
-            </div>
-
-            {/* Footer Disclaimer */}
-            <div style={{
-              position: 'absolute',
-              bottom: '20mm',
-              left: '20mm',
-              right: '20mm',
-              fontSize: '9pt',
-              borderTop: '1px solid #000',
-              paddingTop: '8px',
-              color: '#555'
-            }}>
-              <p style={{ margin: '4px 0' }}>
-                <em>*Assumes consistent monthly contributions with no investment growth. Actual time may vary if returns are earned.</em>
-              </p>
-              <p style={{ margin: '4px 0' }}>
-                <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
-              </p>
-              <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
-                Caelum Financial Solutions
-              </p>
-            </div>
-          </div>
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
-
-          <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">HEALTH</h1>
-
-          <p className="text-lg text-[#003266] text-center mt-6">
-            This represents the number of years to reach your health fund goal.
-          </p>
-
-          <div className="flex justify-center mb-14 mt-6">
-            <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-              {result} year/s
-            </div>
-          </div>
-
-          <div className="mt-10 flex justify-between">
-            <Link to="/FNA/AppointmentForm">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                Book an Appointment
-              </button>
+      <>
+      {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+      <HealthResultPDF
+        ref={resultRef}
+        healthFundNeeded={parseFloat(healthQuestion1) || 0}
+        monthlyContribution={parseFloat(healthQuestion2) || 0}
+        yearsToGoal={parseFloat(computeResult())}
+      />
+      
+        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+          <Link
+              to="/FNA/door"
+              className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+                          after:content-[''] after:absolute after:left-0 after:-bottom-1
+                          after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                          after:transition-all after:duration-300
+                          hover:after:w-full"
+            >
+              ← Back to Doors
             </Link>
+          <div  className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+            
+            <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
 
-            <Link to="/FNA/OurServices">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                View Recommendations
-              </button>
-            </Link>
+            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">HEALTH</h1>
+
+            <p className="text-lg text-[#003266] text-center mt-6">
+              This represents the number of years to reach your health fund goal.
+            </p>
+
+            <div className="flex justify-center mb-14 mt-6">
+              <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                {result} year/s
+              </div>
+            </div>
+
+            <div className="mt-10 flex justify-between">
+              <Link to="/FNA/AppointmentForm">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  Book an Appointment
+                </button>
+              </Link>
+
+              <Link to="/FNA/OurServices">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  View Recommendations
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

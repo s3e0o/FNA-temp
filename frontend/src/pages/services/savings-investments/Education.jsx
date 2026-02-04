@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import EducationResultPDF from "../../../components/pdf/EducationResultPDF.jsx";
 
 function Education() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -258,6 +259,21 @@ function Education() {
     }
 
     return (
+      <>
+      {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+        <EducationResultPDF
+          ref={resultRef}
+          childAge={parseInt(childAge) || 0}
+          selectedSchool={selectedSchool}
+          customSchoolFee={parseFloat(customSchoolFee) || 0}
+          savedAmount={parseFloat(savedAmount) || 0}
+          yearsUntilCollege={result.yearsUntilCollege}
+          annualFee={result.annualFee}
+          futureValue={result.futureValue}
+          remainingNeeded={result.remainingNeeded}
+          monthlySavings={monthlySavings}
+        />
+      {/* === VISIBLE RESULT SECTION === */}
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <Link
           to="/FNA/door"
@@ -269,78 +285,7 @@ function Education() {
         >
           ← Back to Doors
         </Link>
-        <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-
-          {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
-          <div
-            ref={resultRef}
-            style={{
-              position: 'absolute',
-              left: '-9999px',
-              width: '210mm',
-              minHeight: '297mm',
-              padding: '20mm',
-              boxSizing: 'border-box',
-              fontFamily: 'Arial, Helvetica, sans-serif',
-              fontSize: '12pt',
-              color: '#000',
-              backgroundColor: '#fff',
-            }}
-          >
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
-              <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>EDUCATION</h2>
-            </div>
-
-            {/* Goal Statement */}
-            <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
-              To plan for your child’s 4-year college education based on current savings and future needs.
-            </div>
-
-            {/* Inputs Section */}
-            <div style={{ marginBottom: '24px' }}>
-              <p><strong>1.</strong> Child’s age: <u>&nbsp;&nbsp;{childAge || '—'} years&nbsp;&nbsp;</u></p>
-              <p><strong>2.</strong> Selected school: <u>&nbsp;&nbsp;{selectedSchool === 'Other' ? `Other (₱${parseFloat(customSchoolFee).toLocaleString('en-PH', { minimumFractionDigits: 2 })})` : selectedSchool || '—'}&nbsp;&nbsp;</u></p>
-              <p><strong>3.</strong> Amount already saved: ₱<u>&nbsp;&nbsp;{parseFloat(savedAmount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-            </div>
-
-            {/* Results Section */}
-            {submitted && (() => {
-              const result = computeResult();
-              const monthlySavings = computeMonthlySavings();
-              return (
-                <div style={{ marginBottom: '24px' }}>
-                  <p><strong>Years until college:</strong> {result.yearsUntilCollege} years</p>
-                  <p><strong>Total amount needed for 4-year college (future value):</strong> ₱{result.futureValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                  <p><strong>Remaining amount to save:</strong> ₱{result.remainingNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                  <p><strong>Recommended monthly savings (5% annual return):</strong> ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                </div>
-              );
-            })()}
-
-            {/* Footer Disclaimer */}
-            <div style={{
-              position: 'absolute',
-              bottom: '20mm',
-              left: '20mm',
-              right: '20mm',
-              fontSize: '9pt',
-              borderTop: '1px solid #000',
-              paddingTop: '8px',
-              color: '#555'
-            }}>
-              <p style={{ margin: '4px 0' }}>
-                <em>*Assumes 8% annual education cost inflation and 5% annual investment return. Actual results may vary.</em>
-              </p>
-              <p style={{ margin: '4px 0' }}>
-                <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
-              </p>
-              <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
-                Caelum Financial Solutions
-              </p>
-            </div>
-          </div>
+        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
           
           <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
 
@@ -396,6 +341,7 @@ function Education() {
 
         </div>
       </div>
+      </>
     );
   }
 

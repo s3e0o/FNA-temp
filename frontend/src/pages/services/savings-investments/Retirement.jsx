@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import RetirementResultPDF from "../../../components/pdf/RetirementResultPDF.jsx";
 
 function Retirement() {
 
@@ -224,153 +225,79 @@ function Retirement() {
     }
 
     return (
-      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        <Link
-          to="/FNA/door"
-          className="relative inline-block text-[#395998] font-medium mb-5 ml-10
-                      after:content-[''] after:absolute after:left-0 after:-bottom-1
-                      after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                      after:transition-all after:duration-300
-                      hover:after:w-full"
-        >
-          ← Back to Doors
-        </Link>
-        <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-
-          {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
-          <div
+      <>
+        {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+          <RetirementResultPDF
             ref={resultRef}
-            style={{
-              position: 'absolute',
-              left: '-9999px',
-              width: '210mm',
-              minHeight: '297mm',
-              padding: '20mm',
-              boxSizing: 'border-box',
-              fontFamily: 'Arial, Helvetica, sans-serif',
-              fontSize: '12pt',
-              color: '#000',
-              backgroundColor: '#fff',
-            }}
+            currentAge={parseInt(currentAge) || 0}
+            retirementAge={parseInt(retirementAge) || 0}
+            monthlyIncome={parseFloat(monthlyIncome) || 0}
+            yearsAfterRetirement={parseInt(yearsAfterRetirement) || 0}
+            yearsUntilRetirement={result.yearsUntilRetirement}
+            totalRetirementFundNeeded={result.totalRetirementFundNeeded}
+            multiplier={result.multiplier}
+            monthlySavings={monthlySavings}
+          />
+        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+          <Link
+            to="/FNA/door"
+            className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+                        after:content-[''] after:absolute after:left-0 after:-bottom-1
+                        after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                        after:transition-all after:duration-300
+                        hover:after:w-full"
           >
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
-              <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>RETIREMENT</h2>
-            </div>
+            ← Back to Doors
+          </Link>
+          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
 
-            {/* Goal Statement */}
-            <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
-              To maintain your lifestyle after retirement
-            </div>
+            <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
 
-            {/* Inputs Section */}
-            <div style={{ marginBottom: '24px' }}>
-              <p><strong>A.</strong> How old are you? <u>&nbsp;&nbsp;{currentAge}&nbsp;&nbsp;</u> years old</p>
-              <p><strong>B.</strong> At what age do you plan to retire? <u>&nbsp;&nbsp;{retirementAge}&nbsp;&nbsp;</u> years old</p>
-              <p><strong>C.</strong> How much is your monthly income? ₱<u>&nbsp;&nbsp;{parseFloat(monthlyIncome).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-              <p><strong>D.</strong> How many years after retirement do you want to receive this amount?</p>
-              <div style={{ marginLeft: '20px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                {[10, 11, 12, 13, 14, 15].map((yr) => (
-                  <span key={yr} style={{ minWidth: '80px', textAlign: 'center' }}>
-                    {yearsAfterRetirement == yr ? (
-                      <span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>● {yr} years</span>
-                    ) : (
-                      <span>○ {yr} years</span>
-                    )}
-                  </span>
-                ))}
+            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">RETIREMENT</h1>
+
+            <p className="text-lg text-[#003266] text-center mt-6">
+              Based on your retirement plan starting at age {retirementAge}:
+            </p>
+
+            <div className="space-y-6 mt-6 mb-14">
+              <div className="text-center">
+                <p className="text-lg text-[#003266] mb-2">Years until retirement:</p>
+                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                  {result.yearsUntilRetirement} years
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-lg text-[#003266] mb-2">Total retirement fund needed:</p>
+                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                  ₱{result.totalRetirementFundNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-lg text-[#003266] mb-2">Monthly savings needed to reach goal:</p>
+                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                  ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
               </div>
             </div>
 
-            {/* Calculation Result */}
-            <div style={{ marginBottom: '20px' }}>
-              <p>
-                This is the total retirement fund you need to maintain your current lifestyle in{' '}
-                <u>&nbsp;&nbsp;{result.yearsUntilRetirement}&nbsp;&nbsp;</u> years (B – A).
-              </p>
-              <p style={{ marginTop: '12px' }}>
-                <strong>Formula:</strong> (12 × C) × D × multiplier = (12 × {monthlyIncome}) × {yearsAfterRetirement} × {result.multiplier.toFixed(4)} ={' '}
-                <strong>₱{result.totalRetirementFundNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-              </p>
+            <div className="mt-10 flex justify-between">
+              <Link to="/FNA/AppointmentForm">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  Book an Appointment
+                </button>
+              </Link>
+
+              <Link to="/FNA/OurServices">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  View Recommendations
+                </button>
+              </Link>
             </div>
-
-            {/* Monthly Savings Recommendation */}
-            <div style={{ marginBottom: '30px' }}>
-              <p>
-                <strong>Recommended monthly savings*:</strong> ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-            </div>
-
-            {/* Footer Disclaimer */}
-            <div style={{
-              position: 'absolute',
-              bottom: '20mm',
-              left: '20mm',
-              right: '20mm',
-              fontSize: '9pt',
-              borderTop: '1px solid #000',
-              paddingTop: '8px',
-              color: '#555'
-            }}>
-              <p style={{ margin: '4px 0' }}>
-                <em>*Assumes a 6% annual return on investment. Actual savings may vary based on market performance.</em>
-              </p>
-              <p style={{ margin: '4px 0' }}>
-                <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer. Computation assumes an average inflation rate of 4%.
-              </p>
-              <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
-                Caelum Financial Solutions
-              </p>
-            </div>
-          </div>
-
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
-
-          <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">RETIREMENT</h1>
-
-          <p className="text-lg text-[#003266] text-center mt-6">
-            Based on your retirement plan starting at age {retirementAge}:
-          </p>
-
-          <div className="space-y-6 mt-6 mb-14">
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Years until retirement:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                {result.yearsUntilRetirement} years
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Total retirement fund needed:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{result.totalRetirementFundNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Monthly savings needed to reach goal:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 flex justify-between">
-            <Link to="/FNA/AppointmentForm">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                Book an Appointment
-              </button>
-            </Link>
-
-            <Link to="/FNA/OurServices">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                View Recommendations
-              </button>
-            </Link>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

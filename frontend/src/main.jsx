@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import AboutCaelum from "./components/AboutCaelum.jsx";
@@ -64,8 +65,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         {/* Corporate FNA */}
         <Route path="/fna/corporate/questions" element={<Questions />} />
-        <Route path="/fna/corporate/homepage" element={<HomePage />} />
-        
+
+        {/* Components for FNA Results PDF Export */}        
         {/* FNA Corporate - Financial Wellness Assessment */}
         <Route path="/financial-assessment" element={<HomePage />} />
 

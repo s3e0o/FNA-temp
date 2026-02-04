@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import SavingsResultPDF from "../../../components/pdf/SavingsResultPDF.jsx";
 
 function Savings() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -176,6 +177,16 @@ const parseNumber = (value) => {
     }
 
     return (
+      <>
+        {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+        <SavingsResultPDF
+          ref={resultRef}
+          dream={dreams[0] === "Other" ? otherDream || "Other" : dreams[0]}
+          years={parseInt(years) || 0}
+          currentCost={parseFloat(cost) || 0}
+          futureAmountNeeded={parseFloat(result.replace(/,/g, ''))} // remove commas before passing
+          multiplier={inflationMultipliers[parseInt(years) - 1] || Math.pow(1.04, years)}
+        />
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <Link
           to="/FNA/door"
@@ -187,76 +198,7 @@ const parseNumber = (value) => {
         >
           ← Back to Doors
         </Link>
-        <div ref={resultRef} className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-      {/* Hidden Printable PDF Template — DO NOT DISPLAY IN UI */}
-        <div
-          ref={resultRef}
-          style={{
-            position: 'absolute',
-            left: '-9999px',
-            width: '210mm',
-            minHeight: '297mm',
-            padding: '20mm',
-            boxSizing: 'border-box',
-            fontFamily: 'Arial, Helvetica, sans-serif',
-            fontSize: '12pt',
-            color: '#000',
-            backgroundColor: '#fff',
-          }}
-        >
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
-            <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>SAVINGS</h2>
-          </div>
-
-          {/* Goal Statement */}
-          <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
-            To achieve your financial dream
-          </div>
-
-          {/* Inputs Section */}
-          <div style={{ marginBottom: '24px' }}>
-            <p><strong>A.</strong> What are you saving for? <u>&nbsp;&nbsp;{dreams[0] === "Other" ? otherDream || "Other" : dreams[0]}&nbsp;&nbsp;</u></p>
-            <p><strong>B.</strong> In how many years do you want to fulfill your dream? <u>&nbsp;&nbsp;{years}&nbsp;&nbsp;</u> years</p>
-            <p><strong>C.</strong> What is the cost of realizing your dream now? ₱<u>&nbsp;&nbsp;{parseFloat(cost).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-          </div>
-
-          {/* Calculation Result */}
-          <div style={{ marginBottom: '20px' }}>
-            <p>
-              This is the amount you need to save today to achieve your goal in{' '}
-              <u>&nbsp;&nbsp;{years}&nbsp;&nbsp;</u> years, adjusted for an average annual inflation rate of 4%.
-            </p>
-            <p style={{ marginTop: '12px' }}>
-              <strong>Formula:</strong> C × (1.04)<sup>B</sup> = {cost} × {inflationMultipliers[parseInt(years) - 1]?.toFixed(4) || Math.pow(1.04, years).toFixed(4)} ={' '}
-              <strong>₱{result}</strong>
-            </p>
-          </div>
-
-          {/* Footer Disclaimer */}
-          <div style={{
-            position: 'absolute',
-            bottom: '20mm',
-            left: '20mm',
-            right: '20mm',
-            fontSize: '9pt',
-            borderTop: '1px solid #000',
-            paddingTop: '8px',
-            color: '#555'
-          }}>
-            <p style={{ margin: '4px 0' }}>
-              <em>*Assumes a 4% annual inflation rate. Actual future cost may vary.</em>
-            </p>
-            <p style={{ margin: '4px 0' }}>
-              <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
-            </p>
-            <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
-              Caelum Financial Solutions
-            </p>
-          </div>
-        </div>
-
+        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
           <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
 
           <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">SAVINGS</h1>
@@ -272,20 +214,21 @@ const parseNumber = (value) => {
           </div>
 
           <div className="mt-10 flex justify-between">
-                     <Link to="/FNA/AppointmentForm">
-                       <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                         Book an Appointment
-                       </button>
-                     </Link>
-         
-                     <Link to="/FNA/OurServices">
-                       <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                         View Recommendations
-                       </button>
-                     </Link>
-                   </div>
+            <Link to="/FNA/AppointmentForm">
+              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                Book an Appointment
+              </button>
+            </Link>
+
+            <Link to="/FNA/OurServices">
+              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                View Recommendations
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
+      </>
     );
   }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import LifeProtectionResultPDF from "../../../components/pdf/LifeProtectionResultPDF.jsx";
 
 function LifeProtection() {
   const formatCurrency = (value) => {
@@ -239,80 +240,22 @@ function LifeProtection() {
   return (
     <>
       {/* === (A) HIDDEN PDF TEMPLATE — DO NOT DISPLAY IN UI === */}
-      <div
+      {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+      <LifeProtectionResultPDF
         ref={resultRef}
-        style={{
-          position: 'absolute',
-          left: '-9999px',
-          width: '210mm',
-          minHeight: '297mm',
-          padding: '20mm',
-          boxSizing: 'border-box',
-          fontFamily: 'Arial, Helvetica, sans-serif',
-          fontSize: '12pt',
-          color: '#000',
-          backgroundColor: '#fff',
+        years={parseInt(lifeQuestion1)}
+        expenses={{
+          "Rent": parseFloat(expenses.rent) || 0,
+          "Loan Payments": parseFloat(expenses.loanPayments) || 0,
+          "Allowances": parseFloat(expenses.allowances) || 0,
+          "Utilities": parseFloat(expenses.utilities) || 0,
+          "Others": parseFloat(expenses.others) || 0,
         }}
-      >
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h1 style={{ fontSize: '18pt', fontWeight: 'bold', margin: '0' }}>FINANCIAL NEEDS ANALYSIS</h1>
-          <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginTop: '8px', color: '#003266' }}>LIFE PROTECTION</h2>
-        </div>
-
-        {/* Goal Statement */}
-        <div style={{ marginBottom: '20px', fontStyle: 'italic', paddingLeft: '10px', borderLeft: '3px solid #003266' }}>
-          To protect your family's quality of life in case of uncertainties.
-        </div>
-
-        {/* Inputs Section */}
-        <div style={{ marginBottom: '24px' }}>
-          <p><strong>A.</strong> How many years will you be providing for your family? <u>&nbsp;&nbsp;{lifeQuestion1}&nbsp;&nbsp;</u> years</p>
-          <p><strong>B.</strong> What is your total monthly living expense?</p>
-          <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-            <p>Rent: ₱{parseFloat(expenses.rent || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-            <p>Loan Payments: ₱{parseFloat(expenses.loanPayments || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-            <p>Allowances: ₱{parseFloat(expenses.allowances || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-            <p>Utilities: ₱{parseFloat(expenses.utilities || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-            <p>Others: ₱{parseFloat(expenses.others || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-            <p><strong>Total Monthly Expenses:</strong> ₱{totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-          </div>
-          <p><strong>C.</strong> Do you have existing coverage? ₱<u>&nbsp;&nbsp;{parseFloat(lifeQuestion3 || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}&nbsp;&nbsp;</u></p>
-        </div>
-
-        {/* Calculation Result */}
-        <div style={{ marginBottom: '20px' }}>
-          <p>
-            This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
-          </p>
-          <p style={{ marginTop: '12px' }}>
-            <strong>Formula:</strong> (12 × B × multiplier) – C = (12 × {totalExpenses.toLocaleString('en-PH')}) × {multiplier.toFixed(4)} – {parseFloat(lifeQuestion3 || 0).toLocaleString('en-PH')} ={' '}
-            <strong>₱{result}</strong>
-          </p>
-        </div>
-
-        {/* Footer Disclaimer */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20mm',
-          left: '20mm',
-          right: '20mm',
-          fontSize: '9pt',
-          borderTop: '1px solid #000',
-          paddingTop: '8px',
-          color: '#555'
-        }}>
-          <p style={{ margin: '4px 0' }}>
-            <em>*Assumes 4% annual inflation. Multiplier based on accumulated inflation over {lifeQuestion1} years.</em>
-          </p>
-          <p style={{ margin: '4px 0' }}>
-            <strong>Note:</strong> The results of this FNA are for reference only and should not be interpreted as financial advice, recommendation, or offer.
-          </p>
-          <p style={{ textAlign: 'right', marginTop: '6px', fontWeight: 'bold' }}>
-            Caelum Financial Solutions
-          </p>
-        </div>
-      </div>
+        totalExpenses={totalExpenses}
+        existingCoverage={parseFloat(lifeQuestion3) || 0}
+        multiplier={multiplier}
+        result={parseFloat(computeResult())}
+      />
 
       {/* === (B) VISIBLE RESULT UI === */}
       <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>

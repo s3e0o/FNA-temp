@@ -10,12 +10,12 @@ function LifeProtection() {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(Math.abs(value)); // Use Math.abs if negative values shouldn't show minus
+    }).format(Math.abs(value));
   };
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [lifeQuestion1, setLifeQuestion1] = useState(""); // years
-  const [lifeQuestion3, setLifeQuestion3] = useState(""); // total coverage
+  const [lifeQuestion1, setLifeQuestion1] = useState("");
+  const [lifeQuestion3, setLifeQuestion3] = useState("");
   const [expenses, setExpenses] = useState({
     rent: "",
     loanPayments: "",
@@ -37,7 +37,6 @@ function LifeProtection() {
 
   const resultRef = useRef(null);
 
-  // Calculate total expenses using useMemo
   const totalExpenses = useMemo(() => {
     return Object.values(expenses).reduce((sum, value) => {
       return sum + (parseFloat(value) || 0);
@@ -49,67 +48,61 @@ function LifeProtection() {
   }, []);
 
   const validateCurrentStep = () => {
-  const newErrors = {};
+    const newErrors = {};
 
-  // Always validate Q1 if we're on step 1 or beyond (especially step 4)
-  if (currentStep >= 1) {
-    const years = lifeQuestion1.trim();
-    const yearsNum = parseInt(years, 10);
+    if (currentStep >= 1) {
+      const years = lifeQuestion1.trim();
+      const yearsNum = parseInt(years, 10);
 
-    if (years === "") {
-      newErrors.question1 = "Number of years is required.";
-    } else if (isNaN(yearsNum)) {
-      newErrors.question1 = "Please enter a valid number of years.";
-    } else if (!Number.isInteger(yearsNum) || yearsNum < 1 || yearsNum > 20) {
-      newErrors.question1 = "Please enter a whole number of years between 1 and 20.";
+      if (years === "") {
+        newErrors.question1 = "Number of years is required.";
+      } else if (isNaN(yearsNum)) {
+        newErrors.question1 = "Please enter a valid number of years.";
+      } else if (!Number.isInteger(yearsNum) || yearsNum < 1 || yearsNum > 20) {
+        newErrors.question1 = "Please enter a whole number of years between 1 and 20.";
+      }
     }
-  }
 
-  // Validate Q2 if on step 2 or beyond (including review)
-  if (currentStep >= 2) {
-  const expenseFields = [
-    { name: 'rent', label: 'Rent' },
-    { name: 'loanPayments', label: 'Loan Payments' },
-    { name: 'allowances', label: 'Allowances' },
-    { name: 'utilities', label: 'Utilities' },
-    { name: 'others', label: 'Others' }
-  ];
+    if (currentStep >= 2) {
+      const expenseFields = [
+        { name: 'rent', label: 'Rent' },
+        { name: 'loanPayments', label: 'Loan Payments' },
+        { name: 'allowances', label: 'Allowances' },
+        { name: 'utilities', label: 'Utilities' },
+        { name: 'others', label: 'Others' }
+      ];
 
-  // Validate each field individually
-  expenseFields.forEach(field => {
-    const value = expenses[field.name];
-    const trimmed = value.trim();
-    if (trimmed === "") {
-      newErrors[`expense_${field.name}`] = `${field.label} is required.`;
-    } else if (isNaN(parseFloat(trimmed)) || parseFloat(trimmed) < 0) {
-      newErrors[`expense_${field.name}`] = `Please enter a valid non-negative amount for ${field.label}.`;
+      expenseFields.forEach(field => {
+        const value = expenses[field.name];
+        const trimmed = value.trim();
+        if (trimmed === "") {
+          newErrors[`expense_${field.name}`] = `${field.label} is required.`;
+        } else if (isNaN(parseFloat(trimmed)) || parseFloat(trimmed) < 0) {
+          newErrors[`expense_${field.name}`] = `Please enter a valid non-negative amount for ${field.label}.`;
+        }
+      });
+
+      const allExpensesFilledAndValid = Object.values(expenses).every(value => {
+        const trimmed = value.trim();
+        return trimmed !== "" && !isNaN(parseFloat(trimmed)) && parseFloat(trimmed) >= 0;
+      });
+
+      if (!allExpensesFilledAndValid) {
+        newErrors.question2 = "Please fill in all monthly expense fields with valid amounts. Enter 0 for any that do not apply.";
+      }
     }
-  });
 
-  // Additionally, you can skip the "question2" top-level error since individual errors are shown,
-  // but if you still want a summary error, keep this:
-  const allExpensesFilledAndValid = Object.values(expenses).every(value => {
-    const trimmed = value.trim();
-    return trimmed !== "" && !isNaN(parseFloat(trimmed)) && parseFloat(trimmed) >= 0;
-  });
-
-  if (!allExpensesFilledAndValid) {
-    newErrors.question2 = "Please fill in all monthly expense fields with valid amounts. Enter 0 for any that do not apply.";
-  }
-}
-
-  // Validate Q3 if on step 3 or beyond (including review)
-  if (currentStep >= 3) {
-    if (!lifeQuestion3.trim()) {
-      newErrors.question3 = "Total coverage amount is required.";
-    } else if (isNaN(parseFloat(lifeQuestion3)) || parseFloat(lifeQuestion3) < 0) {
-      newErrors.question3 = "Please enter a valid non-negative amount for total coverage.";
+    if (currentStep >= 3) {
+      if (!lifeQuestion3.trim()) {
+        newErrors.question3 = "Total coverage amount is required.";
+      } else if (isNaN(parseFloat(lifeQuestion3)) || parseFloat(lifeQuestion3) < 0) {
+        newErrors.question3 = "Please enter a valid non-negative amount for total coverage.";
+      }
     }
-  }
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleNext = () => {
     if (validateCurrentStep()) {
@@ -128,44 +121,24 @@ function LifeProtection() {
     }
   };
 
-  // Calculate minimum amount needed for life protection
   const computeResult = () => {
-  const years = parseInt(lifeQuestion1);
-  const totalMonthly = totalExpenses;
-  const existingCoverage = parseFloat(lifeQuestion3) || 0;
+    const years = parseInt(lifeQuestion1);
+    const totalMonthly = totalExpenses;
+    const existingCoverage = parseFloat(lifeQuestion3) || 0;
 
-  // Multiplier table for "4% inflation p.a. (accumulated)" from the PDF
-  const multiplierTable = {
-    1: 1.0400,
-    2: 2.1216,
-    3: 3.2465,
-    4: 4.4163,
-    5: 5.6330,
-    6: 6.8983,
-    7: 8.2142,
-    8: 9.5828,
-    9: 11.0061,
-    10: 12.4864,
-    11: 14.0258,
-    12: 15.6268,
-    13: 17.2919,
-    14: 19.0236,
-    15: 20.8245,
-    16: 22.6975,
-    17: 24.6454,
-    18: 26.6712,
-    19: 28.7781,
-    20: 30.9692,
+    const multiplierTable = {
+      1: 1.0400, 2: 2.1216, 3: 3.2465, 4: 4.4163, 5: 5.6330,
+      6: 6.8983, 7: 8.2142, 8: 9.5828, 9: 11.0061, 10: 12.4864,
+      11: 14.0258, 12: 15.6268, 13: 17.2919, 14: 19.0236, 15: 20.8245,
+      16: 22.6975, 17: 24.6454, 18: 26.6712, 19: 28.7781, 20: 30.9692,
+    };
+
+    const multiplier = multiplierTable[years] || 0;
+    const totalNeeded = 12 * totalMonthly * multiplier;
+    const minimumAmountNeeded = Math.max(0, totalNeeded - existingCoverage);
+
+    return minimumAmountNeeded.toFixed(2);
   };
-
-  const multiplier = multiplierTable[years] || 0;
-
-  // Formula from PDF: (12 × B × multiplier) – C
-  const totalNeeded = 12 * totalMonthly * multiplier;
-  const minimumAmountNeeded = Math.max(0, totalNeeded - existingCoverage);
-
-  return minimumAmountNeeded.toFixed(2);
-};
 
   const handleExportPDF = async () => {
     if (!resultRef.current) return;
@@ -216,305 +189,344 @@ function LifeProtection() {
   };
 
   if (submitted) {
-  const result = computeResult();
-  const years = parseInt(lifeQuestion1);
-  const totalMonthly = totalExpenses;
-  const existingCoverage = parseFloat(lifeQuestion3) || 0;
-  const multiplierTable = {
-    1: 1.0400, 2: 2.1216, 3: 3.2465, 4: 4.4163, 5: 5.6330,
-    6: 6.8983, 7: 8.2142, 8: 9.5828, 9: 11.0061, 10: 12.4864,
-    11: 14.0258, 12: 15.6268, 13: 17.2919, 14: 19.0236, 15: 20.8245,
-    16: 22.6975, 17: 24.6454, 18: 26.6712, 19: 28.7781, 20: 30.9692,
-  };
-  const multiplier = multiplierTable[years] || 0;
+    const result = computeResult();
+    const years = parseInt(lifeQuestion1);
+    const totalMonthly = totalExpenses;
+    const existingCoverage = parseFloat(lifeQuestion3) || 0;
+    const multiplierTable = {
+      1: 1.0400, 2: 2.1216, 3: 3.2465, 4: 4.4163, 5: 5.6330,
+      6: 6.8983, 7: 8.2142, 8: 9.5828, 9: 11.0061, 10: 12.4864,
+      11: 14.0258, 12: 15.6268, 13: 17.2919, 14: 19.0236, 15: 20.8245,
+      16: 22.6975, 17: 24.6454, 18: 26.6712, 19: 28.7781, 20: 30.9692,
+    };
+    const multiplier = multiplierTable[years] || 0;
 
-  if (showAppointmentForm) {
-    // ... keep your appointment form as-is ...
+    if (showAppointmentForm) {
+      return (
+        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+          {/* Your existing appointment form */}
+        </div>
+      );
+    }
+
     return (
-      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        {/* Your existing appointment form */}
-      </div>
+      <>
+        <LifeProtectionResultPDF
+          ref={resultRef}
+          years={parseInt(lifeQuestion1)}
+          expenses={{
+            "Rent": parseFloat(expenses.rent) || 0,
+            "Loan Payments": parseFloat(expenses.loanPayments) || 0,
+            "Allowances": parseFloat(expenses.allowances) || 0,
+            "Utilities": parseFloat(expenses.utilities) || 0,
+            "Others": parseFloat(expenses.others) || 0,
+          }}
+          totalExpenses={totalExpenses}
+          existingCoverage={parseFloat(lifeQuestion3) || 0}
+          multiplier={multiplier}
+          result={parseFloat(computeResult())}
+        />
+
+        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+          <Link
+            to="/FNA/door"
+            className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+                        after:content-[''] after:absolute after:left-0 after:-bottom-1
+                        after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                        after:transition-all after:duration-300
+                        hover:after:w-full"
+          >
+            ← Back to Doors
+          </Link>
+          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+            <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">
+              Export to PDF
+            </button>
+
+            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">LIFE PROTECTION</h1>
+
+            <p className="text-lg text-[#003266] text-center mt-6">
+              This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
+            </p>
+
+            <div className="flex justify-center mb-14 mt-6">
+              <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
+                ₱{formatCurrency(parseFloat(result))}
+              </div>
+            </div>
+
+            <div className="mt-10 flex justify-between">
+              <Link to="/FNA/AppointmentForm">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  Book an Appointment
+                </button>
+              </Link>
+              <Link to="/FNA/OurServices">
+                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
+                  View Recommendations
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <>
-      {/* === (A) HIDDEN PDF TEMPLATE — DO NOT DISPLAY IN UI === */}
-      {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
-      <LifeProtectionResultPDF
-        ref={resultRef}
-        years={parseInt(lifeQuestion1)}
-        expenses={{
-          "Rent": parseFloat(expenses.rent) || 0,
-          "Loan Payments": parseFloat(expenses.loanPayments) || 0,
-          "Allowances": parseFloat(expenses.allowances) || 0,
-          "Utilities": parseFloat(expenses.utilities) || 0,
-          "Others": parseFloat(expenses.others) || 0,
-        }}
-        totalExpenses={totalExpenses}
-        existingCoverage={parseFloat(lifeQuestion3) || 0}
-        multiplier={multiplier}
-        result={parseFloat(computeResult())}
-      />
-
-      {/* === (B) VISIBLE RESULT UI === */}
-      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        <Link
-          to="/FNA/door"
-          className="relative inline-block text-[#395998] font-medium mb-5 ml-10
-                      after:content-[''] after:absolute after:left-0 after:-bottom-1
-                      after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                      after:transition-all after:duration-300
-                      hover:after:w-full"
-        >
-          ← Back to Doors
-        </Link>
-        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">
-            Export to PDF
-          </button>
-
-          <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">LIFE PROTECTION</h1>
-
-          <p className="text-lg text-[#003266] text-center mt-6">
-            This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
-          </p>
-
-          <div className="flex justify-center mb-14 mt-6">
-            <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-              ₱{formatCurrency(parseFloat(result))}
-            </div>
-          </div>
-
-          <div className="mt-10 flex justify-between">
-            <Link to="/FNA/AppointmentForm">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                Book an Appointment
-              </button>
-            </Link>
-            <Link to="/FNA/OurServices">
-              <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                View Recommendations
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-  return (
     <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-        <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">LIFE PROTECTION</h1>
-
-        <div className="flex justify-center mb-10">
-          <div className="relative flex items-center w-[640px]">
-            <div className="absolute left-10 right-1 top-6 h-[2px] bg-[#8FA6BF]" />
-            {[1,2,3,4].map(n => (
-              <React.Fragment key={n}>
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full ${currentStep >= n ? "bg-[#003266]" : "bg-[#B7C5D6]"} flex items-center justify-center`}>
-                    <div className="w-10 h-10 rounded-full border-3 border-white text-[#F4B43C] flex items-center justify-center text-lg">{n}</div>
-                  </div>
-                  <span className={`text-sm mt-2 ${currentStep >= n ? "text-[#003266]" : "text-[#8FA6BF]"}`}>
-                    {n===1?"Question 1":n===2?"Question 2":n===3?"Question 3":"Review"}
-                  </span>
-                </div>
-                {n!==4 && <div className="flex-1" />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        <form className="space-y-8">
-          {currentStep === 1 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">How many years will you be providing for your family (i.e. until your children became financially independent)?</p>
-              <input 
-                type="number" 
-                value={lifeQuestion1} 
-                onChange={(e)=>setLifeQuestion1(e.target.value)} 
-                className="w-80 p-3 border rounded-lg text-center" 
-                placeholder="Enter years"
-              />
-              {errors.question1 && <p className="text-red-500 mt-2">{errors.question1}</p>}
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">How much do you spend monthly for living expenses?</p>
+      {/* Main outer container */}
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl shadow-xl p-8">
+          {/* Progress Bar Container - KEEPING THE SLIDING PROGRESS BAR */}
+          <div className="mb-12">
+            <div className="relative">
+              {/* Background track */}
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                {/* Progress fill - sliding bar */}
+                <div 
+                  className="h-full bg-[#003266] rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                ></div>
+              </div>
               
-              <div className="max-w-md mx-auto space-y-4 mb-8">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Left column - Labels */}
-                  <div className="space-y-4 text-right">
-                    <div className="h-12 flex items-center justify-end">
-                      <span className="text-lg text-[#003266]">Rent:</span>
-                    </div>
-                    <div className="h-12 flex items-center justify-end">
-                      <span className="text-lg text-[#003266]">Loan Payments:</span>
-                    </div>
-                    <div className="h-12 flex items-center justify-end">
-                      <span className="text-lg text-[#003266]">Allowances:</span>
-                    </div>
-                    <div className="h-12 flex items-center justify-end">
-                      <span className="text-lg text-[#003266]">Utilities:</span>
-                    </div>
-                    <div className="h-12 flex items-center justify-end">
-                      <span className="text-lg text-[#003266]">Others:</span>
+              {/* Step Labels - Simplified to Question 1, Question 2, Question 3, Review */}
+              <div className="flex justify-between mt-6">
+                {["Question 1", "Question 2", "Question 3", "Review"].map((label, index) => (
+                  <div key={index} className="flex flex-col items-center relative -top-2">
+                    {/* Step indicator dot */}
+                    <div 
+                      className={`w-4 h-4 rounded-full mb-2 ${currentStep > index + 1 ? "bg-[#003266]" : currentStep === index + 1 ? "bg-[#003266] ring-4 ring-blue-100" : "bg-gray-300"}`}
+                    ></div>
+                    <span 
+                      className={`text-sm font-medium whitespace-nowrap ${currentStep >= index + 1 ? "text-[#003266]" : "text-gray-500"}`}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Content container - ONLY CHANGING THIS TO MATCH OUTER CONTAINER */}
+          <div className="bg-white rounded-xl shadow-lg p-10 mb-8 border border-gray-200">
+            {/* Step content header */}
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-bold text-[#003266] mb-4">LIFE PROTECTION</h1>
+            </div>
+
+            {/* Question/Input container */}
+            <div className="max-w-2xl mx-auto">
+              {currentStep === 1 && (
+                <div className="text-center">
+                  <p className="text-xl text-[#003266] mb-10">How many years will you be providing for your family (i.e. until your children became financially independent)?</p>
+                  
+                  <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden max-w-md mx-auto mb-8">
+                    <input 
+                      type="number" 
+                      value={lifeQuestion1} 
+                      onChange={(e)=>setLifeQuestion1(e.target.value)} 
+                      className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                      placeholder="Enter years"
+                      min="1"
+                      max="20"
+                    />
+                    <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                      YEARS
                     </div>
                   </div>
+                  {errors.question1 && <p className="text-red-500 text-lg mb-8">{errors.question1}</p>}
+                </div>
+              )}
 
-                  {/* Right column - Inputs */}
-                  <div className="space-y-4">
-                    {["rent", "loanPayments", "allowances", "utilities", "others"].map((field) => (
-                      <div key={field} className="relative">
-                        <input
-                          type="number"
-                          value={expenses[field]}
-                          onChange={(e) => handleExpenseChange(field, e.target.value)}
-                          placeholder="0.00"
-                          className="w-full pl-3 pr-3 py-3 border rounded-lg text-center"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003266] text-lg">₱</span>
-                        {errors[`expense_${field}`] && <p className="text-red-500 text-sm mt-1">{errors[`expense_${field}`]}</p>}
+              {currentStep === 2 && (
+                <div className="text-center">
+                  <p className="text-xl text-[#003266] mb-10">How much do you spend monthly for living expenses?</p>
+                  
+                  <div className="space-y-6 mb-10">
+                    {[
+                      { key: 'rent', label: 'Rent' },
+                      { key: 'loanPayments', label: 'Loan Payments' },
+                      { key: 'allowances', label: 'Allowances' },
+                      { key: 'utilities', label: 'Utilities' },
+                      { key: 'others', label: 'Others' }
+                    ].map(({ key, label }) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <span className="text-xl text-[#003266] font-semibold w-1/3 text-right pr-8">{label}:</span>
+                        <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden w-2/3">
+                          <input
+                            type="number"
+                            value={expenses[key]}
+                            onChange={(e) => handleExpenseChange(key, e.target.value)}
+                            placeholder="0.00"
+                            className="flex-grow p-4 text-center text-xl focus:outline-none"
+                            min="0"
+                            step="0.01"
+                          />
+                          <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                            ₱
+                          </div>
+                        </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                {/* Total Expenses */}
-                <div className="pt-6 border-t-2 border-gray-300">
-                  <div className="grid grid-cols-2 gap-4 items-center">
-                    <div className="flex items-center justify-end">
-                      <span className="text-lg font-semibold text-[#003266]">Total Expenses:</span>
+                    
+                    {/* Total Expenses */}
+                    <div className="pt-10 border-t-2 border-gray-300 mt-10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-[#003266] w-1/3 text-right pr-8">Total Expenses:</span>
+                        <div className="flex border-2 border-[#003266] rounded-xl overflow-hidden w-2/3 bg-blue-50">
+                          <div className="flex-grow p-4 text-center text-2xl font-bold text-[#003266]">
+                            ₱{totalExpenses.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="relative">
-                      <div className="w-full pl-3 pr-3 py-3 border rounded-lg bg-gray-50 text-center">
-                        <span className="text-lg text-[#003266] font-semibold">₱{totalExpenses.toFixed(2)}</span>
+                  </div>
+                  
+                  {errors.question2 && <p className="text-red-500 text-lg text-center mb-4">{errors.question2}</p>}
+                  {Object.keys(errors).map(key => 
+                    key.startsWith('expense_') && (
+                      <p key={key} className="text-red-500 text-center text-lg">{errors[key]}</p>
+                    )
+                  )}
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                <div className="text-center">
+                  <p className="text-xl text-[#003266] mb-10">If you have any other plans, how much is your total coverage?</p>
+                  
+                  <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden max-w-md mx-auto mb-8">
+                    <input 
+                      type="number" 
+                      value={lifeQuestion3} 
+                      onChange={(e)=>setLifeQuestion3(e.target.value)} 
+                      className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                      placeholder="Enter amount"
+                      min="0"
+                      step="0.01"
+                    />
+                    <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                      ₱
+                    </div>
+                  </div>
+                  {errors.question3 && <p className="text-red-500 text-lg">{errors.question3}</p>}
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                <div className="space-y-10">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Years Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border border-blue-100">
+                      <h3 className="text-2xl font-bold text-[#003266] mb-6">Question 1: Years providing for family</h3>
+                      <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden">
+                        <input 
+                          type="number" 
+                          value={lifeQuestion1} 
+                          onChange={(e)=>setLifeQuestion1(e.target.value)} 
+                          className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                          min="1"
+                          max="20"
+                        />
+                        <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                          YEARS
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Existing Coverage Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border border-blue-100">
+                      <h3 className="text-2xl font-bold text-[#003266] mb-6">Question 3: Existing Coverage</h3>
+                      <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden">
+                        <input 
+                          type="number" 
+                          value={lifeQuestion3} 
+                          onChange={(e)=>setLifeQuestion3(e.target.value)} 
+                          className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                          min="0"
+                          step="0.01"
+                        />
+                        <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                          ₱
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Monthly Expenses Review Card */}
+                  <div className="bg-gradient-to-br from-blue-50 to-white p-10 rounded-2xl shadow-lg border border-blue-100">
+                    <h3 className="text-3xl font-bold text-[#003266] mb-8 text-center">Question 2: Monthly Expenses Review</h3>
+                    <div className="space-y-6 max-w-3xl mx-auto">
+                      {[
+                        { key: 'rent', label: 'Rent' },
+                        { key: 'loanPayments', label: 'Loan Payments' },
+                        { key: 'allowances', label: 'Allowances' },
+                        { key: 'utilities', label: 'Utilities' },
+                        { key: 'others', label: 'Others' }
+                      ].map(({ key, label }) => (
+                        <div key={key} className="flex items-center justify-between">
+                          <span className="text-xl text-[#003266] font-semibold">{label}:</span>
+                          <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden w-64">
+                            <input
+                              type="number"
+                              value={expenses[key]}
+                              onChange={(e) => handleExpenseChange(key, e.target.value)}
+                              className="flex-grow p-4 text-center text-xl focus:outline-none"
+                              min="0"
+                              step="0.01"
+                            />
+                            <div className="bg-gray-100 px-6 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                              ₱
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Total Expenses */}
+                      <div className="pt-8 mt-8 border-t-2 border-gray-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-2xl font-bold text-[#003266]">Total Expenses:</span>
+                          <div className="flex border-2 border-[#003266] rounded-xl overflow-hidden w-64 bg-blue-50">
+                            <div className="flex-grow p-4 text-center text-2xl font-bold text-[#003266]">
+                              ₱{totalExpenses.toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {errors.question2 && <p className="text-red-500 text-center">{errors.question2}</p>}
+              )}
             </div>
-          )}
+          </div>
 
-          {currentStep === 3 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">If you have any other plans, how much is your total coverage?</p>
-              <input 
-                type="number" 
-                value={lifeQuestion3} 
-                onChange={(e)=>setLifeQuestion3(e.target.value)} 
-                className="w-80 p-3 border rounded-lg text-center" 
-                placeholder="Enter amount"
-              />
-              {errors.question3 && <p className="text-red-500 mt-2">{errors.question3}</p>}
-            </div>
-          )}
+          {/* Navigation buttons container */}
+          <div className="flex justify-between items-center pt-8 border-t border-gray-300">
+            {currentStep > 1 ? (
+              <button 
+                onClick={handleBack} 
+                className="border-2 border-[#003266] text-[#003266] font-bold px-12 py-4 rounded-xl hover:bg-[#003266] hover:text-white transition-colors duration-300 text-lg"
+              >
+                Back
+              </button>
+            ) : (
+              <Link 
+                to="/services/yes_services/LifeProHealth" 
+                className="border-2 border-[#003266] text-[#003266] font-bold px-12 py-4 rounded-xl hover:bg-[#003266] hover:text-white transition-colors duration-300 text-lg"
+              >
+                Back
+              </Link>
+            )}
 
-          {currentStep === 4 && (
-            <div className="text-center space-y-6">
-              <p className="text-lg text-[#003266] mb-4 font-semibold">Review Your Inputs</p>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span>Years providing for family:</span>
-                  <input 
-                    type="number" 
-                    value={lifeQuestion1} 
-                    onChange={(e)=>setLifeQuestion1(e.target.value)} 
-                    className="border rounded px-2 py-1 w-32 text-center" 
-                  />
-                </div>
-                
-                <div className="border p-4 rounded">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold">Monthly Expenses:</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Rent:</span>
-                      <input 
-                        type="number" 
-                        value={expenses.rent} 
-                        onChange={(e)=>handleExpenseChange('rent', e.target.value)} 
-                        className="border rounded px-2 py-1 w-32 text-center" 
-                      />
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Loan Payments:</span>
-                      <input 
-                        type="number" 
-                        value={expenses.loanPayments} 
-                        onChange={(e)=>handleExpenseChange('loanPayments', e.target.value)} 
-                        className="border rounded px-2 py-1 w-32 text-center" 
-                      />
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Allowances:</span>
-                      <input 
-                        type="number" 
-                        value={expenses.allowances} 
-                        onChange={(e)=>handleExpenseChange('allowances', e.target.value)} 
-                        className="border rounded px-2 py-1 w-32 text-center" 
-                      />
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Utilities:</span>
-                      <input 
-                        type="number" 
-                        value={expenses.utilities} 
-                        onChange={(e)=>handleExpenseChange('utilities', e.target.value)} 
-                        className="border rounded px-2 py-1 w-32 text-center" 
-                      />
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Others:</span>
-                      <input 
-                        type="number" 
-                        value={expenses.others} 
-                        onChange={(e)=>handleExpenseChange('others', e.target.value)} 
-                        className="border rounded px-2 py-1 w-32 text-center" 
-                      />
-                    </div>
-                    <div className="pt-2 border-t">
-                      <div className="flex justify-between font-semibold">
-                        <span>Total Expenses:</span>
-                        <span>₱{totalExpenses.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span>Existing Coverage:</span>
-                  <input 
-                    type="number" 
-                    value={lifeQuestion3} 
-                    onChange={(e)=>setLifeQuestion3(e.target.value)} 
-                    className="border rounded px-2 py-1 w-32 text-center" 
-                  />
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mt-4">You can edit any field before final submission.</p>
-            </div>
-          )}
-        </form>
-
-        <div className="mt-10 flex justify-between">
-          {currentStep > 1 ? (
-            <button onClick={handleBack} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">Previous</button>
-          ) : (
-            <Link to="/services/yes_services/LifeProHealth" className="text-[#003266] cursor-pointer">Back</Link>
-          )}
-
-          <button onClick={handleNext} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">{currentStep===4?"Submit":"Next"}</button>
+            <button 
+              onClick={handleNext} 
+              className="bg-[#003266] text-white font-bold px-16 py-4 rounded-xl hover:bg-[#00214d] transition-colors duration-300 text-lg"
+            >
+              {currentStep === 4 ? "Submit" : "Next "}
+            </button>
+          </div>
         </div>
       </div>
     </div>

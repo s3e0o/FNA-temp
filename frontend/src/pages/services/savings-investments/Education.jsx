@@ -20,25 +20,25 @@ function Education() {
     time: "",
   });
   const [appointmentErrors, setAppointmentErrors] = useState({});
-
+  const [customSchoolFee, setCustomSchoolFee] = useState("");
   const resultRef = useRef(null);
 
   const formatCurrency = (value) => {
-    return value.toLocaleString('en-PH', {
+    if (isNaN(value) || value === null || value === undefined) return "0.00";
+    return new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+      maximumFractionDigits: 2,
+    }).format(Math.abs(value));
   };
+
   // School options with annual fees
   const schoolOptions = [
     { name: "UP", fee: 75000 },
     { name: "La Salle", fee: 195000 },
     { name: "Ateneo", fee: 190000 },
     { name: "UST", fee: 120000 },
-    { name: "Other", fee: 0 } // User can input custom amount
+    { name: "Other", fee: 0 }, // User can input custom amount
   ];
-
-  const [customSchoolFee, setCustomSchoolFee] = useState("");
 
   useEffect(() => {
     document.title = "Financial Needs Analysis | Education";
@@ -46,28 +46,26 @@ function Education() {
 
   const validateCurrentStep = () => {
     const newErrors = {};
-    
     if (currentStep === 1) {
-      // Question 1 validation (child's age)
       if (!childAge.trim() || isNaN(parseInt(childAge)) || parseInt(childAge) <= 0) {
         newErrors.question1 = "Please enter a valid age (greater than 0).";
       } else if (parseInt(childAge) >= 18) {
         newErrors.question1 = "Child's age should be less than 18 years.";
       }
     } else if (currentStep === 2) {
-      // Question 2 validation (school selection)
       if (!selectedSchool.trim()) {
         newErrors.question2 = "Please select a school.";
-      } else if (selectedSchool === "Other" && (!customSchoolFee.trim() || isNaN(parseFloat(customSchoolFee)) || parseFloat(customSchoolFee) <= 0)) {
+      } else if (
+        selectedSchool === "Other" &&
+        (!customSchoolFee.trim() || isNaN(parseFloat(customSchoolFee)) || parseFloat(customSchoolFee) <= 0)
+      ) {
         newErrors.question2 = "Please enter a valid annual fee for Other school.";
       }
     } else if (currentStep === 3) {
-      // Question 3 validation (amount saved)
       if (!savedAmount.trim() || isNaN(parseFloat(savedAmount)) || parseFloat(savedAmount) < 0) {
         newErrors.question3 = "Please enter a valid amount (0 or greater).";
       }
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -100,7 +98,7 @@ function Education() {
     if (selectedSchool === "Other") {
       return parseFloat(customSchoolFee) || 0;
     }
-    const school = schoolOptions.find(s => s.name === selectedSchool);
+    const school = schoolOptions.find((s) => s.name === selectedSchool);
     return school ? school.fee : 0;
   };
 
@@ -110,11 +108,10 @@ function Education() {
     const annualFee = getAnnualFee();
     const alreadySaved = parseFloat(savedAmount) || 0;
 
-    // Official multiplier table from PDF: "4 yr Education @ 8% p.a."
     const multiplierTable = {
-      0: 1.0000, // no inflation if starting now
+      0: 1.0,
       1: 1.2167,
-      2: 1.3140,
+      2: 1.314,
       3: 1.4191,
       4: 1.5326,
       5: 1.6552,
@@ -135,9 +132,7 @@ function Education() {
       20: 5.2507,
     };
 
-    const multiplier = multiplierTable[yearsUntilCollege] || 1.0; // fallback to 1.0
-
-    // Formula from PDF: [(B × 4) × multiplier] – C
+    const multiplier = multiplierTable[yearsUntilCollege] || 1.0;
     const totalNeededToday = annualFee * 4;
     const futureValue = totalNeededToday * multiplier;
     const remainingNeeded = Math.max(0, futureValue - alreadySaved);
@@ -146,9 +141,9 @@ function Education() {
       yearsUntilCollege,
       annualFee,
       totalNeededToday,
-      futureValue,        // This is the "Total amount needed for 4-year college"
+      futureValue,
       alreadySaved,
-      remainingNeeded
+      remainingNeeded,
     };
   };
 
@@ -156,18 +151,15 @@ function Education() {
     const result = computeResult();
     const yearsUntilCollege = result.yearsUntilCollege;
     const remainingNeeded = result.remainingNeeded;
-    
-    // Calculate monthly savings needed assuming 5% annual return
+
     const annualRate = 0.05;
     const monthlyRate = annualRate / 12;
     const totalMonths = yearsUntilCollege * 12;
-    
+
     if (yearsUntilCollege === 0 || remainingNeeded === 0) return 0;
-    
-    // Future value of annuity formula: FV = PMT * [(1 + r)^n - 1] / r
-    // Rearranged to solve for PMT: PMT = FV * r / [(1 + r)^n - 1]
-    const monthlySavings = remainingNeeded * monthlyRate / (Math.pow(1 + monthlyRate, totalMonths) - 1);
-    
+
+    const monthlySavings =
+      remainingNeeded * monthlyRate / (Math.pow(1 + monthlyRate, totalMonths) - 1);
     return monthlySavings;
   };
 
@@ -175,22 +167,20 @@ function Education() {
     if (!resultRef.current) return;
     const canvas = await html2canvas(resultRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF("p", "mm", "a4");
     const width = pdf.internal.pageSize.getWidth() - 10;
     const height = (canvas.height * width) / canvas.width;
-
     pdf.addImage(imgData, "PNG", 5, 5, width, height);
     pdf.save("Education-Planning-Result.pdf");
   };
 
   const handleBookAppointment = () => setShowAppointmentForm(true);
-  
+
   const handleAppointmentChange = (e) => {
     const { name, value } = e.target;
     setAppointmentData({ ...appointmentData, [name]: value });
   };
-  
+
   const validateAppointment = () => {
     const newErrors = {};
     if (!appointmentData.name.trim()) newErrors.name = "Name is required.";
@@ -202,7 +192,7 @@ function Education() {
     setAppointmentErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleAppointmentSubmit = (e) => {
     e.preventDefault();
     if (validateAppointment()) {
@@ -219,40 +209,52 @@ function Education() {
     if (showAppointmentForm) {
       return (
         <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-            <h1 className="text-3xl text-center text-[#003266] mb-8">Appointment Form</h1>
-            <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-              {["name", "email", "phone", "date", "time"].map((field) => (
-                <div key={field}>
-                  <label className="block text-lg text-[#003266] mb-2">{field.toUpperCase()}</label>
-                  <input
-                    type={
-                      field === "email"
-                        ? "email"
-                        : field === "phone"
-                        ? "tel"
-                        : field === "date"
-                        ? "date"
-                        : field === "time"
-                        ? "time"
-                        : "text"
-                    }
-                    name={field}
-                    value={appointmentData[field]}
-                    onChange={handleAppointmentChange}
-                    className="w-full px-4 py-3 border rounded-lg text-lg"
-                  />
-                  {appointmentErrors[field] && (
-                    <p className="text-red-500 mt-1">{appointmentErrors[field]}</p>
-                  )}
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-5">
+              <h1 className="text-xl font-bold text-[#003266] text-center mb-8">Appointment Form</h1>
+              <form onSubmit={handleAppointmentSubmit} className="space-y-6">
+                {["name", "email", "phone", "date", "time"].map((field) => (
+                  <div key={field}>
+                    <label className="block text-sm font-bold text-[#003266] mb-2">{field.toUpperCase()}</label>
+                    <input
+                      type={
+                        field === "email"
+                          ? "email"
+                          : field === "phone"
+                          ? "tel"
+                          : field === "date"
+                          ? "date"
+                          : field === "time"
+                          ? "time"
+                          : "text"
+                      }
+                      name={field}
+                      value={appointmentData[field]}
+                      onChange={handleAppointmentChange}
+                      className="w-full px-3 py-2 border rounded text-sm"
+                    />
+                    {appointmentErrors[field] && (
+                      <p className="text-red-500 text-xs mt-1">{appointmentErrors[field]}</p>
+                    )}
+                  </div>
+                ))}
+                <div className="flex justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setShowAppointmentForm(false)}
+                    className="border-2 border-gray-500 text-gray-500 px-4 py-1.5 rounded-full text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  >
+                    Submit
+                  </button>
                 </div>
-              ))}
-
-              <div className="flex justify-between">
-                <button type="button" onClick={() => setShowAppointmentForm(false)} className="bg-gray-500 text-white px-6 py-3 rounded-md">Cancel</button>
-                <button type="submit" className="bg-[#003266] text-white px-6 py-3 rounded-md">Submit</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       );
@@ -260,7 +262,7 @@ function Education() {
 
     return (
       <>
-      {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
+        {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
         <EducationResultPDF
           ref={resultRef}
           childAge={parseInt(childAge) || 0}
@@ -273,272 +275,318 @@ function Education() {
           remainingNeeded={result.remainingNeeded}
           monthlySavings={monthlySavings}
         />
-      {/* === VISIBLE RESULT SECTION === */}
-      <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-        <Link
-          to="/FNA/door"
-          className="relative inline-block text-[#395998] font-medium mb-5 ml-10
-                      after:content-[''] after:absolute after:left-0 after:-bottom-1
-                      after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                      after:transition-all after:duration-300
-                      hover:after:w-full"
-        >
-          ← Back to Doors
-        </Link>
-        <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-          
-          <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
 
-          <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">EDUCATION</h1>
+        {/* === VISIBLE RESULT SECTION === */}
+        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+          <Link
+            to="/FNA/door"
+            className="relative inline-block text-[#395998] font-medium mb-4 ml-4
+              after:content-[''] after:absolute after:left-0 after:-bottom-1
+              after:w-0 after:h-[1.5px] after:bg-[#F4B43C]
+              after:transition-all after:duration-300
+              hover:after:w-full text-sm"
+          >
+            ← Back to Doors
+          </Link>
 
-          <p className="text-lg text-[#003266] text-center mt-6">
-            Based on your child's age ({childAge} years) and selected school ({selectedSchool}):
-          </p>
-
-          <div className="space-y-6 mt-6 mb-14">
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Years until college starts:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                {result.yearsUntilCollege} years
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-5">
+              <div className="text-center mb-5">
+                <h1 className="text-xl font-bold text-[#003266] mb-3">EDUCATION RESULT</h1>
+                <button
+                  onClick={handleExportPDF}
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Export to PDF
+                </button>
               </div>
-            </div>
 
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Total amount needed for 4-year college:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{formatCurrency(result.futureValue)}
-              </div>
-            </div>
+              <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+                <p className="text-base text-[#003266] text-center mb-5">
+                  Based on your child's age (<span className="font-bold">{childAge} years</span>) and selected school (<span className="font-bold">{selectedSchool}</span>):
+                </p>
 
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Remaining amount needed to save:</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{formatCurrency(result.remainingNeeded)}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-2">Monthly savings needed (5% annual return):</p>
-              <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{formatCurrency(monthlySavings)}
+                <div className="space-y-4 mb-5">
+                  {/* Years Until College */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2">Years Until College</h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        {result.yearsUntilCollege} years
+                      </div>
+                    </div>
+
+                    {/* Total Needed */}
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2">Total Needed (4 yrs)</h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        ₱{formatCurrency(result.futureValue)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Remaining Needed */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-sm font-bold text-[#003266] mb-2 text-center">Remaining Amount Needed</h3>
+                    <div className="text-base font-bold text-[#003266] text-center">
+                      ₱{formatCurrency(result.remainingNeeded)}
+                    </div>
+                  </div>
+
+                  {/* Monthly Savings Needed */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-sm font-bold text-[#003266] mb-2 text-center">Monthly Savings Needed (5% return)</h3>
+                    <div className="text-base font-bold text-[#003266] text-center">
+                      ₱{formatCurrency(monthlySavings)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+                  <Link to="/FNA/AppointmentForm">
+                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                      Book Appointment
+                    </button>
+                  </Link>
+                  <Link to="/FNA/OurServices">
+                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                      View Services
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="mt-10 flex justify-between">
-          <Link to="/FNA/AppointmentForm">
-            <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-              Book an Appointment
-            </button>
-          </Link>
-
-          <Link to="/FNA/OurServices">
-            <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-              View Recommendations
-            </button>
-          </Link>
         </div>
-
-        </div>
-      </div>
       </>
     );
   }
 
   return (
     <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-        <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">EDUCATION</h1>
-
-        <div className="flex justify-center mb-10">
-          <div className="relative flex items-center w-[640px]">
-            <div className="absolute left-10 right-1 top-6 h-[2px] bg-[#8FA6BF]" />
-            {[1,2,3,4].map(n => (
-              <React.Fragment key={n}>
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full ${currentStep >= n ? "bg-[#003266]" : "bg-[#B7C5D6]"} flex items-center justify-center`}>
-                    <div className="w-10 h-10 rounded-full border-3 border-white text-[#F4B43C] flex items-center justify-center text-lg">{n}</div>
-                  </div>
-                  <span className={`text-sm mt-2 ${currentStep >= n ? "text-[#003266]" : "text-[#8FA6BF]"}`}>
-                    {n===1?"Question 1":n===2?"Question 2":n===3?"Question 3":"Review"}
-                  </span>
-                </div>
-                {n!==4 && <div className="flex-1" />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        <form className="space-y-8">
-          {currentStep === 1 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">What is the age of your child?</p>
-              <div className="relative w-80 mx-auto">
-                <input 
-                  type="number" 
-                  value={childAge} 
-                  onChange={(e)=>setChildAge(e.target.value)} 
-                  className="w-full p-3 border rounded-lg text-center" 
-                  placeholder="Enter age"
-                  min="1"
-                  max="17"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">year/s old</span>
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-5">
+          {/* Progress Bar */}
+          <div className="mb-5">
+            <div className="relative">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#003366] rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                ></div>
               </div>
-              {errors.question1 && <p className="text-red-500 mt-2">{errors.question1}</p>}
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">Choose a school with the corresponding annual fee you want him/her to attend?</p>
-              
-              <div className="flex flex-col gap-4 w-80 mx-auto mb-6">
-                {schoolOptions.map((school) => (
-                  <label
-                    key={school.name}
-                    className={`flex items-center justify-between bg-white border rounded-lg px-4 py-3 shadow hover:shadow-md cursor-pointer ${
-                      selectedSchool === school.name ? 'border-[#003266] border-2' : 'border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name="school"
-                        value={school.name}
-                        checked={selectedSchool === school.name}
-                        onChange={(e) => setSelectedSchool(e.target.value)}
-                        className="mr-3 w-5 h-5 accent-[#003266]"
-                      />
-                      <span className="text-[#003266] font-medium">{school.name}</span>
-                    </div>
-                    {school.name !== "Other" && (
-                      <span className="text-[#003266] font-medium">₱{school.fee.toLocaleString()}</span>
-                    )}
-                  </label>
+              <div className="flex justify-between mt-4">
+                {["Question 1", "Question 2", "Question 3", "Review"].map((label, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div
+                      className={`w-3 h-3 rounded-full mb-1.5 ${
+                        currentStep > index + 1 ? "bg-[#003366]" : currentStep === index + 1 ? "bg-[#003366]" : "bg-gray-300"
+                      }`}
+                    ></div>
+                    <span
+                      className={`text-xs font-medium whitespace-nowrap ${
+                        currentStep >= index + 1 ? "text-[#003266]" : "text-gray-500"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </div>
                 ))}
               </div>
-
-              {selectedSchool === "Other" && (
-                <div className="w-80 mx-auto mt-4">
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={customSchoolFee} 
-                      onChange={(e)=>setCustomSchoolFee(e.target.value)} 
-                      className="w-full p-3 pl-10 pr-3 border rounded-lg" 
-                      placeholder="Enter custom annual fee"
-                    />
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">₱</span>
-                  </div>
-                </div>
-              )}
-              
-              {errors.question2 && <p className="text-red-500 mt-2">{errors.question2}</p>}
             </div>
-          )}
+          </div>
 
-          {currentStep === 3 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">How much have you saved for your child's college?</p>
-              <div className="relative w-80 mx-auto">
-                <input 
-                  type="number" 
-                  value={savedAmount} 
-                  onChange={(e)=>setSavedAmount(e.target.value)} 
-                  className="w-full p-3 pl-10 pr-3 border rounded-lg text-center" 
-                  placeholder="Enter amount"
-                  min="0"
-                />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">₱</span>
-              </div>
-              {errors.question3 && <p className="text-red-500 mt-2">{errors.question3}</p>}
+          {/* Content */}
+          <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+            <div className="text-center mb-5">
+              <h1 className="text-xl font-bold text-[#003266] mb-2">EDUCATION</h1>
             </div>
-          )}
 
-          {currentStep === 4 && (
-            <div className="text-center space-y-6">
-              <p className="text-lg text-[#003266] mb-4 font-semibold">Review Your Inputs</p>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Child's Age:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={childAge} 
-                      onChange={(e)=>setChildAge(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center" 
+            <div className="max-w-lg mx-auto">
+              {currentStep === 1 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">What is the age of your child?</p>
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
+                    <input
+                      type="number"
+                      value={childAge}
+                      onChange={(e) => setChildAge(e.target.value)}
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      placeholder="Enter age"
                       min="1"
                       max="17"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003266]">years</span>
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                      YEARS
+                    </div>
                   </div>
+                  {errors.question1 && <p className="text-red-500 text-sm mb-4">{errors.question1}</p>}
                 </div>
-                
-                <div className="border p-4 rounded">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="font-semibold text-[#003266]">Selected School:</span>
+              )}
+
+              {currentStep === 2 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">
+                    Choose a school with the corresponding annual fee you want him/her to attend?
+                  </p>
+                  <div className="flex flex-col gap-3 mb-4">
+                    {schoolOptions.map((school) => (
+                      <label
+                        key={school.name}
+                        className={`flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 shadow hover:shadow-md cursor-pointer ${
+                          selectedSchool === school.name ? "border-[#003266] border-2" : "border-gray-300"
+                        }`}
+                      >
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            name="school"
+                            value={school.name}
+                            checked={selectedSchool === school.name}
+                            onChange={(e) => setSelectedSchool(e.target.value)}
+                            className="mr-3 w-4 h-4 accent-[#003266]"
+                          />
+                          <span className="text-[#003266] font-medium">{school.name}</span>
+                        </div>
+                        {school.name !== "Other" && (
+                          <span className="text-[#003266] font-medium">₱{school.fee.toLocaleString()}</span>
+                        )}
+                      </label>
+                    ))}
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#003266]">School:</span>
-                      <select 
-                        value={selectedSchool} 
-                        onChange={(e)=>setSelectedSchool(e.target.value)} 
-                        className="border rounded px-3 py-2 w-48"
+
+                  {selectedSchool === "Other" && (
+                    <div className="relative max-w-xs mx-auto mb-4">
+                      <input
+                        type="number"
+                        value={customSchoolFee}
+                        onChange={(e) => setCustomSchoolFee(e.target.value)}
+                        className="w-full p-2.5 pl-8 pr-3 border rounded text-center focus:outline-none"
+                        placeholder="Enter custom annual fee"
+                      />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#003266] text-sm">₱</span>
+                    </div>
+                  )}
+
+                  {errors.question2 && <p className="text-red-500 text-sm">{errors.question2}</p>}
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">How much have you saved for your child's college?</p>
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
+                    <input
+                      type="number"
+                      value={savedAmount}
+                      onChange={(e) => setSavedAmount(e.target.value)}
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      placeholder="Enter amount"
+                      min="0"
+                    />
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                      ₱
+                    </div>
+                  </div>
+                  {errors.question3 && <p className="text-red-500 text-sm">{errors.question3}</p>}
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3">Child's Age</h3>
+                      <div className="flex border border-gray-300 rounded overflow-hidden">
+                        <input
+                          type="number"
+                          value={childAge}
+                          onChange={(e) => setChildAge(e.target.value)}
+                          className="flex-grow p-2.5 text-center text-sm focus:outline-none"
+                          min="1"
+                          max="17"
+                        />
+                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                          YEARS
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3">Selected School</h3>
+                      <select
+                        value={selectedSchool}
+                        onChange={(e) => setSelectedSchool(e.target.value)}
+                        className="w-full p-2.5 border rounded text-sm focus:outline-none"
                       >
                         <option value="">Select school</option>
-                        {schoolOptions.map(school => (
+                        {schoolOptions.map((school) => (
                           <option key={school.name} value={school.name}>
-                            {school.name} {school.name !== "Other" ? `(₱${school.fee.toLocaleString()})` : ''}
+                            {school.name} {school.name !== "Other" ? `(₱${school.fee.toLocaleString()})` : ""}
                           </option>
                         ))}
                       </select>
-                    </div>
-                    {selectedSchool === "Other" && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-[#003266]">Custom Annual Fee:</span>
-                        <div className="relative">
-                          <input 
-                            type="number" 
-                            value={customSchoolFee} 
-                            onChange={(e)=>setCustomSchoolFee(e.target.value)} 
-                            className="border rounded px-3 py-2 w-32 text-center pl-8" 
+                      {selectedSchool === "Other" && (
+                        <div className="mt-2 flex border border-gray-300 rounded overflow-hidden">
+                          <input
+                            type="number"
+                            value={customSchoolFee}
+                            onChange={(e) => setCustomSchoolFee(e.target.value)}
+                            className="flex-grow p-2 text-center text-sm focus:outline-none"
+                            placeholder="Custom fee"
                           />
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#003266]">₱</span>
+                          <div className="bg-gray-100 px-2 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                            ₱
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200 md:col-span-2">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3">Amount Saved</h3>
+                      <div className="flex border border-gray-300 rounded overflow-hidden">
+                        <input
+                          type="number"
+                          value={savedAmount}
+                          onChange={(e) => setSavedAmount(e.target.value)}
+                          className="flex-grow p-2.5 text-center text-sm focus:outline-none"
+                          min="0"
+                        />
+                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                          ₱
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Amount Saved:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={savedAmount} 
-                      onChange={(e)=>setSavedAmount(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center pl-8" 
-                      min="0"
-                    />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#003266]">₱</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mt-4">You can edit any field before final submission.</p>
+              )}
             </div>
-          )}
-        </form>
+          </div>
 
-        <div className="mt-10 flex justify-between">
-          {currentStep > 1 ? (
-            <button onClick={handleBack} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">Previous</button>
-          ) : (
-            <Link to="/services/yes_services/SavEdRe" className="text-[#003266] cursor-pointer">Back</Link>
-          )}
-
-          <button onClick={handleNext} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">{currentStep===4?"Submit":"Next"}</button>
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+            {currentStep > 1 ? (
+              <button
+                onClick={handleBack}
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              >
+                Back
+              </button>
+            ) : (
+              <Link
+                to="/services/yes_services/SavEdRe"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              >
+                Back
+              </Link>
+            )}
+            <button
+              onClick={handleNext}
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+            >
+              {currentStep === 4 ? "Submit" : "Next"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

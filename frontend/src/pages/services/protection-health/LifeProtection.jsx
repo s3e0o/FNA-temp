@@ -230,42 +230,105 @@ function LifeProtection() {
         <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
           <Link
             to="/FNA/door"
-            className="relative inline-block text-[#395998] font-medium mb-5 ml-10
+            className="relative inline-block text-[#395998] font-medium mb-4 ml-4
                         after:content-[''] after:absolute after:left-0 after:-bottom-1
-                        after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
+                        after:w-0 after:h-[1.5px] after:bg-[#F4B43C]
                         after:transition-all after:duration-300
-                        hover:after:w-full"
+                        hover:after:w-full text-sm"
           >
             ← Back to Doors
           </Link>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
-            <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">
-              Export to PDF
-            </button>
-
-            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">LIFE PROTECTION</h1>
-
-            <p className="text-lg text-[#003266] text-center mt-6">
-              This is the minimum amount you need for life protection to support your family for {lifeQuestion1} years.
-            </p>
-
-            <div className="flex justify-center mb-14 mt-6">
-              <div className="w-80 py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                ₱{formatCurrency(parseFloat(result))}
+          
+          {/* Result container */}
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-5">
+              {/* Title section */}
+              <div className="text-center mb-5">
+                <h1 className="text-xl font-bold text-[#003266] mb-3">LIFE PROTECTION RESULT</h1>
+                <button onClick={handleExportPDF} className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                  Export to PDF
+                </button>
               </div>
-            </div>
 
-            <div className="mt-10 flex justify-between">
-              <Link to="/FNA/AppointmentForm">
-                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                  Book an Appointment
-                </button>
-              </Link>
-              <Link to="/FNA/OurServices">
-                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                  View Recommendations
-                </button>
-              </Link>
+              {/* Result description */}
+              <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+                <p className="text-base text-[#003266] text-center mb-5">
+                  Minimum amount needed to support your family for <span className="font-bold">{lifeQuestion1} years</span>:
+                </p>
+
+                {/* Result amount */}
+                <div className="flex justify-center mb-5">
+                  <div className="w-52 py-4 text-center text-xl font-bold border border-[#003266] rounded-lg bg-blue-50">
+                    ₱{formatCurrency(parseFloat(result))}
+                  </div>
+                </div>
+
+                {/* Summary section */}
+                <div className="space-y-4 mb-5">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Years Summary - Updated to match outer container */}
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2">Years</h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        {lifeQuestion1} years
+                      </div>
+                    </div>
+
+                    {/* Existing Coverage Summary - Updated to match outer container */}
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2">Existing Coverage</h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        ₱{formatCurrency(parseFloat(lifeQuestion3) || 0)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Monthly Expenses Summary - Updated to match outer container */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-sm font-bold text-[#003266] mb-3 text-center">Monthly Expenses</h3>
+                    <div className="space-y-2">
+                      {[
+                        { key: 'rent', label: 'Rent' },
+                        { key: 'loanPayments', label: 'Loan Payments' },
+                        { key: 'allowances', label: 'Allowances' },
+                        { key: 'utilities', label: 'Utilities' },
+                        { key: 'others', label: 'Others' }
+                      ].map(({ key, label }) => (
+                        <div key={key} className="flex items-center justify-between">
+                          <span className="text-sm text-[#003266] font-semibold">{label}:</span>
+                          <div className="text-sm font-bold text-[#003266]">
+                            ₱{formatCurrency(parseFloat(expenses[key]) || 0)}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Total Expenses */}
+                      <div className="pt-3 mt-3 border-t border-gray-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-base font-bold text-[#003266]">Total:</span>
+                          <div className="text-base font-bold text-[#003266]">
+                            ₱{formatCurrency(totalExpenses)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+                  <Link to="/FNA/AppointmentForm">
+                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                      Book Appointment
+                    </button>
+                  </Link>
+                  <Link to="/FNA/OurServices">
+                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                      View Services
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -275,31 +338,31 @@ function LifeProtection() {
 
   return (
     <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      {/* Main outer container */}
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-xl p-8">
-          {/* Progress Bar Container - KEEPING THE SLIDING PROGRESS BAR */}
-          <div className="mb-12">
+      {/* Main outer container - Made smaller */}
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-5">
+          {/* Progress Bar Container - Smaller */}
+          <div className="mb-5">
             <div className="relative">
-              {/* Background track */}
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              {/* Background track - Thinner */}
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 {/* Progress fill - sliding bar */}
                 <div 
-                  className="h-full bg-[#003266] rounded-full transition-all duration-500 ease-out"
+                  className="h-full bg-[#003366] rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
                 ></div>
               </div>
               
-              {/* Step Labels - Simplified to Question 1, Question 2, Question 3, Review */}
-              <div className="flex justify-between mt-6">
+              {/* Step Labels - Smaller */}
+              <div className="flex justify-between mt-4">
                 {["Question 1", "Question 2", "Question 3", "Review"].map((label, index) => (
-                  <div key={index} className="flex flex-col items-center relative -top-2">
-                    {/* Step indicator dot */}
+                  <div key={index} className="flex flex-col items-center">
+                    {/* Step indicator dot - Smaller */}
                     <div 
-                      className={`w-4 h-4 rounded-full mb-2 ${currentStep > index + 1 ? "bg-[#003266]" : currentStep === index + 1 ? "bg-[#003266] ring-4 ring-blue-100" : "bg-gray-300"}`}
+                      className={`w-3 h-3 rounded-full mb-1.5 ${currentStep > index + 1 ? "bg-[#003366]" : currentStep === index + 1 ? "bg-[#003366]" : "bg-gray-300"}`}
                     ></div>
                     <span 
-                      className={`text-sm font-medium whitespace-nowrap ${currentStep >= index + 1 ? "text-[#003266]" : "text-gray-500"}`}
+                      className={`text-xs font-medium whitespace-nowrap ${currentStep >= index + 1 ? "text-[#003266]" : "text-gray-500"}`}
                     >
                       {label}
                     </span>
@@ -309,42 +372,42 @@ function LifeProtection() {
             </div>
           </div>
 
-          {/* Content container - ONLY CHANGING THIS TO MATCH OUTER CONTAINER */}
-          <div className="bg-white rounded-xl shadow-lg p-10 mb-8 border border-gray-200">
-            {/* Step content header */}
-            <div className="text-center mb-10">
-              <h1 className="text-4xl font-bold text-[#003266] mb-4">LIFE PROTECTION</h1>
+          {/* Content container - Smaller */}
+          <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+            {/* Step content header - Smaller */}
+            <div className="text-center mb-5">
+              <h1 className="text-xl font-bold text-[#003266] mb-2">LIFE PROTECTION</h1>
             </div>
 
             {/* Question/Input container */}
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-lg mx-auto">
               {currentStep === 1 && (
                 <div className="text-center">
-                  <p className="text-xl text-[#003266] mb-10">How many years will you be providing for your family (i.e. until your children became financially independent)?</p>
+                  <p className="text-base text-[#003266] mb-4">How many years will you be providing for your family (i.e. until your children became financially independent)?</p>
                   
-                  <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden max-w-md mx-auto mb-8">
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
                     <input 
                       type="number" 
                       value={lifeQuestion1} 
                       onChange={(e)=>setLifeQuestion1(e.target.value)} 
-                      className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none" 
                       placeholder="Enter years"
                       min="1"
                       max="20"
                     />
-                    <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                       YEARS
                     </div>
                   </div>
-                  {errors.question1 && <p className="text-red-500 text-lg mb-8">{errors.question1}</p>}
+                  {errors.question1 && <p className="text-red-500 text-sm mb-4">{errors.question1}</p>}
                 </div>
               )}
 
               {currentStep === 2 && (
                 <div className="text-center">
-                  <p className="text-xl text-[#003266] mb-10">How much do you spend monthly for living expenses?</p>
+                  <p className="text-base text-[#003266] mb-4">How much do you spend monthly for living expenses?</p>
                   
-                  <div className="space-y-6 mb-10">
+                  <div className="space-y-3 mb-4">
                     {[
                       { key: 'rent', label: 'Rent' },
                       { key: 'loanPayments', label: 'Loan Payments' },
@@ -353,18 +416,18 @@ function LifeProtection() {
                       { key: 'others', label: 'Others' }
                     ].map(({ key, label }) => (
                       <div key={key} className="flex items-center justify-between">
-                        <span className="text-xl text-[#003266] font-semibold w-1/3 text-right pr-8">{label}:</span>
-                        <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden w-2/3">
+                        <span className="text-sm text-[#003266] font-semibold w-2/5 text-right pr-3">{label}:</span>
+                        <div className="flex border border-gray-300 rounded overflow-hidden w-3/5">
                           <input
                             type="number"
                             value={expenses[key]}
                             onChange={(e) => handleExpenseChange(key, e.target.value)}
                             placeholder="0.00"
-                            className="flex-grow p-4 text-center text-xl focus:outline-none"
+                            className="flex-grow p-2 text-center text-sm focus:outline-none"
                             min="0"
                             step="0.01"
                           />
-                          <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                          <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                             ₱
                           </div>
                         </div>
@@ -372,11 +435,11 @@ function LifeProtection() {
                     ))}
                     
                     {/* Total Expenses */}
-                    <div className="pt-10 border-t-2 border-gray-300 mt-10">
+                    <div className="pt-4 border-t border-gray-300 mt-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-[#003266] w-1/3 text-right pr-8">Total Expenses:</span>
-                        <div className="flex border-2 border-[#003266] rounded-xl overflow-hidden w-2/3 bg-blue-50">
-                          <div className="flex-grow p-4 text-center text-2xl font-bold text-[#003266]">
+                        <span className="text-base font-bold text-[#003266] w-2/5 text-right pr-3">Total Expenses:</span>
+                        <div className="flex border border-[#003266] rounded overflow-hidden w-3/5 bg-blue-50">
+                          <div className="flex-grow p-2 text-center text-base font-bold text-[#003266]">
                             ₱{totalExpenses.toFixed(2)}
                           </div>
                         </div>
@@ -384,10 +447,10 @@ function LifeProtection() {
                     </div>
                   </div>
                   
-                  {errors.question2 && <p className="text-red-500 text-lg text-center mb-4">{errors.question2}</p>}
+                  {errors.question2 && <p className="text-red-500 text-sm text-center mb-2">{errors.question2}</p>}
                   {Object.keys(errors).map(key => 
                     key.startsWith('expense_') && (
-                      <p key={key} className="text-red-500 text-center text-lg">{errors[key]}</p>
+                      <p key={key} className="text-red-500 text-center text-sm">{errors[key]}</p>
                     )
                   )}
                 </div>
@@ -395,70 +458,70 @@ function LifeProtection() {
 
               {currentStep === 3 && (
                 <div className="text-center">
-                  <p className="text-xl text-[#003266] mb-10">If you have any other plans, how much is your total coverage?</p>
+                  <p className="text-base text-[#003266] mb-4">If you have any other plans, how much is your total coverage?</p>
                   
-                  <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden max-w-md mx-auto mb-8">
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
                     <input 
                       type="number" 
                       value={lifeQuestion3} 
                       onChange={(e)=>setLifeQuestion3(e.target.value)} 
-                      className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none" 
                       placeholder="Enter amount"
                       min="0"
                       step="0.01"
                     />
-                    <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                       ₱
                     </div>
                   </div>
-                  {errors.question3 && <p className="text-red-500 text-lg">{errors.question3}</p>}
+                  {errors.question3 && <p className="text-red-500 text-sm">{errors.question3}</p>}
                 </div>
               )}
 
               {currentStep === 4 && (
-                <div className="space-y-10">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Years Card */}
-                    <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border border-blue-100">
-                      <h3 className="text-2xl font-bold text-[#003266] mb-6">Question 1: Years providing for family</h3>
-                      <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden">
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Years Card - Updated to match outer container */}
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3">Question 1: Years providing for family</h3>
+                      <div className="flex border border-gray-300 rounded overflow-hidden">
                         <input 
                           type="number" 
                           value={lifeQuestion1} 
                           onChange={(e)=>setLifeQuestion1(e.target.value)} 
-                          className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                          className="flex-grow p-2.5 text-center text-sm focus:outline-none" 
                           min="1"
                           max="20"
                         />
-                        <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                           YEARS
                         </div>
                       </div>
                     </div>
 
-                    {/* Existing Coverage Card */}
-                    <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border border-blue-100">
-                      <h3 className="text-2xl font-bold text-[#003266] mb-6">Question 3: Existing Coverage</h3>
-                      <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden">
+                    {/* Existing Coverage Card - Updated to match outer container */}
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3">Question 3: Existing Coverage</h3>
+                      <div className="flex border border-gray-300 rounded overflow-hidden">
                         <input 
                           type="number" 
                           value={lifeQuestion3} 
                           onChange={(e)=>setLifeQuestion3(e.target.value)} 
-                          className="flex-grow p-5 text-center text-xl focus:outline-none" 
+                          className="flex-grow p-2.5 text-center text-sm focus:outline-none" 
                           min="0"
                           step="0.01"
                         />
-                        <div className="bg-gray-100 px-8 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                           ₱
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Monthly Expenses Review Card */}
-                  <div className="bg-gradient-to-br from-blue-50 to-white p-10 rounded-2xl shadow-lg border border-blue-100">
-                    <h3 className="text-3xl font-bold text-[#003266] mb-8 text-center">Question 2: Monthly Expenses Review</h3>
-                    <div className="space-y-6 max-w-3xl mx-auto">
+                  {/* Monthly Expenses Review Card - Updated to match outer container */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-base font-bold text-[#003266] mb-4 text-center">Question 2: Monthly Expenses Review</h3>
+                    <div className="space-y-2 max-w-lg mx-auto">
                       {[
                         { key: 'rent', label: 'Rent' },
                         { key: 'loanPayments', label: 'Loan Payments' },
@@ -467,29 +530,29 @@ function LifeProtection() {
                         { key: 'others', label: 'Others' }
                       ].map(({ key, label }) => (
                         <div key={key} className="flex items-center justify-between">
-                          <span className="text-xl text-[#003266] font-semibold">{label}:</span>
-                          <div className="flex border-2 border-gray-300 rounded-xl overflow-hidden w-64">
+                          <span className="text-sm text-[#003266] font-semibold">{label}:</span>
+                          <div className="flex border border-gray-300 rounded overflow-hidden w-36">
                             <input
                               type="number"
                               value={expenses[key]}
                               onChange={(e) => handleExpenseChange(key, e.target.value)}
-                              className="flex-grow p-4 text-center text-xl focus:outline-none"
+                              className="flex-grow p-1.5 text-center text-sm focus:outline-none"
                               min="0"
                               step="0.01"
                             />
-                            <div className="bg-gray-100 px-6 flex items-center justify-center font-bold text-[#003266] border-l-2 border-gray-300 text-lg">
+                            <div className="bg-gray-100 px-2 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
                               ₱
                             </div>
                           </div>
                         </div>
                       ))}
                       
-                      {/* Total Expenses */}
-                      <div className="pt-8 mt-8 border-t-2 border-gray-300">
+                      {/* Total Expenses - Smaller */}
+                      <div className="pt-3 mt-3 border-t border-gray-300">
                         <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-[#003266]">Total Expenses:</span>
-                          <div className="flex border-2 border-[#003266] rounded-xl overflow-hidden w-64 bg-blue-50">
-                            <div className="flex-grow p-4 text-center text-2xl font-bold text-[#003266]">
+                          <span className="text-base font-bold text-[#003266]">Total Expenses:</span>
+                          <div className="flex border border-[#003266] rounded overflow-hidden w-36 bg-blue-50">
+                            <div className="flex-grow p-1.5 text-center text-base font-bold text-[#003266]">
                               ₱{totalExpenses.toFixed(2)}
                             </div>
                           </div>
@@ -502,19 +565,19 @@ function LifeProtection() {
             </div>
           </div>
 
-          {/* Navigation buttons container */}
-          <div className="flex justify-between items-center pt-8 border-t border-gray-300">
+          {/* Navigation buttons container - Smaller */}
+          <div className="flex justify-between items-center pt-4 border-t border-gray-300">
             {currentStep > 1 ? (
               <button 
                 onClick={handleBack} 
-                className="border-2 border-[#003266] text-[#003266] font-bold px-12 py-4 rounded-xl hover:bg-[#003266] hover:text-white transition-colors duration-300 text-lg"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
               >
                 Back
               </button>
             ) : (
               <Link 
                 to="/services/yes_services/LifeProHealth" 
-                className="border-2 border-[#003266] text-[#003266] font-bold px-12 py-4 rounded-xl hover:bg-[#003266] hover:text-white transition-colors duration-300 text-lg"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
               >
                 Back
               </Link>
@@ -522,9 +585,9 @@ function LifeProtection() {
 
             <button 
               onClick={handleNext} 
-              className="bg-[#003266] text-white font-bold px-16 py-4 rounded-xl hover:bg-[#00214d] transition-colors duration-300 text-lg"
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
             >
-              {currentStep === 4 ? "Submit" : "Next "}
+              {currentStep === 4 ? "Submit" : "Next"}
             </button>
           </div>
         </div>

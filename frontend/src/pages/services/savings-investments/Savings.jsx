@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { MdInfoOutline } from "react-icons/md";
 import SavingsResultPDF from "../../../components/pdf/SavingsResultPDF.jsx";
 
 function Savings() {
@@ -9,11 +10,13 @@ function Savings() {
   const [dreams, setDreams] = useState([]);
   const [years, setYears] = useState("");
   const [cost, setCost] = useState("");
+  const [otherDream, setOtherDream] = useState("");
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
 
-  const resultRef = useRef(null);
+  const [displayFutureValue, setDisplayFutureValue] = useState(0);
+  const [displayMonthlySavings, setDisplayMonthlySavings] = useState(0);
 
   const [appointmentData, setAppointmentData] = useState({
     name: "",
@@ -24,30 +27,66 @@ function Savings() {
   });
   const [appointmentErrors, setAppointmentErrors] = useState({});
 
-  const [otherDream, setOtherDream] = useState("");
+  const resultRef = useRef(null);
 
-  useEffect(() => {
-    document.title = "Savings | Financial Needs Analysis";
-  }, []);
+  const handleReset = () => {
+    setDreams([]);
+    setOtherDream("");
+    setYears("");
+    setCost("");
+    setErrors({});
+    setCurrentStep(1);
+    setDisplayFutureAmount(0);
+  };
+
+  // Animation value for future amount
+  const [displayFutureAmount, setDisplayFutureAmount] = useState(0);
 
   const inflationMultipliers = [
     1.0400, 1.0816, 1.1249, 1.1699, 1.2167, 1.2653, 1.3159, 1.3686, 1.4233, 1.4802,
     1.5395, 1.6010, 1.6651, 1.7317, 1.8009, 1.8730, 1.9479, 2.0258, 2.1068, 2.1911
   ];
 
+  // ─── Animation when entering review step ─────────────────────────────────
+  useEffect(() => {
+    if (currentStep !== 4) return;
+
+    const futureAmount = Number(cost || 0) * (inflationMultipliers[parseInt(years) - 1] || Math.pow(1.04, Number(years) || 0));
+
+    const animate = (start, end, duration, setter) => {
+      if (Math.abs(end - start) < 1) {
+        setter(end);
+        return;
+      }
+      let startTime = null;
+      const stepAnim = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const t = Math.min((timestamp - startTime) / duration, 1);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const value = Math.round(start + (end - start) * eased);
+        setter(value);
+        if (t < 1) requestAnimationFrame(stepAnim);
+        else setter(end);
+      };
+      requestAnimationFrame(stepAnim);
+    };
+
+    animate(displayFutureAmount, Math.round(futureAmount), 1400, setDisplayFutureAmount);
+  }, [currentStep, years, cost]);
+
   const validateInputs = () => {
     const newErrors = {};
-
     if (currentStep === 1 && dreams.length === 0) newErrors.dreams = "Please select at least one goal.";
     if (currentStep === 2) {
-      if (!years || isNaN(parseInt(years)) || parseInt(years) < 1 || parseInt(years) > 20)
+      const y = parseInt(years);
+      if (!years || isNaN(y) || y < 1 || y > 20)
         newErrors.years = "Please enter a valid number of years (1–20).";
     }
     if (currentStep === 3) {
-      if (!cost || isNaN(parseFloat(cost)) || parseFloat(cost) <= 0)
+      const c = parseFloat(cost);
+      if (!cost || isNaN(c) || c <= 0)
         newErrors.cost = "Please enter a valid cost.";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -68,21 +107,18 @@ function Savings() {
 
   const computeResult = () => {
     const yearIndex = parseInt(years) - 1;
-    const multiplier =
-      inflationMultipliers[yearIndex] || Math.pow(1.04, years);
-
-    return Number(parseFloat(cost) * multiplier).toLocaleString(undefined, {
+    const multiplier = inflationMultipliers[yearIndex] || Math.pow(1.04, Number(years) || 0);
+    return Number(parseFloat(cost || 0) * multiplier).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
   };
 
-  const handleDreamChange = (e) => {
-    const value = e.target.value;
-    if (dreams.includes(value)) {
-      setDreams(dreams.filter(d => d !== value));
+  const handleDreamChange = (value) => {
+    if (dreams[0] === value) {
+      setDreams([]);
     } else {
-      setDreams([...dreams, value]);
+      setDreams([value]);
     }
   };
 
@@ -90,29 +126,20 @@ function Savings() {
     if (!resultRef.current) return;
     const canvas = await html2canvas(resultRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF("p", "mm", "a4");
     const width = pdf.internal.pageSize.getWidth() - 10;
     const height = (canvas.height * width) / canvas.width;
-
     pdf.addImage(imgData, "PNG", 5, 5, width, height);
     pdf.save("Savings-Planning-Result.pdf");
   };
 
-  const formatNumber = (value) => {
-    if (!value) return "";
-    return Number(value).toLocaleString();
-  };
-
-  const parseNumber = (value) => {
-    return value.replace(/,/g, "");
-  };
-
   const handleBookAppointment = () => setShowAppointmentForm(true);
+
   const handleAppointmentChange = (e) => {
     const { name, value } = e.target;
-    setAppointmentData({ ...appointmentData, [name]: value });
+    setAppointmentData((prev) => ({ ...prev, [name]: value }));
   };
+
   const validateAppointment = () => {
     const newErrors = {};
     if (!appointmentData.name.trim()) newErrors.name = "Name is required.";
@@ -124,6 +151,7 @@ function Savings() {
     setAppointmentErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleAppointmentSubmit = (e) => {
     e.preventDefault();
     if (validateAppointment()) {
@@ -133,11 +161,8 @@ function Savings() {
     }
   };
 
-  // Helper to get selected dream label
   const getSelectedDreamLabel = () => {
-    if (dreams[0] === "Other") {
-      return otherDream || "Other";
-    }
+    if (dreams[0] === "Other") return otherDream.trim() || "Other";
     return dreams[0] || "";
   };
 
@@ -146,47 +171,53 @@ function Savings() {
 
     if (showAppointmentForm) {
       return (
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div
+          className="min-h-auto pt-32 px-4 pb-16"
+          style={{
+            backgroundImage: `url("/background.jpg")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg p-5">
-              <h1 className="text-xl font-bold text-[#003266] text-center mb-8">Appointment Form</h1>
-              <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-                {["name", "email", "phone", "date", "time"].map((field) => (
-                  <div key={field}>
-                    <label className="block text-sm font-bold text-[#003266] mb-2">{field.toUpperCase()}</label>
+              <h1 className="text-xl font-bold text-[#003266] text-center mb-6">
+                Book Appointment
+              </h1>
+              <form onSubmit={handleAppointmentSubmit} className="space-y-4 max-w-lg mx-auto">
+                {["name", "email", "phone", "date", "time"].map((f) => (
+                  <div key={f}>
+                    <label className="block text-[#003266] font-semibold mb-1.5 capitalize text-sm">
+                      {f.replace(/([A-Z])/g, " $1")}
+                    </label>
                     <input
                       type={
-                        field === "email"
-                          ? "email"
-                          : field === "phone"
-                          ? "tel"
-                          : field === "date"
-                          ? "date"
-                          : field === "time"
-                          ? "time"
-                          : "text"
+                        f === "email" ? "email" :
+                        f === "phone" ? "tel" :
+                        f === "date" ? "date" :
+                        f === "time" ? "time" : "text"
                       }
-                      name={field}
-                      value={appointmentData[field]}
+                      name={f}
+                      value={appointmentData[f]}
                       onChange={handleAppointmentChange}
-                      className="w-full px-3 py-2 border rounded text-sm"
+                      className="w-full p-2.5 border border-gray-300 rounded text-center focus:outline-none focus:border-[#003266]"
                     />
-                    {appointmentErrors[field] && (
-                      <p className="text-red-500 text-xs mt-1">{appointmentErrors[field]}</p>
+                    {appointmentErrors[f] && (
+                      <p className="text-red-500 text-xs mt-1">{appointmentErrors[f]}</p>
                     )}
                   </div>
                 ))}
-                <div className="flex justify-between">
+                <div className="flex justify-between pt-4">
                   <button
                     type="button"
                     onClick={() => setShowAppointmentForm(false)}
-                    className="border-2 border-gray-500 text-gray-500 px-4 py-1.5 rounded-full text-sm"
+                    className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                    className="border-2 border-[#003366] bg-[#003366] text-white px-6 py-1.5 rounded-full font-medium hover:bg-[#002244] transition-colors duration-200 text-sm"
                   >
                     Submit
                   </button>
@@ -200,33 +231,37 @@ function Savings() {
 
     return (
       <>
-        {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
         <SavingsResultPDF
           ref={resultRef}
           dream={getSelectedDreamLabel()}
           years={parseInt(years) || 0}
           currentCost={parseFloat(cost) || 0}
           futureAmountNeeded={parseFloat(result.replace(/,/g, ''))}
-          multiplier={inflationMultipliers[parseInt(years) - 1] || Math.pow(1.04, years)}
+          multiplier={inflationMultipliers[parseInt(years) - 1] || Math.pow(1.04, Number(years))}
         />
 
-        {/* === VISIBLE RESULT SECTION === */}
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div
+          className="min-h-auto pt-32 px-4 pb-16"
+          style={{
+            backgroundImage: `url("/background.jpg")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <Link
-            to="/FNA/door"
-            className="relative inline-block text-[#395998] font-medium mb-4 ml-4
-              after:content-[''] after:absolute after:left-0 after:-bottom-1
-              after:w-0 after:h-[1.5px] after:bg-[#F4B43C]
-              after:transition-all after:duration-300
-              hover:after:w-full text-sm"
-          >
-            ← Back to Doors
-          </Link>
+              to="/FNA/door"
+              className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
+            >
+              ← Back to Doors
+            </Link>
 
           <div className="max-w-2xl mx-auto">
+
             <div className="bg-white rounded-lg shadow-lg p-5">
               <div className="text-center mb-5">
-                <h1 className="text-xl font-bold text-[#003266] mb-3">SAVINGS RESULT</h1>
+                <h1 className="text-xl font-bold text-[#003266] mb-3">
+                  SAVINGS RESULT
+                </h1>
                 <button
                   onClick={handleExportPDF}
                   className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
@@ -241,18 +276,19 @@ function Savings() {
                   <span className="font-bold">{years} years</span>, you will need:
                 </p>
 
-                <div className="bg-white rounded-lg shadow p-4 border border-gray-200 mb-5">
-                  <div className="text-base font-bold text-[#003266] text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-64 py-5 text-center text-2xl font-bold border border-[#003266] rounded-lg bg-blue-50">
                     ₱{result}
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t border-gray-300">
-                  <Link to="/FNA/AppointmentForm">
-                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
-                      Book Appointment
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleBookAppointment}
+                    className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  >
+                    Book Appointment
+                  </button>
                   <Link to="/FNA/OurServices">
                     <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
                       View Services
@@ -268,7 +304,14 @@ function Savings() {
   }
 
   return (
-    <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+    <div
+      className="min-h-auto pt-32 px-4 pb-16"
+      style={{
+        backgroundImage: `url("/background.jpg")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-5">
           {/* Progress Bar */}
@@ -278,19 +321,23 @@ function Savings() {
                 <div
                   className="h-full bg-[#003366] rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
-                ></div>
+                />
               </div>
               <div className="flex justify-between mt-4">
-                {["Question 1", "Question 2", "Question 3", "Review"].map((label, index) => (
-                  <div key={index} className="flex flex-col items-center">
+                {["Question 1", "Question 2", "Question 3", "Review"].map((label, i) => (
+                  <div key={i} className="flex flex-col items-center">
                     <div
                       className={`w-3 h-3 rounded-full mb-1.5 ${
-                        currentStep > index + 1 ? "bg-[#003366]" : currentStep === index + 1 ? "bg-[#003366]" : "bg-gray-300"
+                        currentStep > i + 1
+                          ? "bg-[#003366]"
+                          : currentStep === i + 1
+                          ? "bg-[#003366]"
+                          : "bg-gray-300"
                       }`}
-                    ></div>
+                    />
                     <span
                       className={`text-xs font-medium whitespace-nowrap ${
-                        currentStep >= index + 1 ? "text-[#003266]" : "text-gray-500"
+                        currentStep >= i + 1 ? "text-[#003266]" : "text-gray-500"
                       }`}
                     >
                       {label}
@@ -301,7 +348,6 @@ function Savings() {
             </div>
           </div>
 
-          {/* Content */}
           <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
             <div className="text-center mb-5">
               <h1 className="text-xl font-bold text-[#003266] mb-2">SAVINGS</h1>
@@ -311,38 +357,32 @@ function Savings() {
               {currentStep === 1 && (
                 <div className="text-center">
                   <p className="text-base text-[#003266] mb-4">What are you saving for?</p>
-                  <div className="flex flex-col gap-3 mb-4">
+                  <div className="space-y-3">
                     {["House", "Car", "Business", "Other"].map((option) => (
-                      <label
+                      <button
                         key={option}
-                        className={`flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 shadow hover:shadow-md cursor-pointer ${
-                          dreams[0] === option ? "border-[#003266] border-2" : "border-gray-300"
+                        onClick={() => handleDreamChange(option)}
+                        className={`w-full py-3 px-4 rounded-lg font-medium transition-all text-left ${
+                          dreams[0] === option
+                            ? "bg-[#003366] text-white shadow-md"
+                            : "bg-gray-100 hover:bg-gray-200 text-[#003266]"
                         }`}
                       >
-                        <div className="flex items-center">
-                          <input
-                            type="radio"
-                            name="dream"
-                            value={option}
-                            checked={dreams[0] === option}
-                            onChange={() => setDreams([option])}
-                            className="mr-3 w-4 h-4 accent-[#003266]"
-                          />
-                          <span className="text-[#003266] font-medium">{option}</span>
-                        </div>
+                        {option}
                         {option === "Other" && dreams[0] === "Other" && (
                           <input
                             type="text"
                             placeholder="Please specify"
                             value={otherDream}
                             onChange={(e) => setOtherDream(e.target.value)}
-                            className="ml-4 px-2 py-1 border rounded text-sm w-32"
+                            className="mt-2 w-full px-3 py-2 bg-white text-[#003266] rounded border border-gray-300 focus:outline-none focus:border-[#003366]"
+                            onClick={(e) => e.stopPropagation()}
                           />
                         )}
-                      </label>
+                      </button>
                     ))}
                   </div>
-                  {errors.dreams && <p className="text-red-500 text-sm">{errors.dreams}</p>}
+                  {errors.dreams && <p className="text-red-500 text-sm mt-4">{errors.dreams}</p>}
                 </div>
               )}
 
@@ -356,7 +396,7 @@ function Savings() {
                       type="number"
                       value={years}
                       onChange={(e) => setYears(e.target.value)}
-                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none focus:border-[#003366]"
                       placeholder="Enter years"
                       min="1"
                       max="20"
@@ -375,80 +415,101 @@ function Savings() {
                     What is the cost of realizing your dream now?
                   </p>
                   <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
+                      ₱
+                    </div>
                     <input
                       type="number"
                       value={cost}
                       onChange={(e) => setCost(e.target.value)}
-                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none focus:border-[#003366]"
                       placeholder="Enter amount"
                       min="0"
+                      step="1"
                     />
-                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
-                      ₱
-                    </div>
                   </div>
                   {errors.cost && <p className="text-red-500 text-sm">{errors.cost}</p>}
                 </div>
               )}
 
               {currentStep === 4 && (
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                      <h3 className="text-sm font-bold text-[#003266] mb-3">Saving For</h3>
-                      <select
-                        value={dreams[0] || ""}
-                        onChange={(e) => setDreams([e.target.value])}
-                        className="w-full p-2.5 border rounded text-sm focus:outline-none"
-                      >
-                        <option value="">Select goal</option>
-                        {["House", "Car", "Business", "Other"].map((goal) => (
-                          <option key={goal} value={goal}>{goal}</option>
-                        ))}
-                      </select>
-                      {dreams[0] === "Other" && (
-                        <div className="mt-2">
+                <div className="space-y-5">
+                  <h2 className="text-lg font-bold text-[#003266] text-center mb-4">
+                    Review & Edit Your Answers
+                  </h2>
+
+                  {/* Live animated preview */}
+                  <div className="bg-blue-50 border border-[#003266] rounded-lg p-5 mb-6 text-center shadow-sm">
+                    <p className="text-base text-[#003266] mb-4">
+                      Estimated Future Amount Needed (updates live):
+                    </p>
+                    <div className="text-3xl font-bold text-[#003266] tabular-nums">
+                      ₱{displayFutureAmount.toLocaleString("en-PH")}
+                    </div>
+                  </div>
+
+                  {/* Editable fields */}
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <h3 className="text-sm font-bold text-[#003266] mb-2">Saving For</h3>
+                        <select
+                          value={dreams[0] || ""}
+                          onChange={(e) => setDreams([e.target.value])}
+                          className="w-full p-2.5 border rounded text-sm focus:outline-none focus:border-[#003366]"
+                        >
+                          <option value="">Select goal</option>
+                          {["House", "Car", "Business", "Other"].map((goal) => (
+                            <option key={goal} value={goal}>{goal}</option>
+                          ))}
+                        </select>
+
+                        {dreams[0] === "Other" && (
                           <input
                             type="text"
                             value={otherDream}
                             onChange={(e) => setOtherDream(e.target.value)}
                             placeholder="Specify your goal"
-                            className="w-full p-2 border rounded text-sm"
+                            className="mt-3 w-full p-2 border rounded text-sm focus:outline-none focus:border-[#003366]"
                           />
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
 
-                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                      <h3 className="text-sm font-bold text-[#003266] mb-3">Years Until Goal</h3>
-                      <div className="flex border border-gray-300 rounded overflow-hidden">
-                        <input
-                          type="number"
-                          value={years}
-                          onChange={(e) => setYears(e.target.value)}
-                          className="flex-grow p-2.5 text-center text-sm focus:outline-none"
-                          min="1"
-                          max="20"
-                        />
-                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
-                          YEARS
+                      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <h3 className="text-sm font-bold text-[#003266] mb-2">Years Until Goal</h3>
+                        <div className="flex border border-gray-300 rounded overflow-hidden">
+                          <input
+                            type="number"
+                            value={years}
+                            onChange={(e) => setYears(e.target.value)}
+                            className="flex-grow p-2.5 text-center text-sm focus:outline-none focus:border-[#003366]"
+                            min="1"
+                            max="20"
+                          />
+                          <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                            YEARS
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200 md:col-span-2">
-                      <h3 className="text-sm font-bold text-[#003266] mb-3">Current Cost (₱)</h3>
-                      <div className="flex border border-gray-300 rounded overflow-hidden">
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3 text-center">
+                        Current Cost of Your Goal
+                      </h3>
+                      <div className="flex border border-gray-300 rounded overflow-hidden max-w-md mx-auto">
+                        <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
+                          ₱
+                        </div>
                         <input
                           type="number"
                           value={cost}
                           onChange={(e) => setCost(e.target.value)}
-                          className="flex-grow p-2.5 text-center text-sm focus:outline-none"
+                          className="flex-grow p-2.5 text-center text-sm focus:outline-none focus:border-[#003366]"
+                          placeholder="Enter amount"
                           min="0"
+                          step="1"
                         />
-                        <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
-                          ₱
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -457,7 +518,6 @@ function Savings() {
             </div>
           </div>
 
-          {/* Navigation Buttons */}
           <div className="flex justify-between items-center pt-4 border-t border-gray-300">
             {currentStep > 1 ? (
               <button
@@ -474,6 +534,7 @@ function Savings() {
                 Back
               </Link>
             )}
+
             <button
               onClick={handleNext}
               className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"

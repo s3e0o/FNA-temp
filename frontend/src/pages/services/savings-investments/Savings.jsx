@@ -5,11 +5,19 @@ import html2canvas from "html2canvas";
 import { MdInfoOutline } from "react-icons/md";
 import SavingsResultPDF from "../../../components/pdf/SavingsResultPDF.jsx";
 
+// Helper: Format number with commas for display (max 9 digits)
+const formatNumberWithCommas = (value) => {
+  if (!value) return "";
+  const cleaned = value.replace(/[^0-9]/g, "");
+  const truncated = cleaned.slice(0, 9);
+  return truncated.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 function Savings() {
   const [currentStep, setCurrentStep] = useState(1);
   const [dreams, setDreams] = useState([]);
   const [years, setYears] = useState("");
-  const [cost, setCost] = useState("");
+  const [cost, setCost] = useState(""); // stores clean digit string (e.g., "1000000")
   const [otherDream, setOtherDream] = useState("");
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -17,6 +25,7 @@ function Savings() {
 
   const [displayFutureValue, setDisplayFutureValue] = useState(0);
   const [displayMonthlySavings, setDisplayMonthlySavings] = useState(0);
+  const [displayFutureAmount, setDisplayFutureAmount] = useState(0);
 
   const [appointmentData, setAppointmentData] = useState({
     name: "",
@@ -39,15 +48,12 @@ function Savings() {
     setDisplayFutureAmount(0);
   };
 
-  // Animation value for future amount
-  const [displayFutureAmount, setDisplayFutureAmount] = useState(0);
-
   const inflationMultipliers = [
     1.0400, 1.0816, 1.1249, 1.1699, 1.2167, 1.2653, 1.3159, 1.3686, 1.4233, 1.4802,
     1.5395, 1.6010, 1.6651, 1.7317, 1.8009, 1.8730, 1.9479, 2.0258, 2.1068, 2.1911
   ];
 
-  // ─── Animation when entering review step ─────────────────────────────────
+  // Animation when entering review step
   useEffect(() => {
     if (currentStep !== 4) return;
 
@@ -120,6 +126,14 @@ function Savings() {
     } else {
       setDreams([value]);
     }
+  };
+
+  // ✅ NEW: Handle cost input with formatting & digit limit
+  const handleCostChange = (e) => {
+    let value = e.target.value;
+    const digitsOnly = value.replace(/[^0-9]/g, "");
+    const limited = digitsOnly.slice(0, 9); // max 9 digits
+    setCost(limited);
   };
 
   const handleExportPDF = async () => {
@@ -249,14 +263,13 @@ function Savings() {
           }}
         >
           <Link
-              to="/FNA/door"
-              className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
-            >
-              ← Back to Doors
-            </Link>
+            to="/FNA/door"
+            className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
+          >
+            ← Back to Doors
+          </Link>
 
           <div className="max-w-2xl mx-auto">
-
             <div className="bg-white rounded-lg shadow-lg p-5">
               <div className="text-center mb-5">
                 <h1 className="text-xl font-bold text-[#003266] mb-3">
@@ -419,13 +432,13 @@ function Savings() {
                       ₱
                     </div>
                     <input
-                      type="number"
-                      value={cost}
-                      onChange={(e) => setCost(e.target.value)}
+                      type="text" // ✅ changed from "number"
+                      value={formatNumberWithCommas(cost)}
+                      onChange={handleCostChange}
                       className="flex-grow p-2.5 text-center text-base focus:outline-none focus:border-[#003366]"
                       placeholder="Enter amount"
-                      min="0"
-                      step="1"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                     />
                   </div>
                   {errors.cost && <p className="text-red-500 text-sm">{errors.cost}</p>}
@@ -438,7 +451,6 @@ function Savings() {
                     Review & Edit Your Answers
                   </h2>
 
-                  {/* Live animated preview */}
                   <div className="bg-blue-50 border border-[#003266] rounded-lg p-5 mb-6 text-center shadow-sm">
                     <p className="text-base text-[#003266] mb-4">
                       Estimated Future Amount Needed (updates live):
@@ -448,7 +460,6 @@ function Savings() {
                     </div>
                   </div>
 
-                  {/* Editable fields */}
                   <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
@@ -502,13 +513,13 @@ function Savings() {
                           ₱
                         </div>
                         <input
-                          type="number"
-                          value={cost}
-                          onChange={(e) => setCost(e.target.value)}
+                          type="text" // ✅ changed from "number"
+                          value={formatNumberWithCommas(cost)}
+                          onChange={handleCostChange}
                           className="flex-grow p-2.5 text-center text-sm focus:outline-none focus:border-[#003366]"
                           placeholder="Enter amount"
-                          min="0"
-                          step="1"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                         />
                       </div>
                     </div>

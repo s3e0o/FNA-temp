@@ -5,12 +5,20 @@ import html2canvas from "html2canvas";
 import { MdInfoOutline } from "react-icons/md";
 import EducationResultPDF from "../../../components/pdf/EducationResultPDF.jsx";
 
+// Helper: Format number with commas (max 9 digits)
+const formatNumberWithCommas = (value) => {
+  if (!value) return "";
+  const cleaned = value.replace(/[^0-9]/g, "");
+  const truncated = cleaned.slice(0, 9);
+  return truncated.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 function Education() {
   const [currentStep, setCurrentStep] = useState(1);
   const [childAge, setChildAge] = useState("");
   const [selectedSchool, setSelectedSchool] = useState("");
-  const [savedAmount, setSavedAmount] = useState("");
-  const [customSchoolFee, setCustomSchoolFee] = useState("");
+  const [savedAmount, setSavedAmount] = useState(""); // clean digit string
+  const [customSchoolFee, setCustomSchoolFee] = useState(""); // clean digit string
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
@@ -78,6 +86,22 @@ function Education() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(Math.abs(value));
+  };
+
+  // ✅ Handle savedAmount input
+  const handleSavedAmountChange = (e) => {
+    let value = e.target.value;
+    const digitsOnly = value.replace(/[^0-9]/g, "");
+    const limited = digitsOnly.slice(0, 9); // max 9 digits
+    setSavedAmount(limited);
+  };
+
+  // ✅ Handle customSchoolFee input
+  const handleCustomSchoolFeeChange = (e) => {
+    let value = e.target.value;
+    const digitsOnly = value.replace(/[^0-9]/g, "");
+    const limited = digitsOnly.slice(0, 9); // max 9 digits
+    setCustomSchoolFee(limited);
   };
 
   const validateCurrentStep = () => {
@@ -329,10 +353,17 @@ function Education() {
 
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg p-5">
+              {/* ✅ ADDED: Export to PDF button */}
               <div className="text-center mb-5">
                 <h1 className="text-xl font-bold text-[#003266] mb-3">
                   EDUCATION RESULT
                 </h1>
+                <button
+                  onClick={handleExportPDF}
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Export to PDF
+                </button>
               </div>
 
               <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
@@ -499,13 +530,15 @@ function Education() {
                         <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
                           ₱
                         </div>
+                        {/* ✅ Formatted custom school fee */}
                         <input
-                          type="number"
-                          value={customSchoolFee}
-                          onChange={(e) => setCustomSchoolFee(e.target.value)}
+                          type="text"
+                          value={formatNumberWithCommas(customSchoolFee)}
+                          onChange={handleCustomSchoolFeeChange}
                           className="flex-grow p-2.5 text-center text-base focus:outline-none focus:border-[#003366]"
                           placeholder="Enter annual fee"
-                          min="0"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                         />
                       </div>
                     </div>
@@ -524,13 +557,15 @@ function Education() {
                     <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
                       ₱
                     </div>
+                    {/* ✅ Formatted saved amount */}
                     <input
-                      type="number"
-                      value={savedAmount}
-                      onChange={(e) => setSavedAmount(e.target.value)}
+                      type="text"
+                      value={formatNumberWithCommas(savedAmount)}
+                      onChange={handleSavedAmountChange}
                       className="flex-grow p-2.5 text-center text-base focus:outline-none focus:border-[#003366]"
                       placeholder="Enter amount"
-                      min="0"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                     />
                   </div>
                   {errors.question3 && <p className="text-red-500 text-sm">{errors.question3}</p>}
@@ -539,19 +574,6 @@ function Education() {
 
               {currentStep === 4 && (
                 <div className="space-y-6">
-                  {/* Header + Reset */}
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-[#003266]">
-                      Review & Edit Your Education Plan
-                    </h2>
-                    <button
-                      onClick={handleReset}
-                      className="px-6 py-2 border-2 border-gray-500 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
-                    >
-                      Reset
-                    </button>
-                  </div>
-
                   {/* Live Results Preview */}
                   <div className="bg-blue-50 border border-[#003266] rounded-lg p-6 text-center shadow-sm">
                     <p className="text-base text-[#003266] mb-5 font-medium">
@@ -619,13 +641,15 @@ function Education() {
                             <div className="bg-gray-100 px-4 flex items-center font-bold text-[#003266] border-r border-gray-300 text-base">
                               ₱
                             </div>
+                            {/* ✅ Formatted custom school fee */}
                             <input
-                              type="number"
-                              value={customSchoolFee}
-                              onChange={(e) => setCustomSchoolFee(e.target.value)}
+                              type="text"
+                              value={formatNumberWithCommas(customSchoolFee)}
+                              onChange={handleCustomSchoolFeeChange}
                               className="flex-grow p-3 text-center focus:outline-none focus:border-[#003366]"
                               placeholder="Annual fee"
-                              min="0"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
                             />
                           </div>
                         )}
@@ -641,32 +665,17 @@ function Education() {
                         <div className="bg-gray-100 px-5 flex items-center font-bold text-[#003266] border-r border-gray-300 text-base">
                           ₱
                         </div>
+                        {/* ✅ Formatted saved amount */}
                         <input
-                          type="number"
-                          value={savedAmount}
-                          onChange={(e) => setSavedAmount(e.target.value)}
+                          type="text"
+                          value={formatNumberWithCommas(savedAmount)}
+                          onChange={handleSavedAmountChange}
                           className="flex-grow p-3 text-center focus:outline-none focus:border-[#003366]"
-                          min="0"
-                          step="1000"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                         />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bottom Actions */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 mt-6 border-t border-gray-200">
-                    <button
-                      onClick={handleReset}
-                      className="px-8 py-3 border-2 border-gray-500 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors min-w-[160px]"
-                    >
-                      Reset All
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      className="px-10 py-3 bg-[#003366] text-white rounded-full font-medium hover:bg-[#002244] transition-colors shadow-md min-w-[160px]"
-                    >
-                      Submit & See Result
-                    </button>
                   </div>
                 </div>
               )}

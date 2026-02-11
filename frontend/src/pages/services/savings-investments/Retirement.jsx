@@ -1,224 +1,249 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import RetirementResultPDF from "../../../components/pdf/RetirementResultPDF.jsx";
 
-function Retirement() {
+const Retirement = () => {
+  const [step, setStep] = useState(1);
+  const [currentAge, setCurrentAge] = useState("");
+  const [retirementAge, setRetirementAge] = useState("");
+  const [monthlyIncome, setMonthlyIncome] = useState("");
+  const [yearsAfter, setYearsAfter] = useState(""); // "10" .. "15"
 
-  const getRetirementMultiplier = (yearsAfterRetirement, yearsUntilRetirement) => {
-    // Cap yearsAfterRetirement to available rows (10–15 in PDF)
-    const n = Math.min(Math.max(Math.round(yearsAfterRetirement), 10), 15);
-    // Cap yearsUntilRetirement to available columns (1–20 in PDF)
-    const t = Math.min(Math.max(Math.round(yearsUntilRetirement), 1), 20);
-
-    // Multiplier table from PDF: rows = retirement period (10-15 years), columns = years until retirement (1-20)
-    const table = {
-      10: [1.2486,1.2986,1.3505,1.4045,1.4607,1.5192,1.5799,1.6431,1.7088,1.7772,1.8483,1.9222,1.9991,2.0791,2.1622,2.2487,2.3387,2.4322,2.5295,2.6307],
-      11: [1.2751,1.3261,1.3791,1.4343,1.4917,1.5513,1.6134,1.6779,1.7450,1.8148,1.8874,1.9629,2.0414,2.1231,2.2080,2.2963,2.3882,2.4837,2.5831,2.6864],
-      12: [1.3022,1.3543,1.4085,1.4648,1.5234,1.5844,1.6477,1.7137,1.7822,1.8535,1.9276,2.0047,2.0849,2.1683,2.2551,2.3453,2.4391,2.5366,2.6381,2.7436],
-      13: [1.3301,1.3834,1.4387,1.4962,1.5561,1.6183,1.6831,1.7504,1.8204,1.8932,1.9689,2.0477,2.1296,2.2148,2.3034,2.3955,2.4913,2.5910,2.6946,2.8024],
-      14: [1.3588,1.4132,1.4697,1.5285,1.5896,1.6532,1.7194,1.7881,1.8596,1.9340,2.0114,2.0919,2.1755,2.2625,2.3530,2.4472,2.2451,2.6469,2.7527,2.8628],
-      15: [1.3883,1.4438,1.5016,1.5617,1.6241,1.6891,1.7566,1.8269,1.9000,1.9760,2.0550,2.1372,2.2227,2.3116,2.4041,2.5003,2.6003,2.7043,2.8124,2.9249]
-    };
-
-    return table[n][t - 1]; // t=1 → index 0
-  };
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const [currentAge, setCurrentAge] = useState(""); // Question 1: Current age
-  const [retirementAge, setRetirementAge] = useState(""); // Question 2: Planned retirement age
-  const [monthlyIncome, setMonthlyIncome] = useState(""); // Question 3: Monthly income
-  const [yearsAfterRetirement, setYearsAfterRetirement] = useState(""); // Question 4: Years after retirement
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
-  const [appointmentData, setAppointmentData] = useState({
+  const [showAppointment, setShowAppointment] = useState(false);
+
+  const [appointment, setAppointment] = useState({
     name: "",
     email: "",
     phone: "",
     date: "",
     time: "",
   });
-  const [appointmentErrors, setAppointmentErrors] = useState({});
 
   const resultRef = useRef(null);
 
-  useEffect(() => {
-    document.title = "Retirement | Financial Needs Analysis";
-  }, []);
+  // ─── Calculation Logic (unchanged) ──────────────────────────────────────
+  const getMultiplier = (postYears, untilYears) => {
+    const row = Math.min(Math.max(Math.round(postYears), 10), 15);
+    const col = Math.min(Math.max(Math.round(untilYears), 1), 20);
 
-  const validateCurrentStep = () => {
-    const newErrors = {};
-    
-    if (currentStep === 1) {
-      // Question 1 validation (current age)
-      if (!currentAge.trim() || isNaN(parseInt(currentAge)) || parseInt(currentAge) <= 0) {
-        newErrors.question1 = "Please enter a valid age (greater than 0).";
-      } else if (parseInt(currentAge) >= 100) {
-        newErrors.question1 = "Please enter a realistic age (less than 100).";
-      }
-    } else if (currentStep === 2) {
-      // Question 2 validation (retirement age)
-      if (!retirementAge.trim() || isNaN(parseInt(retirementAge)) || parseInt(retirementAge) <= 0) {
-        newErrors.question2 = "Please enter a valid retirement age (greater than 0).";
-      } else if (parseInt(retirementAge) <= parseInt(currentAge)) {
-        newErrors.question2 = "Retirement age must be greater than your current age.";
-      } else if (parseInt(retirementAge) >= 100) {
-        newErrors.question2 = "Please enter a realistic retirement age (less than 100).";
-      }
-    } else if (currentStep === 3) {
-      // Question 3 validation (monthly income)
-      if (!monthlyIncome.trim() || isNaN(parseFloat(monthlyIncome)) || parseFloat(monthlyIncome) <= 0) {
-        newErrors.question3 = "Please enter a valid monthly income (greater than 0).";
-      }
-    } else if (currentStep === 4) {
-      // Question 4: must be one of 10–15 (now enforced by UI, but still validate)
-      if (!yearsAfterRetirement || !["10", "11", "12", "13", "14", "15"].includes(yearsAfterRetirement)) {
-        newErrors.question4 = "Please select a retirement period.";
-      }
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleNext = () => {
-    if (validateCurrentStep()) {
-      if (currentStep < 5) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        setSubmitted(true);
-      }
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      setErrors({});
-    }
-  };
-
-  const computeResult = () => {
-    const currentAgeNum = parseInt(currentAge);
-    const retirementAgeNum = parseInt(retirementAge);
-    const monthlyIncomeNum = parseFloat(monthlyIncome);
-    const yearsAfterRetirementNum = parseInt(yearsAfterRetirement);
-
-    const yearsUntilRetirement = retirementAgeNum - currentAgeNum;
-
-    // Get multiplier from PDF table based on retirement period and years until retirement
-    const multiplier = getRetirementMultiplier(yearsAfterRetirementNum, yearsUntilRetirement);
-
-    // CORRECTED FORMULA from PDF: (12 × C) × D × multiplier
-    // Where C = monthly income, D = years after retirement
-    const totalRetirementFundNeeded = (12 * monthlyIncomeNum) * yearsAfterRetirementNum * multiplier;
-
-    return {
-      yearsUntilRetirement,
-      totalRetirementFundNeeded,
-      multiplier
+    const table = {
+      10: [1.2486,1.2986,1.3505,1.4045,1.4607,1.5192,1.5799,1.6431,1.7088,1.7772,1.8483,1.9222,1.9991,2.0791,2.1622,2.2487,2.3387,2.4322,2.5295,2.6307],
+      11: [1.2751,1.3261,1.3791,1.4343,1.4917,1.5513,1.6134,1.6779,1.7450,1.8148,1.8874,1.9629,2.0414,2.1231,2.2080,2.2963,2.3882,2.4837,2.5831,2.6864],
+      12: [1.3022,1.3543,1.4085,1.4648,1.5234,1.5844,1.6477,1.7137,1.7822,1.8535,1.9276,2.0047,2.0849,2.1683,2.2551,2.3453,2.4391,2.5366,2.6381,2.7436],
+      13: [1.3301,1.3834,1.4387,1.4962,1.5561,1.6183,1.6831,1.7504,1.8204,1.8932,1.9689,2.0477,2.1296,2.2148,2.3034,2.3955,2.4913,2.5910,2.6946,2.8024],
+      14: [1.3588,1.4132,1.4697,1.5285,1.5896,1.6532,1.7194,1.7881,1.8596,1.9340,2.0114,2.0919,2.1755,2.2625,2.3530,2.4472,2.2451,2.6469,2.7527,2.8628],
+      15: [1.3883,1.4438,1.5016,1.5617,1.6241,1.6891,1.7566,1.8269,1.9000,1.9760,2.0550,2.1372,2.2227,2.3116,2.4041,2.5003,2.6003,2.7043,2.8124,2.9249],
     };
+
+    return table[row]?.[col - 1] ?? 1;
   };
 
-  const computeMonthlySavings = () => {
-    const result = computeResult();
-    const yearsUntilRetirement = result.yearsUntilRetirement;
-    const targetAmount = result.totalRetirementFundNeeded;
+  const yearsToRetirement = useMemo(() => {
+    const c = Number(currentAge);
+    const r = Number(retirementAge);
+    return r > c && !isNaN(c) && !isNaN(r) ? r - c : 0;
+  }, [currentAge, retirementAge]);
 
-    if (yearsUntilRetirement <= 0 || targetAmount <= 0) return 0;
+  const multiplier = useMemo(() => {
+    if (!yearsAfter || !yearsToRetirement) return 0;
+    return getMultiplier(Number(yearsAfter), yearsToRetirement);
+  }, [yearsAfter, yearsToRetirement]);
 
-    const annualRate = 0.06;
-    const monthlyRate = annualRate / 12;
-    const totalMonths = yearsUntilRetirement * 12;
+  const totalNeeded = useMemo(() => {
+    const income = Number(monthlyIncome);
+    const yrs = Number(yearsAfter);
+    if (isNaN(income) || isNaN(yrs)) return 0;
+    return income * 12 * yrs * multiplier;
+  }, [monthlyIncome, yearsAfter, multiplier]);
 
-    const monthlySavings = targetAmount * monthlyRate / (Math.pow(1 + monthlyRate, totalMonths) - 1);
-    return monthlySavings;
+  const monthlySave = useMemo(() => {
+    if (yearsToRetirement <= 0 || totalNeeded <= 0) return 0;
+    const r = 0.06 / 12;
+    const n = yearsToRetirement * 12;
+    return (totalNeeded * r) / (Math.pow(1 + r, n) - 1);
+  }, [totalNeeded, yearsToRetirement]);
+
+  // Animation values
+  const [displayTotal, setDisplayTotal] = useState(0);
+  const [displayMonthly, setDisplayMonthly] = useState(0);
+
+  // Animate when in review step and values change
+  useEffect(() => {
+    if (step !== 5) return;
+
+    const animate = (start, end, duration, setter) => {
+      if (Math.abs(end - start) < 1) {
+        setter(end);
+        return;
+      }
+
+      let startTime = null;
+      const stepAnim = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const t = Math.min((timestamp - startTime) / duration, 1);
+        // easeOutQuad
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const value = Math.round(start + (end - start) * eased);
+        setter(value);
+        if (t < 1) requestAnimationFrame(stepAnim);
+        else setter(end);
+      };
+      requestAnimationFrame(stepAnim);
+    };
+
+    animate(displayTotal, Math.round(totalNeeded), 1400, setDisplayTotal);
+    animate(displayMonthly, Math.round(monthlySave), 1600, setDisplayMonthly);
+  }, [step, totalNeeded, monthlySave]);
+
+  // ─── Validation ─────────────────────────────────────────────────────────
+  const validate = () => {
+    const err = {};
+
+    if (step === 1) {
+      const a = Number(currentAge);
+      if (!currentAge.trim() || isNaN(a) || a < 18 || a > 99 || !Number.isInteger(a)) {
+        err.age = "Please enter a valid age (18–99)";
+      }
+    }
+
+    if (step === 2) {
+      const a = Number(retirementAge);
+      const c = Number(currentAge);
+      if (!retirementAge.trim() || isNaN(a) || a <= c || a > 99 || !Number.isInteger(a)) {
+        err.retirement = "Retirement age must be > current age and ≤ 99";
+      }
+    }
+
+    if (step === 3) {
+      const inc = Number(monthlyIncome);
+      if (!monthlyIncome.trim() || isNaN(inc) || inc <= 0) {
+        err.income = "Please enter a valid monthly income";
+      }
+    }
+
+    if (step === 4) {
+      if (!["10", "11", "12", "13", "14", "15"].includes(yearsAfter)) {
+        err.years = "Please select years in retirement";
+      }
+    }
+
+    setErrors(err);
+    return Object.keys(err).length === 0;
   };
 
-  const handleExportPDF = async () => {
+  const next = () => {
+    if (validate()) {
+      if (step < 5) setStep(step + 1);
+      else setSubmitted(true);
+    }
+  };
+
+  const back = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
+  // ─── PDF Export ─────────────────────────────────────────────────────────
+  const exportPDF = async () => {
     if (!resultRef.current) return;
     const canvas = await html2canvas(resultRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF("p", "mm", "a4");
     const width = pdf.internal.pageSize.getWidth() - 10;
     const height = (canvas.height * width) / canvas.width;
-
     pdf.addImage(imgData, "PNG", 5, 5, width, height);
-    pdf.save("Retirement-Planning-Result.pdf");
+    pdf.save("Retirement-Plan.pdf");
   };
 
-  const handleBookAppointment = () => setShowAppointmentForm(true);
-  
-  const handleAppointmentChange = (e) => {
+  // ─── Appointment ────────────────────────────────────────────────────────
+  const openAppointment = () => setShowAppointment(true);
+
+  const handleApptChange = (e) => {
     const { name, value } = e.target;
-    setAppointmentData({ ...appointmentData, [name]: value });
+    setAppointment((prev) => ({ ...prev, [name]: value }));
   };
-  
-  const validateAppointment = () => {
-    const newErrors = {};
-    if (!appointmentData.name.trim()) newErrors.name = "Name is required.";
-    if (!appointmentData.email.trim() || !/\S+@\S+\.\S+/.test(appointmentData.email))
-      newErrors.email = "Valid email is required.";
-    if (!appointmentData.phone.trim()) newErrors.phone = "Phone number is required.";
-    if (!appointmentData.date) newErrors.date = "Preferred date is required.";
-    if (!appointmentData.time) newErrors.time = "Preferred time is required.";
-    setAppointmentErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  const handleAppointmentSubmit = (e) => {
+
+  const submitAppointment = (e) => {
     e.preventDefault();
-    if (validateAppointment()) {
-      alert("Appointment booked successfully!");
-      setShowAppointmentForm(false);
-      setAppointmentData({ name: "", email: "", phone: "", date: "", time: "" });
-    }
+    if (!appointment.name.trim()) return alert("Name is required");
+    if (!appointment.email.includes("@")) return alert("Valid email required");
+    if (!appointment.phone.trim()) return alert("Phone required");
+    if (!appointment.date || !appointment.time) return alert("Date & time required");
+
+    alert("Appointment booked successfully!");
+    setShowAppointment(false);
+    setAppointment({ name: "", email: "", phone: "", date: "", time: "" });
+  };
+
+  const formatCurrency = (value) => {
+    if (isNaN(value) || value == null) return "0.00";
+    return new Intl.NumberFormat("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Math.abs(value));
   };
 
   if (submitted) {
-    const result = computeResult();
-    const monthlySavings = computeMonthlySavings();
-
-    if (showAppointmentForm) {
+    if (showAppointment) {
       return (
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-            <h1 className="text-3xl text-center text-[#003266] mb-8">Appointment Form</h1>
-            <form onSubmit={handleAppointmentSubmit} className="space-y-6">
-              {["name", "email", "phone", "date", "time"].map((field) => (
-                <div key={field}>
-                  <label className="block text-lg text-[#003266] mb-2">{field.toUpperCase()}</label>
-                  <input
-                    type={
-                      field === "email"
-                        ? "email"
-                        : field === "phone"
-                        ? "tel"
-                        : field === "date"
-                        ? "date"
-                        : field === "time"
-                        ? "time"
-                        : "text"
-                    }
-                    name={field}
-                    value={appointmentData[field]}
-                    onChange={handleAppointmentChange}
-                    className="w-full px-4 py-3 border rounded-lg text-lg"
-                  />
-                  {appointmentErrors[field] && (
-                    <p className="text-red-500 mt-1">{appointmentErrors[field]}</p>
-                  )}
+        <div
+          className="min-h-auto pt-32 px-4 pb-16"
+          style={{
+            backgroundImage: `url("/background.jpg")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-5">
+              <h1 className="text-xl font-bold text-[#003266] text-center mb-6">
+                Book Appointment
+              </h1>
+              <form onSubmit={submitAppointment} className="space-y-4 max-w-lg mx-auto">
+                {["name", "email", "phone", "date", "time"].map((f) => (
+                  <div key={f}>
+                    <label className="block text-[#003266] font-semibold mb-1.5 capitalize text-sm">
+                      {f.replace(/([A-Z])/g, " $1")}
+                    </label>
+                    <input
+                      type={
+                        f === "email"
+                          ? "email"
+                          : f === "phone"
+                          ? "tel"
+                          : f === "date"
+                          ? "date"
+                          : f === "time"
+                          ? "time"
+                          : "text"
+                      }
+                      name={f}
+                      value={appointment[f]}
+                      onChange={handleApptChange}
+                      className="w-full p-2.5 border border-gray-300 rounded text-center focus:outline-none focus:border-[#003266]"
+                    />
+                  </div>
+                ))}
+                <div className="flex justify-between pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAppointment(false)}
+                    className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="border-2 border-[#003366] bg-[#003366] text-white px-6 py-1.5 rounded-full font-medium hover:bg-[#002244] transition-colors duration-200 text-sm"
+                  >
+                    Submit
+                  </button>
                 </div>
-              ))}
-
-              <div className="flex justify-between">
-                <button type="button" onClick={() => setShowAppointmentForm(false)} className="bg-gray-500 text-white px-6 py-3 rounded-md">Cancel</button>
-                <button type="submit" className="bg-[#003266] text-white px-6 py-3 rounded-md">Submit</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       );
@@ -226,74 +251,134 @@ function Retirement() {
 
     return (
       <>
-        {/* === HIDDEN PDF TEMPLATE FOR EXPORT === */}
-          <RetirementResultPDF
-            ref={resultRef}
-            currentAge={parseInt(currentAge) || 0}
-            retirementAge={parseInt(retirementAge) || 0}
-            monthlyIncome={parseFloat(monthlyIncome) || 0}
-            yearsAfterRetirement={parseInt(yearsAfterRetirement) || 0}
-            yearsUntilRetirement={result.yearsUntilRetirement}
-            totalRetirementFundNeeded={result.totalRetirementFundNeeded}
-            multiplier={result.multiplier}
-            monthlySavings={monthlySavings}
-          />
-        <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-          <Link
-            to="/FNA/door"
-            className="relative inline-block text-[#395998] font-medium mb-5 ml-10
-                        after:content-[''] after:absolute after:left-0 after:-bottom-1
-                        after:w-0 after:h-[2.5px] after:bg-[#F4B43C]
-                        after:transition-all after:duration-300
-                        hover:after:w-full"
-          >
-            ← Back to Doors
-          </Link>
-          <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white relative">
+        <RetirementResultPDF
+          ref={resultRef}
+          currentAge={Number(currentAge)}
+          retirementAge={Number(retirementAge)}
+          monthlyIncome={Number(monthlyIncome)}
+          yearsAfterRetirement={Number(yearsAfter)}
+          yearsUntilRetirement={yearsToRetirement}
+          totalRetirementFundNeeded={totalNeeded}
+          multiplier={multiplier}
+          monthlySavings={monthlySave}
+        />
 
-            <button onClick={handleExportPDF} className="absolute top-4 right-4 bg-[#003266] text-white px-4 py-2 rounded-md text-sm cursor-pointer">Export to PDF</button>
+        <div
+          className="min-h-auto pt-32 px-4 pb-16"
+          style={{
+            backgroundImage: `url("/background.jpg")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="max-w-2xl mx-auto">
+            <Link
+              to="/FNA/door"
+              className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
+            >
+              ← Back to Doors
+            </Link>
 
-            <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-6">RETIREMENT</h1>
-
-            <p className="text-lg text-[#003266] text-center mt-6">
-              Based on your retirement plan starting at age {retirementAge}:
-            </p>
-
-            <div className="space-y-6 mt-6 mb-14">
-              <div className="text-center">
-                <p className="text-lg text-[#003266] mb-2">Years until retirement:</p>
-                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                  {result.yearsUntilRetirement} years
-                </div>
-              </div>
-
-              <div className="text-center">
-                <p className="text-lg text-[#003266] mb-2">Total retirement fund needed:</p>
-                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                  ₱{result.totalRetirementFundNeeded.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-              </div>
-
-              <div className="text-center">
-                <p className="text-lg text-[#003266] mb-2">Monthly savings needed to reach goal:</p>
-                <div className="w-80 mx-auto py-4 text-center text-[#003266] text-2xl font-bold border rounded-lg shadow">
-                  ₱{monthlySavings.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10 flex justify-between">
-              <Link to="/FNA/AppointmentForm">
-                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                  Book an Appointment
+            <div className="bg-white rounded-lg shadow-lg p-5">
+              <div className="text-center mb-5">
+                <h1 className="text-xl font-bold text-[#003266] mb-3">
+                  RETIREMENT RESULT
+                </h1>
+                <button
+                  onClick={exportPDF}
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                >
+                  Export to PDF
                 </button>
-              </Link>
+              </div>
 
-              <Link to="/FNA/OurServices">
-                <button className="bg-[#003266] text-white px-6 py-3 rounded-md cursor-pointer">
-                  View Recommendations
-                </button>
-              </Link>
+              <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+                <p className="text-base text-[#003266] text-center mb-5">
+                  Total retirement fund needed:
+                </p>
+
+                <div className="flex justify-center mb-6">
+                  <div className="w-64 py-5 text-center text-2xl font-bold border border-[#003266] rounded-lg bg-blue-50">
+                    ₱{formatCurrency(totalNeeded)}
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-5">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2 text-center">
+                        Years until Retirement
+                      </h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        {yearsToRetirement} years
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-2 text-center">
+                        Monthly Savings Needed
+                      </h3>
+                      <div className="text-base font-bold text-[#003266] text-center">
+                        ₱{formatCurrency(monthlySave)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-sm font-bold text-[#003266] mb-3 text-center">
+                      Key Inputs
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-[#003266] font-semibold">
+                          Current Age:
+                        </span>
+                        <span className="text-sm font-bold text-[#003266]">
+                          {currentAge} years
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-[#003266] font-semibold">
+                          Retirement Age:
+                        </span>
+                        <span className="text-sm font-bold text-[#003266]">
+                          {retirementAge} years
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-[#003266] font-semibold">
+                          Desired Monthly Income:
+                        </span>
+                        <span className="text-sm font-bold text-[#003266]">
+                          ₱{formatCurrency(Number(monthlyIncome))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-[#003266] font-semibold">
+                          Years in Retirement:
+                        </span>
+                        <span className="text-sm font-bold text-[#003266]">
+                          {yearsAfter} years
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+                  <button
+                    onClick={openAppointment}
+                    className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  >
+                    Book Appointment
+                  </button>
+                  <Link to="/FNA/OurServices">
+                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm">
+                      View Services
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -302,197 +387,313 @@ function Retirement() {
   }
 
   return (
-    <div className="min-h-auto pt-32 px-4 pb-16" style={{ backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="max-w-3xl mx-auto rounded-lg shadow-lg p-8 bg-white">
-        <h1 className="text-3xl font-Axiforma text-[#003266] text-center mb-8">RETIREMENT</h1>
-
-        <div className="flex justify-center mb-10">
-          <div className="relative flex items-center w-[640px]">
-            <div className="absolute left-10 right-1 top-6 h-[2px] bg-[#8FA6BF]" />
-            {[1,2,3,4,5].map(n => (
-              <React.Fragment key={n}>
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full ${currentStep >= n ? "bg-[#003266]" : "bg-[#B7C5D6]"} flex items-center justify-center`}>
-                    <div className="w-10 h-10 rounded-full border-3 border-white text-[#F4B43C] flex items-center justify-center text-lg">{n}</div>
-                  </div>
-                  <span className={`text-sm mt-2 ${currentStep >= n ? "text-[#003266]" : "text-[#8FA6BF]"}`}>
-                    {n===1?"Question 1":n===2?"Question 2":n===3?"Question 3":n===4?"Question 4":"Review"}
-                  </span>
-                </div>
-                {n!==5 && <div className="flex-1" />}
-              </React.Fragment>
-            ))}
+    <div
+      className="min-h-auto pt-32 px-4 pb-16"
+      style={{
+        backgroundImage: `url("/background.jpg")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-5">
+          <div className="mb-5">
+            <div className="relative">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#003366] rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((step - 1) / 4) * 100}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-4">
+                {["Question 1", "Question 2", "Question 3", "Question 4", "Review"].map(
+                  (label, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <div
+                        className={`w-3 h-3 rounded-full mb-1.5 ${
+                          step > i + 1
+                            ? "bg-[#003366]"
+                            : step === i + 1
+                            ? "bg-[#003366]"
+                            : "bg-gray-300"
+                        }`}
+                      />
+                      <span
+                        className={`text-xs font-medium whitespace-nowrap ${
+                          step >= i + 1 ? "text-[#003266]" : "text-gray-500"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <form className="space-y-8">
-          {currentStep === 1 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">How old are you?</p>
-              <div className="relative w-80 mx-auto">
-                <input 
-                  type="number" 
-                  value={currentAge} 
-                  onChange={(e)=>setCurrentAge(e.target.value)} 
-                  className="w-full p-3 border rounded-lg text-center" 
-                  placeholder="Enter age"
-                  min="18"
-                  max="99"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">years old</span>
-              </div>
-              {errors.question1 && <p className="text-red-500 mt-2">{errors.question1}</p>}
+          <div className="bg-white rounded-lg shadow p-5 mb-5 border border-gray-200">
+            <div className="text-center mb-5">
+              <h1 className="text-xl font-bold text-[#003266] mb-2">
+                RETIREMENT
+              </h1>
             </div>
-          )}
 
-          {currentStep === 2 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">At what age do you plan to retire?</p>
-              <div className="relative w-80 mx-auto">
-                <input 
-                  type="number" 
-                  value={retirementAge} 
-                  onChange={(e)=>setRetirementAge(e.target.value)} 
-                  className="w-full p-3 border rounded-lg text-center" 
-                  placeholder="Enter age"
-                  min="21"
-                  max="99"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">years old</span>
-              </div>
-              {errors.question2 && <p className="text-red-500 mt-2">{errors.question2}</p>}
-            </div>
-          )}
-
-          {currentStep === 3 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-8">How much is your monthly income?</p>
-              <div className="relative w-80 mx-auto">
-                <input 
-                  type="number" 
-                  value={monthlyIncome} 
-                  onChange={(e)=>setMonthlyIncome(e.target.value)} 
-                  className="w-full p-3 pl-10 pr-3 border rounded-lg text-center" 
-                  placeholder="Enter amount"
-                  min="1"
-                />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003266] text-lg">₱</span>
-              </div>
-              {errors.question3 && <p className="text-red-500 mt-2">{errors.question3}</p>}
-            </div>
-          )}
-
-          {currentStep === 4 && (
-            <div className="text-center">
-              <p className="text-lg text-[#003266] mb-6">
-                How many years after retirement do you want to receive this amount?
-              </p>
-              <div className="grid grid-cols-3 gap-4 w-full max-w-md mx-auto">
-                {[10, 11, 12, 13, 14, 15].map((year) => (
-                  <label
-                    key={year}
-                    className={`flex items-center justify-center w-full h-14 border rounded-lg cursor-pointer transition-all ${
-                      yearsAfterRetirement == year
-                        ? "bg-[#003266] text-white border-[#003266]"
-                        : "bg-white text-[#003266] border-[#8FA6BF]"
-                    }`}
-                  >
+            <div className="max-w-lg mx-auto">
+              {step === 1 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">
+                    How old are you now?
+                  </p>
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
                     <input
-                      type="radio"
-                      name="yearsAfterRetirement"
-                      value={year}
-                      checked={yearsAfterRetirement == year}
-                      onChange={(e) => setYearsAfterRetirement(e.target.value)}
-                      className="hidden"
-                    />
-                    {year} years
-                  </label>
-                ))}
-              </div>
-              {errors.question4 && <p className="text-red-500 mt-3">{errors.question4}</p>}
-            </div>
-          )}
-
-          {currentStep === 5 && (
-            <div className="text-center space-y-6">
-              <p className="text-lg text-[#003266] mb-4 font-semibold">Review Your Inputs</p>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Current Age:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={currentAge} 
-                      onChange={(e)=>setCurrentAge(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center" 
+                      type="number"
+                      value={currentAge}
+                      onChange={(e) => setCurrentAge(e.target.value)}
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      placeholder="Enter age"
                       min="18"
                       max="99"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003266]">years</span>
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                      YEARS
+                    </div>
                   </div>
+                  {errors.age && (
+                    <p className="text-red-500 text-sm mb-4">{errors.age}</p>
+                  )}
                 </div>
-                
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Retirement Age:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={retirementAge} 
-                      onChange={(e)=>setRetirementAge(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center" 
-                      min="21"
+              )}
+
+              {step === 2 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">
+                    At what age do you plan to retire?
+                  </p>
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
+                    <input
+                      type="number"
+                      value={retirementAge}
+                      onChange={(e) => setRetirementAge(e.target.value)}
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      placeholder="Enter age"
+                      min={Number(currentAge) + 1 || 19}
                       max="99"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003266]">years</span>
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                      YEARS OLD
+                    </div>
                   </div>
+                  {errors.retirement && (
+                    <p className="text-red-500 text-sm mb-4">
+                      {errors.retirement}
+                    </p>
+                  )}
                 </div>
-                
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Monthly Income:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={monthlyIncome} 
-                      onChange={(e)=>setMonthlyIncome(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center pl-8" 
+              )}
+
+              {step === 3 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">
+                    What is your current monthly income?
+                  </p>
+                  <div className="flex border border-gray-300 rounded overflow-hidden max-w-xs mx-auto mb-4">
+                    <div className="bg-gray-100 px-4 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
+                      ₱
+                    </div>
+                    <input
+                      type="number"
+                      value={monthlyIncome}
+                      onChange={(e) => setMonthlyIncome(e.target.value)}
+                      className="flex-grow p-2.5 text-center text-base focus:outline-none"
+                      placeholder="Enter amount"
                       min="1"
+                      step="0.01"
                     />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#003266]">₱</span>
+                  </div>
+                  {errors.income && (
+                    <p className="text-red-500 text-sm mb-4">{errors.income}</p>
+                  )}
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="text-center">
+                  <p className="text-base text-[#003266] mb-4">
+                    How many years do you want this income to last after retirement?
+                  </p>
+                  <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
+                    {[10, 11, 12, 13, 14, 15].map((y) => (
+                      <button
+                        key={y}
+                        onClick={() => setYearsAfter(String(y))}
+                        className={`py-3 rounded-lg font-medium transition-all text-sm ${
+                          yearsAfter === String(y)
+                            ? "bg-[#003366] text-white shadow-md"
+                            : "bg-gray-100 hover:bg-gray-200 text-[#003266]"
+                        }`}
+                      >
+                        {y} yrs
+                      </button>
+                    ))}
+                  </div>
+                  {errors.years && (
+                    <p className="text-red-500 text-sm mt-4">{errors.years}</p>
+                  )}
+                </div>
+              )}
+
+              {step === 5 && (
+                <div className="space-y-5">
+                  <h2 className="text-lg font-bold text-[#003266] text-center mb-4">
+                    Review & Edit Your Answers
+                  </h2>
+
+                  {/* Live Result Preview with animation */}
+                  <div className="bg-blue-50 border border-[#003266] rounded-lg p-5 mb-6 text-center shadow-sm">
+                    <p className="text-base text-[#003266] mb-4">
+                      Estimated Results (updates live):
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">
+                          Total Fund Needed
+                        </div>
+                        <div className="text-2xl font-bold text-[#003366] tabular-nums">
+                          ₱{displayTotal.toLocaleString("en-PH")}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">
+                          Monthly Savings Needed
+                        </div>
+                        <div className="text-2xl font-bold text-[#003366] tabular-nums">
+                          ₱{displayMonthly.toLocaleString("en-PH")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <h3 className="text-sm font-bold text-[#003266] mb-2">
+                          Current Age
+                        </h3>
+                        <div className="flex border border-gray-300 rounded overflow-hidden">
+                          <input
+                            type="number"
+                            value={currentAge}
+                            onChange={(e) => setCurrentAge(e.target.value)}
+                            className="flex-grow p-2.5 text-center text-sm focus:outline-none"
+                            min="18"
+                            max="99"
+                          />
+                          <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                            YEARS
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                        <h3 className="text-sm font-bold text-[#003266] mb-2">
+                          Retirement Age
+                        </h3>
+                        <div className="flex border border-gray-300 rounded overflow-hidden">
+                          <input
+                            type="number"
+                            value={retirementAge}
+                            onChange={(e) => setRetirementAge(e.target.value)}
+                            className="flex-grow p-2.5 text-center text-sm focus:outline-none"
+                            min={Number(currentAge) + 1 || 19}
+                            max="99"
+                          />
+                          <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-l border-gray-300 text-sm">
+                            YEARS
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <h3 className="text-sm font-bold text-[#003266] mb-3 text-center">
+                        Other Inputs
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-[#003266] font-semibold w-2/5 text-right pr-3">
+                            Monthly Income:
+                          </span>
+                          <div className="flex border border-gray-300 rounded overflow-hidden w-3/5">
+                            <div className="bg-gray-100 px-3 flex items-center justify-center font-bold text-[#003266] border-r border-gray-300 text-sm">
+                              ₱
+                            </div>
+                            <input
+                              type="number"
+                              value={monthlyIncome}
+                              onChange={(e) => setMonthlyIncome(e.target.value)}
+                              className="flex-grow p-2 text-center text-sm focus:outline-none"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-[#003266] font-semibold w-2/5 text-right pr-3">
+                            Years in Retirement:
+                          </span>
+                          <div className="flex flex-wrap gap-2 w-3/5 justify-end">
+                            {[10, 11, 12, 13, 14, 15].map((y) => (
+                              <button
+                                key={y}
+                                onClick={() => setYearsAfter(String(y))}
+                                className={`px-3 py-1.5 rounded text-xs font-medium transition ${
+                                  yearsAfter === String(y)
+                                    ? "bg-[#003366] text-white shadow"
+                                    : "bg-gray-100 hover:bg-gray-200 text-[#003266]"
+                                }`}
+                              >
+                                {y} yrs
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex justify-between items-center border p-4 rounded">
-                  <span className="text-[#003266]">Years After Retirement:</span>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      value={yearsAfterRetirement} 
-                      onChange={(e)=>setYearsAfterRetirement(e.target.value)} 
-                      className="border rounded px-3 py-2 w-32 text-center" 
-                      min="1"
-                      max="40"
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003266]">years</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mt-4">You can edit any field before final submission.</p>
+              )}
             </div>
-          )}
-        </form>
+          </div>
 
-        <div className="mt-10 flex justify-between">
-          {currentStep > 1 ? (
-            <button onClick={handleBack} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">Previous</button>
-          ) : (
-            <Link to="/services/yes_services/SavEdRe" className="text-[#003266] cursor-pointer">Back</Link>
-          )}
+          <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+            {step > 1 ? (
+              <button
+                onClick={back}
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              >
+                Back
+              </button>
+            ) : (
+              <Link
+                to="/services/yes_services/SavEdRe"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              >
+                Back
+              </Link>
+            )}
 
-          <button onClick={handleNext} className="bg-[#003266] text-white px-10 py-3 rounded-md cursor-pointer">{currentStep===5?"Submit":"Next"}</button>
+            <button
+              onClick={next}
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+            >
+              {step === 5 ? "Submit" : "Next"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Retirement;

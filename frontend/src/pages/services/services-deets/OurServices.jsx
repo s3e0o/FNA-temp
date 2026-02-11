@@ -67,11 +67,13 @@ export default function OurServices() {
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
         {services.map((service, index) => (
-          <div
+          // Wrap the entire card in <Link>
+          <Link
             key={index}
+            to={service.link}
             className="relative h-[420px] rounded-xl overflow-hidden shadow-xl
                        group cursor-pointer transition-all duration-300 ease-out
-                       hover:-translate-y-2 hover:shadow-2xl"
+                       hover:-translate-y-2 hover:shadow-2xl block"
           >
             {/* Image */}
             <img
@@ -98,18 +100,17 @@ export default function OurServices() {
                 {service.desc}
               </p>
 
-              {/* Learn More */}
-              <Link
-                to={service.link}
+              {/* "Learn More" as non-interactive styled text */}
+              <span
                 className="mt-4 text-sm font-medium text-white flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
                            group-hover:opacity-100 group-hover:translate-y-0
-                           hover:text-[#F4B43C] cursor-pointer"
+                           hover:text-[#F4B43C]"
               >
                 Learn More →
-              </Link>
+              </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

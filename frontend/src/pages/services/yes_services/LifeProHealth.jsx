@@ -43,14 +43,16 @@ export default function LifeProHealth() {
         Our Services
       </h1>
 
-      {/* Cards - Centered grid for 2 items with better width control */}
+      {/* Cards - Centered grid */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-8">
         {services.map((service, index) => (
-          <div
+          // Wrap the entire card in <Link>
+          <Link
             key={index}
+            to={service.link}
             className="relative h-[420px] w-full max-w-[280px] rounded-xl overflow-hidden shadow-xl
                        group cursor-pointer transition-all duration-300 ease-out
-                       hover:-translate-y-2 hover:shadow-2xl"
+                       hover:-translate-y-2 hover:shadow-2xl block"
           >
             {/* Image */}
             <img
@@ -77,18 +79,16 @@ export default function LifeProHealth() {
                 {service.desc}
               </p>
 
-              {/* Learn More */}
-              <Link
-                to={service.link}
+              {/* "Take the test" as non-interactive text (still styled) */}
+              <span
                 className="mt-4 text-sm font-medium text-white hover:text-[#F4B43C] flex items-center gap-1
                            opacity-0 translate-y-2 transition-all duration-300
-                           group-hover:opacity-100 group-hover:translate-y-0
-                           cursor-default cursor-pointer"
+                           group-hover:opacity-100 group-hover:translate-y-0"
               >
                 Take the test →
-              </Link>
+              </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

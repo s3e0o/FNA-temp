@@ -12,8 +12,33 @@ const COLORS = {
 const money = (v) =>
   Number(v || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 });
 
+// Helper: Convert decimal years to "X year(s) and Y month(s)"
+const formatYearsAndMonths = (totalYears) => {
+  if (totalYears <= 0) return "0 years";
+
+  const years = Math.floor(totalYears);
+  let months = Math.round((totalYears - years) * 12);
+
+  // Handle rounding edge case (e.g., 1.99 → 2 years)
+  if (months >= 12) {
+    return `${years + 1} year${years + 1 === 1 ? "" : "s"}`;
+  }
+
+  const parts = [];
+  if (years > 0) {
+    parts.push(`${years} year${years === 1 ? "" : "s"}`);
+  }
+  if (months > 0) {
+    parts.push(`${months} month${months === 1 ? "" : "s"}`);
+  }
+
+  return parts.length > 0 ? parts.join(" and ") : "less than a month";
+};
+
 const HealthResultPDF = React.forwardRef(
   ({ healthFundNeeded, monthlyContribution, yearsToGoal }, ref) => {
+    const yearsAndMonths = formatYearsAndMonths(yearsToGoal);
+
     return (
       <div
         ref={ref}
@@ -32,36 +57,36 @@ const HealthResultPDF = React.forwardRef(
       >
         {/* ===== HEADER ===== */}
         <div style={{ marginBottom: 28 }}>
-            <div
-                style={{
-                display: "flex",
-                justifyContent: "space-between", // pushes logo to right
-                alignItems: "center",
-                borderBottom: `4px solid ${COLORS.primary}`,
-                paddingBottom: 12,
-                }}
-            >
-                {/* LEFT: TEXT */}
-                <div>
-                <h1 style={{ margin: 0, fontSize: 20, color: COLORS.primary }}>
-                    FINANCIAL NEEDS ANALYSIS
-                </h1>
-                <p style={{ margin: "4px 0 0", color: COLORS.muted, fontSize: 11 }}>
-                    Client Summary Report
-                </p>
-                </div>
-
-                {/* RIGHT: LOGO */}
-                <img
-                src="../../../cfb.png"
-                alt="Caelum Financial Solutions"
-                style={{
-                    height: "100px",
-                    width: "auto",
-                    objectFit: "contain",
-                }}
-                />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottom: `4px solid ${COLORS.primary}`,
+              paddingBottom: 12,
+            }}
+          >
+            {/* LEFT: TEXT */}
+            <div>
+              <h1 style={{ margin: 0, fontSize: 20, color: COLORS.primary }}>
+                FINANCIAL NEEDS ANALYSIS
+              </h1>
+              <p style={{ margin: "4px 0 0", color: COLORS.muted, fontSize: 11 }}>
+                Client Summary Report
+              </p>
             </div>
+
+            {/* RIGHT: LOGO */}
+            <img
+              src="../../../cfb.png"
+              alt="Caelum Financial Solutions"
+              style={{
+                height: "100px",
+                width: "auto",
+                objectFit: "contain",
+              }}
+            />
+          </div>
         </div>
 
         {/* ===== SECTION TITLE ===== */}
@@ -132,6 +157,18 @@ const HealthResultPDF = React.forwardRef(
             }}
           >
             {yearsToGoal} year{parseFloat(yearsToGoal) !== 1 ? "s" : ""}
+          </p>
+
+          {/* NEW: Years and Months */}
+          <p
+            style={{
+              margin: "6px 0 0",
+              fontSize: 12,
+              color: COLORS.muted,
+              fontStyle: "italic",
+            }}
+          >
+            or {yearsAndMonths}
           </p>
 
           <div

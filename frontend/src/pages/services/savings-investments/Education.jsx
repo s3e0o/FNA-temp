@@ -360,7 +360,7 @@ function Education() {
                 </h1>
                 <button
                   onClick={handleExportPDF}
-                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
                 >
                   Export to PDF
                 </button>
@@ -577,19 +577,19 @@ function Education() {
                   {/* Live Results Preview */}
                   <div className="bg-blue-50 border border-[#003266] rounded-lg p-6 text-center shadow-sm">
                     <p className="text-base text-[#003266] mb-5 font-medium">
-                      Estimated Results (updates live):
+                      Estimated Results:
                     </p>
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Future College Cost (4 years)</div>
+                        <div className="text-sm text-gray-600 mb-1">College Cost in the Future (4 years)</div>
                         <div className="text-2xl md:text-3xl font-bold text-[#003266] tabular-nums">
-                          ₱{displayFutureValue.toLocaleString("en-PH")}
+                          ₱{formatCurrency(displayFutureValue)}
                         </div>
                       </div>
                       <div>
                         <div className="text-sm text-gray-600 mb-1">Monthly Savings Needed (5% return)</div>
                         <div className="text-2xl md:text-3xl font-bold text-[#003266] tabular-nums">
-                          ₱{displayMonthlySavings.toLocaleString("en-PH")}
+                          ₱{formatCurrency(displayMonthlySavings)}
                         </div>
                       </div>
                     </div>
@@ -686,21 +686,21 @@ function Education() {
             {currentStep > 1 ? (
               <button
                 onClick={handleBack}
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </button>
             ) : (
               <Link
                 to="/services/yes_services/SavEdRe"
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </Link>
             )}
             <button
               onClick={handleNext}
-              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
             >
               {currentStep === 4 ? "Submit" : "Next"}
             </button>

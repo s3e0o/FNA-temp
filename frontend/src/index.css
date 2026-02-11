@@ -77,15 +77,14 @@ body {
 
 .footer-container {
   max-width: 1400px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: 1.2fr 1fr 1.5fr;
-  gap: 40px;
+  gap: 10px;
 }
 
 /* Columns */
 .footer-column h4{
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 600;
   margin-bottom: 16px;
   text-transform: uppercase;
@@ -94,7 +93,7 @@ body {
 }
 
 .footer-column a {
-  font-size: 14px;
+  font-size:11px;
   line-height: 1.6;
   color: #ffffff;
   text-decoration: none;
@@ -103,7 +102,7 @@ body {
   font-family: 'Axiforma Light', sans-serif;
 }
 .footer-column p {
-  font-size: 14px;
+  font-size: 10px;
   line-height: 1.6;
   color: #ffffff;
   text-decoration: none;

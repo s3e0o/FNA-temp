@@ -82,7 +82,15 @@ function Savings() {
 
   const validateInputs = () => {
     const newErrors = {};
-    if (currentStep === 1 && dreams.length === 0) newErrors.dreams = "Please select at least one goal.";
+    if (currentStep === 1) {
+      if (dreams.length === 0) {
+        newErrors.dreams = "Please select at least one goal.";
+      } else if (dreams[0] === "Other") {
+        if (!otherDream.trim()) {
+          newErrors.otherDream = "Please specify what you are saving for.";
+        }
+      }
+    }
     if (currentStep === 2) {
       const y = parseInt(years);
       if (!years || isNaN(y) || y < 1 || y > 20)
@@ -277,7 +285,7 @@ function Savings() {
                 </h1>
                 <button
                   onClick={handleExportPDF}
-                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
                 >
                   Export to PDF
                 </button>
@@ -375,7 +383,7 @@ function Savings() {
                       <button
                         key={option}
                         onClick={() => handleDreamChange(option)}
-                        className={`w-full py-3 px-4 rounded-lg font-medium transition-all text-left ${
+                        className={`w-full py-3 px-4 rounded-lg font-medium cursor-pointer transition-all text-left ${
                           dreams[0] === option
                             ? "bg-[#003366] text-white shadow-md"
                             : "bg-gray-100 hover:bg-gray-200 text-[#003266]"
@@ -396,6 +404,7 @@ function Savings() {
                     ))}
                   </div>
                   {errors.dreams && <p className="text-red-500 text-sm mt-4">{errors.dreams}</p>}
+                  {errors.otherDream && <p className="text-red-500 text-sm mt-2">{errors.otherDream}</p>}
                 </div>
               )}
 
@@ -453,7 +462,7 @@ function Savings() {
 
                   <div className="bg-blue-50 border border-[#003266] rounded-lg p-5 mb-6 text-center shadow-sm">
                     <p className="text-base text-[#003266] mb-4">
-                      Estimated Future Amount Needed (updates live):
+                      Estimated Future Amount Needed:
                     </p>
                     <div className="text-3xl font-bold text-[#003266] tabular-nums">
                       ₱{displayFutureAmount.toLocaleString("en-PH")}
@@ -533,14 +542,14 @@ function Savings() {
             {currentStep > 1 ? (
               <button
                 onClick={handleBack}
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </button>
             ) : (
               <Link
                 to="/services/yes_services/SavEdRe"
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </Link>
@@ -548,7 +557,7 @@ function Savings() {
 
             <button
               onClick={handleNext}
-              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
             >
               {currentStep === 4 ? "Submit" : "Next"}
             </button>

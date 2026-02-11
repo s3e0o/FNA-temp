@@ -8,8 +8,8 @@ const Retirement = () => {
   const [step, setStep] = useState(1);
   const [currentAge, setCurrentAge] = useState("");
   const [retirementAge, setRetirementAge] = useState("");
-  const [monthlyIncome, setMonthlyIncome] = useState("");
-  const [yearsAfter, setYearsAfter] = useState(""); // "10" .. "15"
+  const [monthlyIncome, setMonthlyIncome] = useState(""); // raw: "1234567.89"
+  const [yearsAfter, setYearsAfter] = useState("");
 
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -25,7 +25,37 @@ const Retirement = () => {
 
   const resultRef = useRef(null);
 
-  // ─── Calculation Logic (unchanged) ──────────────────────────────────────
+  // ─── Helper: Format for display (e.g., "1,234,567.89") ─────────────────────
+  const formatCurrencyInput = (value) => {
+    if (!value) return "";
+    const cleaned = value.replace(/[^\d.]/g, "");
+    const parts = cleaned.split(".");
+    let integerPart = parts[0];
+    let decimalPart = parts[1] ? parts[1].slice(0, 2) : "";
+
+    if (integerPart.length > 9) {
+      integerPart = integerPart.slice(0, 9);
+    }
+
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  };
+
+  // ─── Helper: Parse back to raw number string ───────────────────────────────
+  const parseCurrencyInput = (formattedValue) => {
+    if (!formattedValue) return "";
+    return formattedValue.replace(/[^0-9.]/g, "");
+  };
+
+  // ─── Handle monthly income change ──────────────────────────────────────────
+  const handleMonthlyIncomeChange = (e) => {
+    const raw = parseCurrencyInput(e.target.value);
+    const parts = raw.split(".");
+    if (parts[0].length > 9) return; // block >9 digits before decimal
+    setMonthlyIncome(raw);
+  };
+
+  // ─── Calculation Logic (unchanged) ─────────────────────────────────────────
   const getMultiplier = (postYears, untilYears) => {
     const row = Math.min(Math.max(Math.round(postYears), 10), 15);
     const col = Math.min(Math.max(Math.round(untilYears), 1), 20);
@@ -71,7 +101,6 @@ const Retirement = () => {
   const [displayTotal, setDisplayTotal] = useState(0);
   const [displayMonthly, setDisplayMonthly] = useState(0);
 
-  // Animate when in review step and values change
   useEffect(() => {
     if (step !== 5) return;
 
@@ -80,12 +109,10 @@ const Retirement = () => {
         setter(end);
         return;
       }
-
       let startTime = null;
       const stepAnim = (timestamp) => {
         if (!startTime) startTime = timestamp;
         const t = Math.min((timestamp - startTime) / duration, 1);
-        // easeOutQuad
         const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         const value = Math.round(start + (end - start) * eased);
         setter(value);
@@ -99,7 +126,7 @@ const Retirement = () => {
     animate(displayMonthly, Math.round(monthlySave), 1600, setDisplayMonthly);
   }, [step, totalNeeded, monthlySave]);
 
-  // ─── Validation ─────────────────────────────────────────────────────────
+  // ─── Validation ───────────────────────────────────────────────────────────
   const validate = () => {
     const err = {};
 
@@ -120,8 +147,13 @@ const Retirement = () => {
 
     if (step === 3) {
       const inc = Number(monthlyIncome);
-      if (!monthlyIncome.trim() || isNaN(inc) || inc <= 0) {
-        err.income = "Please enter a valid monthly income";
+      if (
+        !monthlyIncome ||
+        isNaN(inc) ||
+        inc <= 0 ||
+        !/^\d+(\.\d{1,2})?$/.test(monthlyIncome)
+      ) {
+        err.income = "Please enter a valid monthly income (up to 9 digits, 2 decimals)";
       }
     }
 
@@ -146,7 +178,7 @@ const Retirement = () => {
     if (step > 1) setStep(step - 1);
   };
 
-  // ─── PDF Export ─────────────────────────────────────────────────────────
+  // ─── PDF Export ───────────────────────────────────────────────────────────
   const exportPDF = async () => {
     if (!resultRef.current) return;
     const canvas = await html2canvas(resultRef.current, { scale: 2 });
@@ -158,7 +190,7 @@ const Retirement = () => {
     pdf.save("Retirement-Plan.pdf");
   };
 
-  // ─── Appointment ────────────────────────────────────────────────────────
+  // ─── Appointment ──────────────────────────────────────────────────────────
   const openAppointment = () => setShowAppointment(true);
 
   const handleApptChange = (e) => {
@@ -178,6 +210,7 @@ const Retirement = () => {
     setAppointment({ name: "", email: "", phone: "", date: "", time: "" });
   };
 
+  // ─── Final Display Formatter (for results) ─────────────────────────────────
   const formatCurrency = (value) => {
     if (isNaN(value) || value == null) return "0.00";
     return new Intl.NumberFormat("en-PH", {
@@ -186,6 +219,7 @@ const Retirement = () => {
     }).format(Math.abs(value));
   };
 
+  // ─── Render Submitted View ─────────────────────────────────────────────────
   if (submitted) {
     if (showAppointment) {
       return (
@@ -271,14 +305,13 @@ const Retirement = () => {
             backgroundPosition: "center",
           }}
         >
+        <Link
+            to="/FNA/door"
+            className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
+          >
+            ← Back to Doors
+        </Link>
           <div className="max-w-2xl mx-auto">
-            <Link
-              to="/FNA/door"
-              className="relative inline-block text-[#395998] font-medium mb-4 ml-4 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[1.5px] after:bg-[#F4B43C] after:transition-all after:duration-300 hover:after:w-full text-sm"
-            >
-              ← Back to Doors
-            </Link>
-
             <div className="bg-white rounded-lg shadow-lg p-5">
               <div className="text-center mb-5">
                 <h1 className="text-xl font-bold text-[#003266] mb-3">
@@ -286,7 +319,7 @@ const Retirement = () => {
                 </h1>
                 <button
                   onClick={exportPDF}
-                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                  className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
                 >
                   Export to PDF
                 </button>
@@ -386,6 +419,7 @@ const Retirement = () => {
     );
   }
 
+  // ─── Main Form Render ─────────────────────────────────────────────────────
   return (
     <div
       className="min-h-auto pt-32 px-4 pb-16"
@@ -502,13 +536,12 @@ const Retirement = () => {
                       ₱
                     </div>
                     <input
-                      type="number"
-                      value={monthlyIncome}
-                      onChange={(e) => setMonthlyIncome(e.target.value)}
+                      type="text"
+                      value={formatCurrencyInput(monthlyIncome)}
+                      onChange={handleMonthlyIncomeChange}
                       className="flex-grow p-2.5 text-center text-base focus:outline-none"
                       placeholder="Enter amount"
-                      min="1"
-                      step="0.01"
+                      inputMode="decimal"
                     />
                   </div>
                   {errors.income && (
@@ -549,7 +582,6 @@ const Retirement = () => {
                     Review & Edit Your Answers
                   </h2>
 
-                  {/* Live Result Preview with animation */}
                   <div className="bg-blue-50 border border-[#003266] rounded-lg p-5 mb-6 text-center shadow-sm">
                     <p className="text-base text-[#003266] mb-4">
                       Estimated Results (updates live):
@@ -629,11 +661,11 @@ const Retirement = () => {
                               ₱
                             </div>
                             <input
-                              type="number"
-                              value={monthlyIncome}
-                              onChange={(e) => setMonthlyIncome(e.target.value)}
+                              type="text"
+                              value={formatCurrencyInput(monthlyIncome)}
+                              onChange={handleMonthlyIncomeChange}
                               className="flex-grow p-2 text-center text-sm focus:outline-none"
-                              step="0.01"
+                              inputMode="decimal"
                             />
                           </div>
                         </div>
@@ -642,7 +674,7 @@ const Retirement = () => {
                           <span className="text-sm text-[#003266] font-semibold w-2/5 text-right pr-3">
                             Years in Retirement:
                           </span>
-                          <div className="flex flex-wrap gap-2 w-3/5 justify-end">
+                          <div className="flex flex-wrap gap-2 w-2/4 justify-left">
                             {[10, 11, 12, 13, 14, 15].map((y) => (
                               <button
                                 key={y}
@@ -670,14 +702,14 @@ const Retirement = () => {
             {step > 1 ? (
               <button
                 onClick={back}
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </button>
             ) : (
               <Link
                 to="/services/yes_services/SavEdRe"
-                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+                className="border-2 border-[#003366] text-[#003366] px-5 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
               >
                 Back
               </Link>
@@ -685,7 +717,7 @@ const Retirement = () => {
 
             <button
               onClick={next}
-              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm"
+              className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
             >
               {step === 5 ? "Submit" : "Next"}
             </button>

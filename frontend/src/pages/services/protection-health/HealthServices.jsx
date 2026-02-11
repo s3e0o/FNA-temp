@@ -8,7 +8,7 @@ import HealthResultPDF from "../../../components/pdf/HealthResultPDF.jsx";
 const formatNumberWithCommas = (value) => {
   if (!value) return "";
   const cleaned = value.replace(/[^0-9]/g, "");
-  const truncated = cleaned.slice(0, 10);
+  const truncated = cleaned.slice(0, 9);
   return truncated.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
@@ -94,18 +94,20 @@ function HealthServices() {
   // Validation per step
   const validateCurrentStep = () => {
     const newErrors = {};
+    const goal = getCleanNumber(healthQuestion1);
+    const monthly = getCleanNumber(healthQuestion2);
 
     if (currentStep === 1 || currentStep === 3) {
-      const goal = getCleanNumber(healthQuestion1);
       if (!healthQuestion1.trim() || isNaN(goal) || goal <= 0) {
         newErrors.question1 = "Please enter a valid amount greater than 0.";
       }
     }
 
     if (currentStep === 2 || currentStep === 3) {
-      const monthly = getCleanNumber(healthQuestion2);
       if (!healthQuestion2.trim() || isNaN(monthly) || monthly <= 0) {
         newErrors.question2 = "Please enter a valid monthly amount greater than 0.";
+      } else if (monthly >= goal) {
+        newErrors.question2 = "Monthly contribution must be less than your total health fund goal.";
       }
     }
 

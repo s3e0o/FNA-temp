@@ -58,10 +58,18 @@ const Survey = () => {
     child3: "",
     child4: "",
     child5: "",
-    netIncome: "",
+    // Income
+    yourNetIncome: "",
+    yourIncomeMonths: "",
+    partnerNetIncome: "",
+    partnerIncomeMonths: "",
+    // Expenses
     savings: "",
     loanPayments: "",
     household: "",
+    education: "",
+    vacation: "",
+    // Assets & Liabilities
     realEstate: "",
     cash: "",
     loans: "",
@@ -83,14 +91,26 @@ const Survey = () => {
   /* =========================
      Calculations
   ========================= */
-  const monthlyExcess = useMemo(() => {
+  const totalMonthlyIncome = useMemo(() => {
     return (
-      Number(form.netIncome || 0) -
-      (Number(form.savings || 0) +
-        Number(form.loanPayments || 0) +
-        Number(form.household || 0))
+      Number(form.yourNetIncome || 0) +
+      Number(form.partnerNetIncome || 0)
     );
-  }, [form]);
+  }, [form.yourNetIncome, form.partnerNetIncome]);
+
+  const totalMonthlyExpenses = useMemo(() => {
+    return (
+      Number(form.savings || 0) +
+      Number(form.loanPayments || 0) +
+      Number(form.household || 0) +
+      Number(form.education || 0) +
+      Number(form.vacation || 0)
+    );
+  }, [form.savings, form.loanPayments, form.household, form.education, form.vacation]);
+
+  const monthlyExcess = useMemo(() => {
+    return totalMonthlyIncome - totalMonthlyExpenses;
+  }, [totalMonthlyIncome, totalMonthlyExpenses]);
 
   const netWorth = useMemo(() => {
     return (
@@ -162,29 +182,132 @@ const Survey = () => {
         )}
 
         {/* ===================== */}
-        {/* STEP 2 - MONTHLY */}
+        {/* STEP 2 - MONTHLY INCOME & EXPENSE */}
         {/* ===================== */}
         {step === 2 && (
           <div className="bg-gray-50 rounded-xl p-10 shadow-inner border border-gray-100">
             <h2 className="text-2xl font-bold text-[#003266] mb-2 text-center">
-              Monthly Income & Expenses
+              MONTHLY INCOME & EXPENSE
             </h2>
             <p className="text-gray-500 text-center mb-8">
-              Let’s understand your monthly flow.
+              Enter your monthly cash flow information.
             </p>
 
-            <div className="space-y-5">
-              <FloatingInput label="Net Monthly Income" name="netIncome" type="number" value={form.netIncome} onChange={handleChange} />
-              <FloatingInput label="Monthly Savings" name="savings" type="number" value={form.savings} onChange={handleChange} />
-              <FloatingInput label="Loan Payments" name="loanPayments" type="number" value={form.loanPayments} onChange={handleChange} />
-              <FloatingInput label="Household Expenses" name="household" type="number" value={form.household} onChange={handleChange} />
+            {/* Income Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+                Income
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <FloatingInput 
+                      label="Your net monthly income" 
+                      name="yourNetIncome" 
+                      type="number" 
+                      value={form.yourNetIncome} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                  <div className="w-32">
+                    <FloatingInput 
+                      label="Months/year" 
+                      name="yourIncomeMonths" 
+                      type="number" 
+                      value={form.yourIncomeMonths} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <FloatingInput 
+                      label="Your partner's net monthly income" 
+                      name="partnerNetIncome" 
+                      type="number" 
+                      value={form.partnerNetIncome} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                  <div className="w-32">
+                    <FloatingInput 
+                      label="Months/year" 
+                      name="partnerIncomeMonths" 
+                      type="number" 
+                      value={form.partnerIncomeMonths} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Total Monthly Net Income / Cash In</span>
+                <span className="text-xl font-bold text-[#003266]">
+                  ₱ {totalMonthlyIncome.toLocaleString()}
+                </span>
+              </div>
             </div>
 
-            <div className="mt-8 bg-white p-5 rounded-lg border text-center">
-              <p className="text-gray-600">Monthly Excess</p>
-              <p className="text-xl font-bold text-[#003266]">
-                ₱ {monthlyExcess.toLocaleString()}
-              </p>
+            {/* Expenses Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+                Expenses
+              </h3>
+              
+              <div className="space-y-4">
+                <FloatingInput 
+                  label="Monthly Savings/Investment" 
+                  name="savings" 
+                  type="number" 
+                  value={form.savings} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Monthly Loan Payments" 
+                  name="loanPayments" 
+                  type="number" 
+                  value={form.loanPayments} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Household and work-related expenses" 
+                  name="household" 
+                  type="number" 
+                  value={form.household} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Education-related expenses" 
+                  name="education" 
+                  type="number" 
+                  value={form.education} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Vacation, recreation, other periodic expenses" 
+                  name="vacation" 
+                  type="number" 
+                  value={form.vacation} 
+                  onChange={handleChange} 
+                />
+              </div>
+
+              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Total Monthly Expenses / Cash Out</span>
+                <span className="text-xl font-bold text-[#003266]">
+                  ₱ {totalMonthlyExpenses.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="mt-6 bg-[#003266]/10 p-5 rounded-lg border border-[#003266]/20 text-center">
+                <p className="text-gray-700 font-medium">Monthly Excess Cash</p>
+                <p className="text-2xl font-bold text-[#003266]">
+                  ₱ {monthlyExcess.toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -198,7 +321,7 @@ const Survey = () => {
               Assets & Liabilities
             </h2>
             <p className="text-gray-500 text-center mb-8">
-              Let’s compute your net worth.
+              Let's compute your net worth.
             </p>
 
             <div className="space-y-5">
@@ -218,16 +341,23 @@ const Survey = () => {
 
         {/* Navigation */}
         <div className="flex justify-between items-center mt-10">
-          <button onClick={prev} disabled={step === 1} className="text-gray-500 disabled:opacity-30 cursor-pointer">
+          <button 
+            onClick={prev} 
+            disabled={step === 1} 
+            className="text-gray-500 disabled:opacity-30 cursor-pointer hover:text-[#003266] transition-colors"
+          >
             ← Previous
           </button>
 
           {step < 3 ? (
-            <button onClick={next} className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266] cursor-pointer">
+            <button 
+              onClick={next} 
+              className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer"
+            >
               Continue →
             </button>
           ) : (
-            <button className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266]-700 cursor-pointer">
+            <button className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer">
               Submit
             </button>
           )}

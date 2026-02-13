@@ -26,6 +26,7 @@ import SavingsDeets from "./pages/services/services-deets/SavingsDeets.jsx";
 import Door from "./pages/services/yes_services/Door.jsx";
 import Questions from "./pages/corporate/Questions.jsx";
 import HomePage from "./pages/corporate/HomePage";
+import Survey from "./pages/in-depth/Survey.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -69,6 +70,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         {/* Components for FNA Results PDF Export */}        
         {/* FNA Corporate - Financial Wellness Assessment */}
         <Route path="/financial-assessment" element={<HomePage />} />
+
+        {/* In-depth FNA */}
+        <Route path="/FNA/in-depth/survey" element={<Survey />} />
 
       </Routes>  
       <Footer /> 

@@ -121,8 +121,8 @@ export default function RetirementDeets() {
                                   opacity-0 translate-y-2
                                   animate-[textFade_0.5s_ease-in-out_forwards]">
                       {active === "what"
-                        ? "A health plan that covers medical expenses such as hospitalization, critical illness, or long-term care."
-                        : "Medical costs are extremely expensive. Health protection prevents financial burden during illness."}
+                        ? "Retirement is the stage of life when a person stops working full-time and lives off their savings and income they prepared earlier."
+                        : "Ensure you have enough money to live comfortably when you stop working. It gives you financial security, allows you to maintain your lifestyle, and reduces stress about money in the future."}
                     </p>
                   </div>
 

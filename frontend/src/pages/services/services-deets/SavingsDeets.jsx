@@ -121,8 +121,8 @@ export default function SavingsDeets() {
                                   opacity-0 translate-y-2
                                   animate-[textFade_0.5s_ease-in-out_forwards]">
                       {active === "what"
-                        ? "A health plan that covers medical expenses such as hospitalization, critical illness, or long-term care."
-                        : "Medical costs are extremely expensive. Health protection prevents financial burden during illness."}
+                        ? "Savings is setting aside money today so you can use it in the future. It means not spending all your money now, but keeping some for important goals."
+                        : "Savings matters because Helps you prepare for future needs. Gives you financial security, Reduces stress during emergencies. Helps you reach your goals"}
                     </p>
                   </div>
 

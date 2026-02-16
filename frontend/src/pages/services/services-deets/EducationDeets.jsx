@@ -121,8 +121,8 @@ export default function EducationDeets() {
                                   opacity-0 translate-y-2
                                   animate-[textFade_0.5s_ease-in-out_forwards]">
                       {active === "what"
-                        ? "A health plan that covers medical expenses such as hospitalization, critical illness, or long-term care."
-                        : "Medical costs are extremely expensive. Health protection prevents financial burden during illness."}
+                        ? "Education is learning knowledge and skills that help a person grow, understand the world, and prepare for a future career."
+                        : "Education helps make sure there is money ready for your child’s schooling in the future."}
                     </p>
                   </div>
 

@@ -69,10 +69,17 @@ const Survey = () => {
     household: "",
     education: "",
     vacation: "",
-    // Assets & Liabilities
-    realEstate: "",
-    cash: "",
-    loans: "",
+    // Assets
+    realProperties: "",
+    carAppliancesJewelry: "",
+    cashBankDeposits: "",
+    mutualFundUITF: "",
+    businessInvestments: "",
+    insuranceCashValue: "",
+    // Liabilities
+    realEstateLoan: "",
+    carSalaryLoans: "",
+    creditCardBalance: "",
   });
 
   const handleChange = (e) => {
@@ -112,13 +119,28 @@ const Survey = () => {
     return totalMonthlyIncome - totalMonthlyExpenses;
   }, [totalMonthlyIncome, totalMonthlyExpenses]);
 
-  const netWorth = useMemo(() => {
+  const totalAssets = useMemo(() => {
     return (
-      Number(form.realEstate || 0) +
-      Number(form.cash || 0) -
-      Number(form.loans || 0)
+      Number(form.realProperties || 0) +
+      Number(form.carAppliancesJewelry || 0) +
+      Number(form.cashBankDeposits || 0) +
+      Number(form.mutualFundUITF || 0) +
+      Number(form.businessInvestments || 0) +
+      Number(form.insuranceCashValue || 0)
     );
-  }, [form]);
+  }, [form.realProperties, form.carAppliancesJewelry, form.cashBankDeposits, form.mutualFundUITF, form.businessInvestments, form.insuranceCashValue]);
+
+  const totalLiabilities = useMemo(() => {
+    return (
+      Number(form.realEstateLoan || 0) +
+      Number(form.carSalaryLoans || 0) +
+      Number(form.creditCardBalance || 0)
+    );
+  }, [form.realEstateLoan, form.carSalaryLoans, form.creditCardBalance]);
+
+  const netWorth = useMemo(() => {
+    return totalAssets - totalLiabilities;
+  }, [totalAssets, totalLiabilities]);
 
   return (
     <div className="w-full px-4 py-20 bg-gradient-to-br from-white via-gray-100 to-blue-100">
@@ -212,7 +234,7 @@ const Survey = () => {
                   </div>
                   <div className="w-32">
                     <FloatingInput 
-                      label="Months/year" 
+                      label="No. of months income received in a year" 
                       name="yourIncomeMonths" 
                       type="number" 
                       value={form.yourIncomeMonths} 
@@ -233,7 +255,7 @@ const Survey = () => {
                   </div>
                   <div className="w-32">
                     <FloatingInput 
-                      label="Months/year" 
+                      label="No. of months income received in a year" 
                       name="partnerIncomeMonths" 
                       type="number" 
                       value={form.partnerIncomeMonths} 
@@ -313,28 +335,125 @@ const Survey = () => {
         )}
 
         {/* ===================== */}
-        {/* STEP 3 - ASSETS */}
+        {/* STEP 3 - ASSETS, LIABILITIES & NET WORTH */}
         {/* ===================== */}
         {step === 3 && (
           <div className="bg-gray-50 rounded-xl p-10 shadow-inner border border-gray-100">
             <h2 className="text-2xl font-bold text-[#003266] mb-2 text-center">
-              Assets & Liabilities
+              ASSETS, LIABILITIES & NET WORTH
             </h2>
             <p className="text-gray-500 text-center mb-8">
               Let's compute your net worth.
             </p>
 
-            <div className="space-y-5">
-              <FloatingInput label="Real Estate Value" name="realEstate" type="number" value={form.realEstate} onChange={handleChange} />
-              <FloatingInput label="Cash & Deposits" name="cash" type="number" value={form.cash} onChange={handleChange} />
-              <FloatingInput label="Total Loans" name="loans" type="number" value={form.loans} onChange={handleChange} />
+            {/* Assets Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+                ASSETS
+              </h3>
+              
+              <div className="space-y-4">
+                <FloatingInput 
+                  label="ASSETS - Real Properties" 
+                  name="realProperties" 
+                  type="number" 
+                  value={form.realProperties} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Car, appliances, jewelry, others" 
+                  name="carAppliancesJewelry" 
+                  type="number" 
+                  value={form.carAppliancesJewelry} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Cash and bank deposits" 
+                  name="cashBankDeposits" 
+                  type="number" 
+                  value={form.cashBankDeposits} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Mutual fund, UITF, VUL, bonds, stocks" 
+                  name="mutualFundUITF" 
+                  type="number" 
+                  value={form.mutualFundUITF} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Business and other investments" 
+                  name="businessInvestments" 
+                  type="number" 
+                  value={form.businessInvestments} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Insurance, pre-need plans cash value" 
+                  name="insuranceCashValue" 
+                  type="number" 
+                  value={form.insuranceCashValue} 
+                  onChange={handleChange} 
+                />
+              </div>
+
+              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Total Assets</span>
+                <span className="text-xl font-bold text-[#003266]">
+                  ₱ {totalAssets.toLocaleString()}
+                </span>
+              </div>
             </div>
 
-            <div className="mt-8 bg-white p-5 rounded-lg border text-center">
-              <p className="text-gray-600">Net Worth</p>
-              <p className="text-xl font-bold text-green-600">
-                ₱ {netWorth.toLocaleString()}
-              </p>
+            {/* Liabilities Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+                LIABILITIES
+              </h3>
+              
+              <div className="space-y-4">
+                <FloatingInput 
+                  label="LIABILITIES - Real Estate Loan" 
+                  name="realEstateLoan" 
+                  type="number" 
+                  value={form.realEstateLoan} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Car, Salary and Other Loans" 
+                  name="carSalaryLoans" 
+                  type="number" 
+                  value={form.carSalaryLoans} 
+                  onChange={handleChange} 
+                />
+                <FloatingInput 
+                  label="Unpaid credit card balance" 
+                  name="creditCardBalance" 
+                  type="number" 
+                  value={form.creditCardBalance} 
+                  onChange={handleChange} 
+                />
+              </div>
+
+              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Total Liabilities</span>
+                <span className="text-xl font-bold text-[#003266]">
+                  ₱ {totalLiabilities.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            {/* Net Worth */}
+            <div className="mt-8 bg-[#003266]/10 p-6 rounded-lg border border-[#003266]/20">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-lg font-semibold text-gray-700">Net Worth</span>
+                <span className="text-2xl font-bold text-[#003266]">
+                  ₱ {netWorth.toLocaleString()}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500 text-right">
+                Total Assets: ₱ {totalAssets.toLocaleString()} - Total Liabilities: ₱ {totalLiabilities.toLocaleString()}
+              </div>
             </div>
           </div>
         )}

@@ -241,7 +241,7 @@ export default function AppointmentForm() {
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6 md:p-10 border border-gray-200">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-[#0a2e5c]">Schedule Your Consultation</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#0a2e5c]">Schedule Your Appointment</h1>
             <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
               Complete the form below to book an appointment with our licensed insurance advisor.
             </p>

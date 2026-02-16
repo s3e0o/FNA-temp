@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import logoImage from "../assets/images/short-cfs-b.png";
+import emailjs from "@emailjs/browser";
 
 export default function AppointmentForm() {
   const [formData, setFormData] = useState({
@@ -112,19 +113,57 @@ export default function AppointmentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      setIsSubmitting(true);
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        // ✅ Success! Show thank you screen
-        setShowThankYou(true);
-      } catch (err) {
-        alert("Something went wrong. Please try again.");
-      } finally {
-        setIsSubmitting(false);
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const templateParams = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        age: formData.age,
+        mobile: formData.mobile.trim(),
+        email: formData.email.trim(),
+        date: formData.date,
+        time: formData.time,
+        feedback: formData.feedback?.trim() || "— No additional notes —",
+        submissionDate: new Date().toLocaleString("en-PH", {
+          timeZone: "Asia/Manila",
+          dateStyle: "medium",
+          timeStyle: "short",
+        }),
+      };
+
+      const response = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_npmog1q",  
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_wfc8bqf",
+        templateParams,
+        {
+          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "ubgyer7dz2teNs5xc",  
+        }
+      );
+
+      console.log("EmailJS SUCCESS!", response.status, response.text);
+      setShowThankYou(true);
+    } catch (err) {
+      console.error("EmailJS failed:", err);
+      let errorMsg = err.text || err.message || "Unknown error";
+
+      if (errorMsg.includes("public key")) {
+        errorMsg += "\n→ Double-check .env has VITE_EMAILJS_PUBLIC_KEY=ubgyer7dz2teNs5xc (restart dev server!)";
+      } else if (errorMsg.includes("412") || errorMsg.includes("scopes") || errorMsg.includes("Gmail_API")) {
+        errorMsg += "\n→ Gmail permission issue: In EmailJS dashboard > Email Services > your Gmail > Disconnect > Reconnect, and approve 'Send email on your behalf' permission.";
       }
+
+      alert(`Failed to send: ${errorMsg}\nOpen DevTools (F12) > Console for more info.`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    document.title = "Schedule Your Consultation | Financial Needs Analysis";
+  }, []);
 
   useEffect(() => {
       document.title = "Schedule Your Consultation | Financial Needs Analysis";

@@ -401,17 +401,17 @@ function LifeProtection() {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-300">
-                  <Link to="/FNA/AppointmentForm">
-                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
-                      Book Appointment
-                    </button>
-                  </Link>
-                  <Link to="/FNA/OurServices">
-                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
-                      View Services
-                    </button>
-                  </Link>
+               <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+                      <Link to="/FNA/OurServices">
+                      <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
+                        View Services
+                      </button>
+                      </Link>
+                      <Link to="/FNA/AppointmentForm">
+                      <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
+                        Book Appointment
+                      </button>
+                    </Link>
                 </div>
               </div>
             </div>
@@ -680,7 +680,7 @@ function LifeProtection() {
               onClick={handleNext} 
               className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
             >
-              {currentStep === 4 ? "Submit" : "Next"}
+              {currentStep === 4 ? "Done" : "Next"}
             </button>
           </div>
         </div>

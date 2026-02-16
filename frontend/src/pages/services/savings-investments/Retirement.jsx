@@ -399,17 +399,16 @@ const Retirement = () => {
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t border-gray-300">
-                  <button
-                    onClick={openAppointment}
-                    className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
-                  >
-                    Book Appointment
-                  </button>
-                  <Link to="/FNA/OurServices">
-                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
-                      View Services
-                    </button>
-                  </Link>
+                                  <Link to="/FNA/OurServices">
+                                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
+                                      View Services
+                                    </button>
+                                  </Link>
+                                  <Link to="/FNA/AppointmentForm">
+                                    <button className="border-2 border-[#003366] text-[#003366] px-4 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
+                                      Book Appointment
+                                    </button>
+                                  </Link>
                 </div>
               </div>
             </div>
@@ -719,7 +718,7 @@ const Retirement = () => {
               onClick={next}
               className="border-2 border-[#003366] text-[#003366] px-6 py-1.5 rounded-full font-medium hover:bg-[#003366] hover:text-white transition-colors duration-200 text-sm cursor-pointer"
             >
-              {step === 5 ? "Submit" : "Next"}
+              {step === 5 ? "Done" : "Next"}
             </button>
           </div>
         </div>

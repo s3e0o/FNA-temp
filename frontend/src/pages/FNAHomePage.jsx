@@ -16,7 +16,7 @@ const FNAHomePage = () => {
 
       <main className="fna-page">
         <div className="fna-card text-center min-h-auto pt-32 px-4 top-0 pb-16">
-          <h2>Hello, [Name]</h2>
+          <h2>Good Day!</h2>
           <p>Have you figured out your financial needs?</p>
 
           <div className="fna-actions flex gap-4 justify-center">

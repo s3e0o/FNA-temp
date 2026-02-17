@@ -18,17 +18,17 @@ const FloatingInput = ({
         value={value}
         onChange={onChange}
         placeholder=" "
-        className="peer w-full bg-gray-100 rounded-xl px-4 pt-6 pb-2 text-gray-800 shadow-inner border border-gray-200 
-        focus:bg-white focus:border-[#003266] focus:ring-2 focus:ring-[#003266]/20 
+        className="peer w-full bg-gray-50 rounded-md px-3 py-3 text-sm text-gray-800 border border-gray-200 
+        focus:bg-white focus:border-[#003266] focus:ring-1 focus:ring-[#003266]/20 
         outline-none transition-all duration-300"
       />
       <label
-        className="absolute left-4 top-2 text-sm text-gray-500 transition-all pointer-events-none
-        peer-placeholder-shown:top-4
-        peer-placeholder-shown:text-base
+        className="absolute left-3 top-2 text-xs text-gray-500 transition-all pointer-events-none
+        peer-placeholder-shown:top-3
+        peer-placeholder-shown:text-sm
         peer-placeholder-shown:text-gray-400
         peer-focus:top-2
-        peer-focus:text-sm
+        peer-focus:text-xs
         peer-focus:text-[#003266]"
       >
         {label}
@@ -143,18 +143,18 @@ const Survey = () => {
   }, [totalAssets, totalLiabilities]);
 
   return (
-    <div className="w-full px-4 py-20 bg-gradient-to-br from-white via-gray-100 to-blue-100">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+    <div className="w-full min-h-screen pt-24 px-4 pb-8 bg-gradient-to-br from-white via-gray-100 to-blue-100">
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6">
 
         {/* Progress Bar */}
-        <div className="w-full h-2 bg-gray-200 rounded-full mb-6 overflow-hidden">
+        <div className="w-full h-1.5 bg-gray-200 rounded-full mb-4 overflow-hidden">
           <div
             className="h-full bg-[#003266] transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <p className="text-sm text-[#003266] font-semibold mb-6">
+        <p className="text-xs text-[#003266] font-semibold mb-4">
           Step {step} of 3
         </p>
 
@@ -162,16 +162,16 @@ const Survey = () => {
         {/* STEP 1 - GENERAL INFO */}
         {/* ===================== */}
         {step === 1 && (
-          <div className="bg-gray-50 rounded-xl p-10 shadow-inner border border-gray-100">
-            <h2 className="text-2xl font-bold text-[#003266] mb-2 text-center">
-              General Information
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-100">
+            <h2 className="text-lg font-bold text-[#003266] mb-1 text-center">
+              GENERAL INFORMATION
             </h2>
-            <p className="text-gray-500 text-center mb-10">
+            <p className="text-gray-500 text-sm text-center mb-6">
               Tell us a little about yourself.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-5">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <FloatingInput label="Your Name" name="name" value={form.name} onChange={handleChange} />
                 <FloatingInput label="Your Age" name="age" type="number" value={form.age} onChange={handleChange} />
                 <FloatingInput label="Years Before Retirement" name="retirementYears" type="number" value={form.retirementYears} onChange={handleChange} />
@@ -179,7 +179,7 @@ const Survey = () => {
                 <FloatingInput label="Your Total Healthcare Coverage" name="healthCoverage" type="number" value={form.healthCoverage} onChange={handleChange} />
               </div>
 
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <FloatingInput label="Civil Status" name="civilStatus" value={form.civilStatus} onChange={handleChange} />
                 <FloatingInput label="Spouse/Partner's Age (if any)" name="spouseAge" type="number" value={form.spouseAge} onChange={handleChange} />
                 <FloatingInput label="Partner's Total Life Insurance Coverage" name="partnerLifeInsurance" type="number" value={form.partnerLifeInsurance} onChange={handleChange} />
@@ -188,11 +188,11 @@ const Survey = () => {
             </div>
 
             {/* Children */}
-            <div className="mt-10">
-              <p className="text-sm font-semibold text-[#003266] mb-4">
+            <div className="mt-6">
+              <p className="text-sm font-semibold text-[#003266] mb-3">
                 Ages of Children Under 18 (if any)
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <FloatingInput label="Child 1" name="child1" type="number" value={form.child1} onChange={handleChange} />
                 <FloatingInput label="Child 2" name="child2" type="number" value={form.child2} onChange={handleChange} />
                 <FloatingInput label="Child 3" name="child3" type="number" value={form.child3} onChange={handleChange} />
@@ -207,34 +207,34 @@ const Survey = () => {
         {/* STEP 2 - MONTHLY INCOME & EXPENSE */}
         {/* ===================== */}
         {step === 2 && (
-          <div className="bg-gray-50 rounded-xl p-10 shadow-inner border border-gray-100">
-            <h2 className="text-2xl font-bold text-[#003266] mb-2 text-center">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-100">
+            <h2 className="text-lg font-bold text-[#003266] mb-1 text-center">
               MONTHLY INCOME & EXPENSE
             </h2>
-            <p className="text-gray-500 text-center mb-8">
+            <p className="text-gray-500 text-sm text-center mb-6">
               Enter your monthly cash flow information.
             </p>
 
             {/* Income Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+            <div className="mb-6">
+              <h3 className="text-base font-semibold text-[#003266] mb-3 border-b border-gray-200 pb-1">
                 Income
               </h3>
               
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
+              <div className="grid lg:grid-cols-2 gap-4">
+                {/* Your Income Card */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <h4 className="font-medium text-[#003266] text-sm mb-3">Your Income</h4>
+                  <div className="space-y-3">
                     <FloatingInput 
-                      label="Your net monthly income" 
+                      label="Net monthly income" 
                       name="yourNetIncome" 
                       type="number" 
                       value={form.yourNetIncome} 
                       onChange={handleChange} 
                     />
-                  </div>
-                  <div className="w-32">
                     <FloatingInput 
-                      label="No. of months income received in a year" 
+                      label="Months per year" 
                       name="yourIncomeMonths" 
                       type="number" 
                       value={form.yourIncomeMonths} 
@@ -243,19 +243,19 @@ const Survey = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <div className="flex-1">
+                {/* Partner Income Card */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <h4 className="font-medium text-[#003266] text-sm mb-3">Partner's Income</h4>
+                  <div className="space-y-3">
                     <FloatingInput 
-                      label="Your partner's net monthly income" 
+                      label="Net monthly income" 
                       name="partnerNetIncome" 
                       type="number" 
                       value={form.partnerNetIncome} 
                       onChange={handleChange} 
                     />
-                  </div>
-                  <div className="w-32">
                     <FloatingInput 
-                      label="No. of months income received in a year" 
+                      label="Months per year" 
                       name="partnerIncomeMonths" 
                       type="number" 
                       value={form.partnerIncomeMonths} 
@@ -265,9 +265,9 @@ const Survey = () => {
                 </div>
               </div>
 
-              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Total Monthly Net Income / Cash In</span>
-                <span className="text-xl font-bold text-[#003266]">
+              <div className="mt-4 bg-white p-3 rounded-lg border flex flex-row justify-between items-center">
+                <span className="font-medium text-sm text-gray-700">Total Monthly Net Income / Cash In</span>
+                <span className="text-base font-bold text-[#003266]">
                   ₱ {totalMonthlyIncome.toLocaleString()}
                 </span>
               </div>
@@ -275,11 +275,11 @@ const Survey = () => {
 
             {/* Expenses Section */}
             <div>
-              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+              <h3 className="text-base font-semibold text-[#003266] mb-3 border-b border-gray-200 pb-1">
                 Expenses
               </h3>
               
-              <div className="space-y-4">
+              <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-3">
                 <FloatingInput 
                   label="Monthly Savings/Investment" 
                   name="savings" 
@@ -295,7 +295,7 @@ const Survey = () => {
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Household and work-related expenses" 
+                  label="Household & work expenses" 
                   name="household" 
                   type="number" 
                   value={form.household} 
@@ -309,7 +309,7 @@ const Survey = () => {
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Vacation, recreation, other periodic expenses" 
+                  label="Vacation & recreation" 
                   name="vacation" 
                   type="number" 
                   value={form.vacation} 
@@ -317,18 +317,20 @@ const Survey = () => {
                 />
               </div>
 
-              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Total Monthly Expenses / Cash Out</span>
-                <span className="text-xl font-bold text-[#003266]">
+              <div className="mt-3 bg-white p-3 rounded-lg border flex flex-row justify-between items-center">
+                <span className="font-medium text-sm text-gray-700">Total Monthly Expenses / Cash Out</span>
+                <span className="text-base font-bold text-[#003266]">
                   ₱ {totalMonthlyExpenses.toLocaleString()}
                 </span>
               </div>
 
-              <div className="mt-6 bg-[#003266]/10 p-5 rounded-lg border border-[#003266]/20 text-center">
-                <p className="text-gray-700 font-medium">Monthly Excess Cash</p>
-                <p className="text-2xl font-bold text-[#003266]">
-                  ₱ {monthlyExcess.toLocaleString()}
-                </p>
+              <div className="mt-4 bg-[#003266]/10 p-4 rounded-lg border border-[#003266]/20">
+                <div className="flex flex-row justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700">Monthly Excess Cash</span>
+                  <span className="text-lg font-bold text-[#003266]">
+                    ₱ {monthlyExcess.toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -338,30 +340,30 @@ const Survey = () => {
         {/* STEP 3 - ASSETS, LIABILITIES & NET WORTH */}
         {/* ===================== */}
         {step === 3 && (
-          <div className="bg-gray-50 rounded-xl p-10 shadow-inner border border-gray-100">
-            <h2 className="text-2xl font-bold text-[#003266] mb-2 text-center">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-100">
+            <h2 className="text-lg font-bold text-[#003266] mb-1 text-center">
               ASSETS, LIABILITIES & NET WORTH
             </h2>
-            <p className="text-gray-500 text-center mb-8">
+            <p className="text-gray-500 text-sm text-center mb-6">
               Let's compute your net worth.
             </p>
 
             {/* Assets Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+            <div className="mb-6">
+              <h3 className="text-base font-semibold text-[#003266] mb-3 border-b border-gray-200 pb-1">
                 ASSETS
               </h3>
               
-              <div className="space-y-4">
+              <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-3">
                 <FloatingInput 
-                  label="ASSETS - Real Properties" 
+                  label="Real Properties" 
                   name="realProperties" 
                   type="number" 
                   value={form.realProperties} 
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Car, appliances, jewelry, others" 
+                  label="Car, appliances, jewelry" 
                   name="carAppliancesJewelry" 
                   type="number" 
                   value={form.carAppliancesJewelry} 
@@ -375,21 +377,21 @@ const Survey = () => {
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Mutual fund, UITF, VUL, bonds, stocks" 
+                  label="Mutual funds, UITF, VUL" 
                   name="mutualFundUITF" 
                   type="number" 
                   value={form.mutualFundUITF} 
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Business and other investments" 
+                  label="Business investments" 
                   name="businessInvestments" 
                   type="number" 
                   value={form.businessInvestments} 
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Insurance, pre-need plans cash value" 
+                  label="Insurance cash value" 
                   name="insuranceCashValue" 
                   type="number" 
                   value={form.insuranceCashValue} 
@@ -397,37 +399,37 @@ const Survey = () => {
                 />
               </div>
 
-              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Total Assets</span>
-                <span className="text-xl font-bold text-[#003266]">
+              <div className="mt-3 bg-white p-3 rounded-lg border flex flex-row justify-between items-center">
+                <span className="font-medium text-sm text-gray-700">Total Assets</span>
+                <span className="text-base font-bold text-[#003266]">
                   ₱ {totalAssets.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* Liabilities Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
+            <div className="mb-6">
+              <h3 className="text-base font-semibold text-[#003266] mb-3 border-b border-gray-200 pb-1">
                 LIABILITIES
               </h3>
               
-              <div className="space-y-4">
+              <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-3">
                 <FloatingInput 
-                  label="LIABILITIES - Real Estate Loan" 
+                  label="Real Estate Loan" 
                   name="realEstateLoan" 
                   type="number" 
                   value={form.realEstateLoan} 
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Car, Salary and Other Loans" 
+                  label="Car & Salary Loans" 
                   name="carSalaryLoans" 
                   type="number" 
                   value={form.carSalaryLoans} 
                   onChange={handleChange} 
                 />
                 <FloatingInput 
-                  label="Unpaid credit card balance" 
+                  label="Credit Card Balance" 
                   name="creditCardBalance" 
                   type="number" 
                   value={form.creditCardBalance} 
@@ -435,19 +437,19 @@ const Survey = () => {
                 />
               </div>
 
-              <div className="mt-4 bg-white p-4 rounded-lg border flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Total Liabilities</span>
-                <span className="text-xl font-bold text-[#003266]">
+              <div className="mt-3 bg-white p-3 rounded-lg border flex flex-row justify-between items-center">
+                <span className="font-medium text-sm text-gray-700">Total Liabilities</span>
+                <span className="text-base font-bold text-[#003266]">
                   ₱ {totalLiabilities.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* Net Worth */}
-            <div className="mt-8 bg-[#003266]/10 p-6 rounded-lg border border-[#003266]/20">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-lg font-semibold text-gray-700">Net Worth</span>
-                <span className="text-2xl font-bold text-[#003266]">
+            <div className="bg-[#003266]/10 p-4 rounded-lg border border-[#003266]/20">
+              <div className="flex flex-row justify-between items-center mb-1">
+                <span className="text-base font-semibold text-gray-700">Net Worth</span>
+                <span className="text-xl font-bold text-[#003266]">
                   ₱ {netWorth.toLocaleString()}
                 </span>
               </div>
@@ -459,11 +461,11 @@ const Survey = () => {
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-10">
+        <div className="flex justify-between items-center mt-6">
           <button 
             onClick={prev} 
             disabled={step === 1} 
-            className="text-gray-500 disabled:opacity-30 cursor-pointer hover:text-[#003266] transition-colors"
+            className="text-sm text-gray-500 disabled:opacity-30 cursor-pointer hover:text-[#003266] transition-colors"
           >
             ← Previous
           </button>
@@ -471,12 +473,12 @@ const Survey = () => {
           {step < 3 ? (
             <button 
               onClick={next} 
-              className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer"
+              className="bg-[#003266] text-white text-sm px-5 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer"
             >
               Continue →
             </button>
           ) : (
-            <button className="bg-[#003266] text-white px-6 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer">
+            <button className="bg-[#003266] text-white text-sm px-5 py-2 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer">
               Submit
             </button>
           )}

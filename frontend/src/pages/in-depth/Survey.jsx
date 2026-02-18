@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, memo } from "react";
+import React, { useState, useMemo, useCallback, memo, useEffect } from "react";
 
 // ────────────────────────────────────────────────
 // Memoized Floating Input Component
@@ -411,6 +411,10 @@ const Survey = () => {
   const toggleSummary = useCallback(() => {
     setShowSummary(prev => !prev);
   }, []);
+
+  useEffect(() => {
+      document.title = "In-depth FNA Survey | Caelum Financial Solutions";
+    }, []);
 
   return (
     <div className="w-full min-h-screen pt-24 md:pt-30 px-4 pb-8 bg-gradient-to-br from-white via-gray-50 to-blue-50 flex justify-center">

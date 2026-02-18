@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 
 /* =========================
-   Floating Input Component
+   Floating Input – with comma formatting & no spinner
 ========================= */
 const FloatingInput = ({
   label,
@@ -14,20 +14,43 @@ const FloatingInput = ({
 }) => {
   const isFilled = value != null && value !== '';
 
+  // Display with commas for number fields
+  const displayValue =
+    type === "number" && value !== '' && value !== undefined
+      ? Number(value).toLocaleString('en-US')
+      : value ?? '';
+
+  const handleInputChange = (e) => {
+    let raw = e.target.value.replace(/,/g, ''); // remove commas
+    if (type === "number") {
+      // Only allow digits
+      if (raw === '' || /^\d+$/.test(raw)) {
+        onChange({
+          ...e,
+          target: { ...e.target, name, value: raw }
+        });
+      }
+    } else {
+      onChange(e);
+    }
+  };
+
   return (
     <div className="relative w-full">
       <input
         id={name}
-        type={type}
+        type={type === "number" ? "text" : type} // text → no spinner
+        inputMode={type === "number" ? "numeric" : undefined}
         name={name}
-        value={value ?? ''}
-        onChange={onChange}
+        value={displayValue}
+        onChange={handleInputChange}
+        onWheel={(e) => e.target.blur()} // prevent scroll change
         placeholder=" "
         required={required}
         className="
           peer w-full bg-gray-50 rounded-md px-4 py-5 text-sm text-gray-800
           border border-gray-300
-          focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-200
+          focus:bg-white focus:border-[#003266] focus:ring-1 focus:ring-[#003266]/20
           outline-none transition-all duration-200
           placeholder-transparent
         "
@@ -53,7 +76,7 @@ const FloatingInput = ({
 };
 
 /* =========================
-   Survey Component
+   Survey Component – full 3 steps
 ========================= */
 const Survey = () => {
   const [step, setStep] = useState(1);
@@ -73,25 +96,21 @@ const Survey = () => {
     child3: "",
     child4: "",
     child5: "",
-    // Income
     yourNetIncome: "",
     yourIncomeMonths: "",
     partnerNetIncome: "",
     partnerIncomeMonths: "",
-    // Expenses
     savings: "",
     loanPayments: "",
     household: "",
     education: "",
     vacation: "",
-    // Assets
     realProperties: "",
     carAppliancesJewelry: "",
     cashBankDeposits: "",
     mutualFundUITF: "",
     businessInvestments: "",
     insuranceCashValue: "",
-    // Liabilities
     realEstateLoan: "",
     carSalaryLoans: "",
     creditCardBalance: "",
@@ -110,9 +129,6 @@ const Survey = () => {
 
   const progress = (step / 3) * 100;
 
-  /* =========================
-     Calculations
-  ========================= */
   const totalMonthlyIncome = useMemo(() => {
     return (
       Number(form.yourNetIncome || 0) +
@@ -130,9 +146,7 @@ const Survey = () => {
     );
   }, [form.savings, form.loanPayments, form.household, form.education, form.vacation]);
 
-  const monthlyExcess = useMemo(() => {
-    return totalMonthlyIncome - totalMonthlyExpenses;
-  }, [totalMonthlyIncome, totalMonthlyExpenses]);
+  const monthlyExcess = totalMonthlyIncome - totalMonthlyExpenses;
 
   const totalAssets = useMemo(() => {
     return (
@@ -153,17 +167,14 @@ const Survey = () => {
     );
   }, [form.realEstateLoan, form.carSalaryLoans, form.creditCardBalance]);
 
-  const netWorth = useMemo(() => {
-    return totalAssets - totalLiabilities;
-  }, [totalAssets, totalLiabilities]);
+  const netWorth = totalAssets - totalLiabilities;
 
   useEffect(() => {
-      document.title = "In-depth Form | Financial Needs Analysis";
-    }, []);
+    document.title = "In-depth Form | Financial Needs Analysis";
+  }, []);
 
   return (
     <div className="w-full min-h-screen pt-30 px-4 pb-8 bg-gradient-to-br from-white via-gray-100 to-blue-100 flex justify-center">
-      
       <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-6 md:p-10">
 
         {/* Progress Bar */}
@@ -190,7 +201,6 @@ const Survey = () => {
               Tell us a little about yourself.
             </p>
 
-            {/* CHANGED: Grid layout to 3 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FloatingInput label="Your Name" name="name" value={form.name} onChange={handleChange} />
               <FloatingInput label="Your Age" name="age" type="number" value={form.age} onChange={handleChange} />
@@ -203,7 +213,6 @@ const Survey = () => {
               <FloatingInput label="Partner's Total Healthcare Coverage" name="partnerHealthCoverage" type="number" value={form.partnerHealthCoverage} onChange={handleChange} />
             </div>
 
-            {/* Children */}
             <div className="mt-10">
               <p className="text-sm font-semibold text-[#003266] mb-4">
                 Ages of Children Under 18 (if any)
@@ -236,46 +245,44 @@ const Survey = () => {
               <h3 className="text-base font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
                 Income
               </h3>
-              
+
               <div className="grid lg:grid-cols-2 gap-6">
-                {/* Your Income Card */}
                 <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
                   <h4 className="font-medium text-[#003266] text-sm mb-4">Your Income</h4>
                   <div className="space-y-4">
-                    <FloatingInput 
-                      label="Net monthly income" 
-                      name="yourNetIncome" 
-                      type="number" 
-                      value={form.yourNetIncome} 
-                      onChange={handleChange} 
+                    <FloatingInput
+                      label="Net monthly income"
+                      name="yourNetIncome"
+                      type="number"
+                      value={form.yourNetIncome}
+                      onChange={handleChange}
                     />
-                    <FloatingInput 
-                      label="Months per year" 
-                      name="yourIncomeMonths" 
-                      type="number" 
-                      value={form.yourIncomeMonths} 
-                      onChange={handleChange} 
+                    <FloatingInput
+                      label="Months per year"
+                      name="yourIncomeMonths"
+                      type="number"
+                      value={form.yourIncomeMonths}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
 
-                {/* Partner Income Card */}
                 <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
                   <h4 className="font-medium text-[#003266] text-sm mb-4">Partner's Income</h4>
                   <div className="space-y-4">
-                    <FloatingInput 
-                      label="Net monthly income" 
-                      name="partnerNetIncome" 
-                      type="number" 
-                      value={form.partnerNetIncome} 
-                      onChange={handleChange} 
+                    <FloatingInput
+                      label="Net monthly income"
+                      name="partnerNetIncome"
+                      type="number"
+                      value={form.partnerNetIncome}
+                      onChange={handleChange}
                     />
-                    <FloatingInput 
-                      label="Months per year" 
-                      name="partnerIncomeMonths" 
-                      type="number" 
-                      value={form.partnerIncomeMonths} 
-                      onChange={handleChange} 
+                    <FloatingInput
+                      label="Months per year"
+                      name="partnerIncomeMonths"
+                      type="number"
+                      value={form.partnerIncomeMonths}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -294,42 +301,42 @@ const Survey = () => {
               <h3 className="text-base font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
                 Expenses
               </h3>
-              
+
               <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                <FloatingInput 
-                  label="Monthly Savings/Investment" 
-                  name="savings" 
-                  type="number" 
-                  value={form.savings} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Monthly Savings/Investment"
+                  name="savings"
+                  type="number"
+                  value={form.savings}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Monthly Loan Payments" 
-                  name="loanPayments" 
-                  type="number" 
-                  value={form.loanPayments} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Monthly Loan Payments"
+                  name="loanPayments"
+                  type="number"
+                  value={form.loanPayments}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Household & work expenses" 
-                  name="household" 
-                  type="number" 
-                  value={form.household} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Household & work expenses"
+                  name="household"
+                  type="number"
+                  value={form.household}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Education-related expenses" 
-                  name="education" 
-                  type="number" 
-                  value={form.education} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Education-related expenses"
+                  name="education"
+                  type="number"
+                  value={form.education}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Vacation & recreation" 
-                  name="vacation" 
-                  type="number" 
-                  value={form.vacation} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Vacation & recreation"
+                  name="vacation"
+                  type="number"
+                  value={form.vacation}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -369,49 +376,49 @@ const Survey = () => {
               <h3 className="text-base font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
                 ASSETS
               </h3>
-              
+
               <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                <FloatingInput 
-                  label="Real Properties" 
-                  name="realProperties" 
-                  type="number" 
-                  value={form.realProperties} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Real Properties"
+                  name="realProperties"
+                  type="number"
+                  value={form.realProperties}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Car, appliances, jewelry" 
-                  name="carAppliancesJewelry" 
-                  type="number" 
-                  value={form.carAppliancesJewelry} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Car, appliances, jewelry"
+                  name="carAppliancesJewelry"
+                  type="number"
+                  value={form.carAppliancesJewelry}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Cash and bank deposits" 
-                  name="cashBankDeposits" 
-                  type="number" 
-                  value={form.cashBankDeposits} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Cash and bank deposits"
+                  name="cashBankDeposits"
+                  type="number"
+                  value={form.cashBankDeposits}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Mutual funds, UITF, VUL" 
-                  name="mutualFundUITF" 
-                  type="number" 
-                  value={form.mutualFundUITF} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Mutual funds, UITF, VUL"
+                  name="mutualFundUITF"
+                  type="number"
+                  value={form.mutualFundUITF}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Business investments" 
-                  name="businessInvestments" 
-                  type="number" 
-                  value={form.businessInvestments} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Business investments"
+                  name="businessInvestments"
+                  type="number"
+                  value={form.businessInvestments}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Insurance cash value" 
-                  name="insuranceCashValue" 
-                  type="number" 
-                  value={form.insuranceCashValue} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Insurance cash value"
+                  name="insuranceCashValue"
+                  type="number"
+                  value={form.insuranceCashValue}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -428,28 +435,28 @@ const Survey = () => {
               <h3 className="text-base font-semibold text-[#003266] mb-4 border-b border-gray-200 pb-2">
                 LIABILITIES
               </h3>
-              
+
               <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                <FloatingInput 
-                  label="Real Estate Loan" 
-                  name="realEstateLoan" 
-                  type="number" 
-                  value={form.realEstateLoan} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Real Estate Loan"
+                  name="realEstateLoan"
+                  type="number"
+                  value={form.realEstateLoan}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Car & Salary Loans" 
-                  name="carSalaryLoans" 
-                  type="number" 
-                  value={form.carSalaryLoans} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Car & Salary Loans"
+                  name="carSalaryLoans"
+                  type="number"
+                  value={form.carSalaryLoans}
+                  onChange={handleChange}
                 />
-                <FloatingInput 
-                  label="Credit Card Balance" 
-                  name="creditCardBalance" 
-                  type="number" 
-                  value={form.creditCardBalance} 
-                  onChange={handleChange} 
+                <FloatingInput
+                  label="Credit Card Balance"
+                  name="creditCardBalance"
+                  type="number"
+                  value={form.creditCardBalance}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -478,17 +485,17 @@ const Survey = () => {
 
         {/* Navigation */}
         <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-100">
-          <button 
-            onClick={prev} 
-            disabled={step === 1} 
+          <button
+            onClick={prev}
+            disabled={step === 1}
             className="text-sm text-gray-500 disabled:opacity-30 cursor-pointer hover:text-[#003266] transition-colors font-medium"
           >
             ← Previous
           </button>
 
           {step < 3 ? (
-            <button 
-              onClick={next} 
+            <button
+              onClick={next}
               className="bg-[#003266] text-white text-sm px-6 py-2.5 rounded-lg hover:bg-[#003266]/80 transition-colors cursor-pointer font-medium shadow-md shadow-blue-900/20"
             >
               Continue →
@@ -499,10 +506,9 @@ const Survey = () => {
             </button>
           )}
         </div>
-
       </div>
     </div>
   );
 };
 
-export default Survey;  
+export default Survey;

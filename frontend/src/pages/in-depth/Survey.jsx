@@ -9,29 +9,44 @@ const FloatingInput = ({
   type = "text",
   value,
   onChange,
+  required = false,
+  ...props
 }) => {
+  const isFilled = value != null && value !== '';
+
   return (
     <div className="relative w-full">
       <input
+        id={name}
         type={type}
         name={name}
-        value={value}
+        value={value ?? ''}
         onChange={onChange}
         placeholder=" "
-        className="peer w-full bg-gray-50 rounded-md px-3 py-3 text-sm text-gray-800 border border-gray-200 
-        focus:bg-white focus:border-[#003266] focus:ring-1 focus:ring-[#003266]/20 
-        outline-none transition-all duration-300"
+        required={required}
+        className="
+          peer w-full bg-gray-50 rounded-md px-4 py-5 text-sm text-gray-800
+          border border-gray-300
+          focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-200
+          outline-none transition-all duration-200
+          placeholder-transparent
+        "
+        {...props}
       />
+
       <label
-        className="absolute left-3 top-2 text-xs text-gray-500 transition-all pointer-events-none
-        peer-placeholder-shown:top-3
-        peer-placeholder-shown:text-sm
-        peer-placeholder-shown:text-gray-400
-        peer-focus:top-2
-        peer-focus:text-xs
-        peer-focus:text-[#003266]"
+        htmlFor={name}
+        className={`
+          absolute left-4 pointer-events-none transition-all duration-200 ease-out
+          text-gray-500 text-sm
+          peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2
+          peer-focus:top-2    peer-focus:text-xs
+          peer-not-placeholder-shown:top-2 peer-not-placeholder-shown:text-xs
+          peer-focus:bg-white peer-focus:px-1 peer-focus:-ml-1
+        `}
       >
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
     </div>
   );

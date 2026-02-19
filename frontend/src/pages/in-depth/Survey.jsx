@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, memo } from "react";
+import React, { useState, useMemo, useCallback, memo, useEffect } from "react";
 import logo from "../../assets/images/short-cfs-b.png";
 
 // ────────────────────────────────────────────────

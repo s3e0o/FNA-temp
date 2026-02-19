@@ -164,11 +164,7 @@ export default function AppointmentForm() {
   useEffect(() => {
     document.title = "Schedule Your Consultation | Financial Needs Analysis";
   }, []);
-
-  useEffect(() => {
-      document.title = "Schedule Your Consultation | Financial Needs Analysis";
-    }, []);
-
+  
     const ThankYouScreen = () => (
     <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0] flex flex-col">
       {/* Main Content - Centered Modal */}

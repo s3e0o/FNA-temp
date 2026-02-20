@@ -11,6 +11,8 @@ export default function AppointmentForm() {
     email: "",
     date: "",
     time: "",
+    purpose: "",
+    meetingSetup: "", // Added meeting setup state
     feedback: "",
     consent: false,
   });
@@ -19,17 +21,24 @@ export default function AppointmentForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
 
-  // Helper: get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split("T")[0];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
+
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      if (name === "purpose" && value !== "Others") {
+        newData.otherPurpose = "";
+      }
+
+      return newData;
     });
 
-    // Clear error when user starts typing/editing
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -39,52 +48,65 @@ export default function AppointmentForm() {
     }
   };
 
-  // 🔍 Validate a single field (used on blur)
   const validateField = (name, value) => {
     let error = null;
 
     switch (name) {
       case "firstName":
         if (!value.trim()) error = "First name is required";
-        else if (!/^[A-Za-z\s]{2,30}$/.test(value)) error = "Please enter a valid first name (2–30 letters)";
+        else if (!/^[A-Za-z\s]{2,30}$/.test(value))
+          error = "First name: 2–30 letters only";
         break;
+
       case "lastName":
         if (!value.trim()) error = "Last name is required";
-        else if (!/^[A-Za-z\s]{2,30}$/.test(value)) error = "Please enter a valid last name (2–30 letters)";
+        else if (!/^[A-Za-z\s]{2,30}$/.test(value))
+          error = "Last name: 2–30 letters only";
         break;
+
       case "age":
-        if (!value) error = "Please select your age";
+        if (!value) error = "Age is required";
         break;
+
       case "mobile":
         if (!value.trim()) error = "Mobile number is required";
-        else if (!/^[0-9\s\-\(\)]{11}$/.test(value)) error = "Please enter a valid mobile number (11 digits)";
+        else if (!/^[0-9\s\-\(\)]{10,15}$/.test(value.replace(/\s/g, "")))
+          error = "Enter a valid mobile number (10–15 digits)";
         break;
+
       case "email":
-        if (!value.trim()) error = "Email address is required";
-        else if (!/^\S+@\S+\.\S+$/.test(value)) error = "Please enter a valid email address";
+        if (!value.trim()) error = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          error = "Invalid email format";
         break;
+
       case "date":
-        if (!value) error = "Please select a preferred date";
-        else if (value < today) error = "Date must be today or in the future";
+        if (!value) error = "Preferred date is required";
+        else if (value < today) error = "Date must be today or future";
         break;
+
       case "time":
         if (!value) {
-          error = "Please select a preferred time";
+          error = "Preferred time is required";
         } else {
-          const [hours, minutes] = value.split(':').map(Number);
-          if (isNaN(hours) || isNaN(minutes)) {
-            error = "Invalid time format";
-          } else {
-            const totalMinutes = hours * 60 + minutes;
-            if (totalMinutes < 480 || totalMinutes > 1020) {
-              error = "Please select a time between 8:00 AM and 5:00 PM";
-            }
-          }
+          const [h, m] = value.split(":").map(Number);
+          if (isNaN(h) || isNaN(m) || h < 8 || h > 17 || (h === 17 && m > 0))
+            error = "Time must be between 8:00 AM – 5:00 PM";
         }
         break;
-      case "consent":
-        if (!value) error = "You must agree to allow us to process your information";
+
+      case "purpose":
+        if (!value) error = "Please select the purpose of your appointment";
         break;
+
+      case "meetingSetup": // Validation for meeting setup
+        if (!value) error = "Please select your preferred meeting setup";
+        break;
+
+      case "consent":
+        if (!value) error = "You must agree to the data processing consent";
+        break;
+
       default:
         break;
     }
@@ -93,27 +115,31 @@ export default function AppointmentForm() {
     return !error;
   };
 
-  // 🧪 Full form validation (used on submit)
-  const validate = () => {
-    const newErrors = {};
-
-    // Reuse field logic by calling validateField for each
+  const validateForm = () => {
     let isValid = true;
-    for (const [key, value] of Object.entries(formData)) {
-      if (key !== "feedback") {
-        // Skip optional feedback
-        const fieldValid = validateField(key, value);
-        if (!fieldValid) isValid = false;
-      }
-    }
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "age",
+      "mobile",
+      "email",
+      "date",
+      "time",
+      "purpose",
+      "meetingSetup", // Included in validation
+      "consent",
+    ];
 
-    // Return overall validity
+    requiredFields.forEach((field) => {
+      if (!validateField(field, formData[field])) isValid = false;
+    });
+
     return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
@@ -126,45 +152,37 @@ export default function AppointmentForm() {
         email: formData.email.trim(),
         date: formData.date,
         time: formData.time,
-        feedback: formData.feedback?.trim() || "— No additional notes —",
+        purpose: formData.purpose,
+        meetingSetup: formData.meetingSetup, // Send to EmailJS
+        feedback: formData.feedback.trim() || "— No additional notes —",
         submissionDate: new Date().toLocaleString("en-PH", {
           timeZone: "Asia/Manila",
           dateStyle: "medium",
           timeStyle: "short",
         }),
+        _charset: "UTF-8",
       };
 
-      const response = await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_npmog1q",  
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_npmog1q",
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_wfc8bqf",
         templateParams,
-        {
-          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "ubgyer7dz2teNs5xc",  
-        }
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "ubgyer7dz2teNs5xc" }
       );
 
-      console.log("EmailJS SUCCESS!", response.status, response.text);
       setShowThankYou(true);
     } catch (err) {
-      console.error("EmailJS failed:", err);
-      let errorMsg = err.text || err.message || "Unknown error";
-
-      if (errorMsg.includes("public key")) {
-        errorMsg += "\n→ Double-check .env has VITE_EMAILJS_PUBLIC_KEY=ubgyer7dz2teNs5xc (restart dev server!)";
-      } else if (errorMsg.includes("412") || errorMsg.includes("scopes") || errorMsg.includes("Gmail_API")) {
-        errorMsg += "\n→ Gmail permission issue: In EmailJS dashboard > Email Services > your Gmail > Disconnect > Reconnect, and approve 'Send email on your behalf' permission.";
-      }
-
-      alert(`Failed to send: ${errorMsg}\nOpen DevTools (F12) > Console for more info.`);
+      console.error("EmailJS error:", err);
+      alert(`Failed to send email.\n${err.text || err.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    document.title = "Schedule Your Consultation | Financial Needs Analysis";
+    document.title = "Set an Appoitment | Financial Needs Analysis";
   }, []);
-  
+
     const ThankYouScreen = () => (
     <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0] flex flex-col">
       {/* Main Content - Centered Modal */}
@@ -222,242 +240,242 @@ export default function AppointmentForm() {
     </div>
   );
 
-  // 📝 Render Form View by default
-  if (showThankYou) {
-    return <ThankYouScreen />;
-  }
+  if (showThankYou) return <ThankYouScreen />;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0] flex flex-col">
-      {/* Top Header Bar – Insurance Branding */}
-      <header className="h-20 bg-[#0a2e5c] flex items-center px-6 shadow-md">
-        <div className="text-white font-bold text-xl">Caelum Financial Solutions</div>
-      </header>
-
-      {/* Main Form Section */}
-      <main className="flex flex-1 items-center justify-center px-4 py-12">
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6 md:p-10 border border-gray-200">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-[#0a2e5c]">Schedule Your Appointment</h1>
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-              Complete the form below to book an appointment with our licensed insurance advisor.
+          <div className="text-center mb-10">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#0a2e5c]">
+              Schedule Your Appointment
+            </h1>
+            <p className="mt-3 text-gray-600">
+              Book a consultation with our licensed financial advisor
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* First Name */}
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="firstName"
                   name="firstName"
-                  type="text"
                   value={formData.firstName}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("firstName", e.target.value)}
-                  placeholder="Enter first name"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  onBlur={() => validateField("firstName", formData.firstName)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.firstName ? "border-red-500" : "border-gray-300"
                   }`}
+                  placeholder="Enter first name"
                 />
-                {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                {errors.firstName && <p className="text-red-600 text-xs mt-1">{errors.firstName}</p>}
               </div>
 
               {/* Last Name */}
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="lastName"
                   name="lastName"
-                  type="text"
                   value={formData.lastName}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("lastName", e.target.value)}
-                  placeholder="Enter last name"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  onBlur={() => validateField("lastName", formData.lastName)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.lastName ? "border-red-500" : "border-gray-300"
                   }`}
+                  placeholder="Enter last name"
                 />
-                {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                {errors.lastName && <p className="text-red-600 text-xs mt-1">{errors.lastName}</p>}
               </div>
 
               {/* Age */}
               <div>
-                <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
-                  Age <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Age <span className="text-red-600">*</span>
                 </label>
-                <select
-                  id="age"
+                <input
+                  type="number"
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("age", e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.age ? "border-red-500" : "border-gray-300"
                   }`}
-                >
-                  <option value="">Select age</option>
-                  {[...Array(83)].map((_, i) => (
-                    <option key={i} value={i + 18}>
-                      {i + 18}
-                    </option>
-                  ))}
-                </select>
-                {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
+                  placeholder="Enter age"
+                />
+                {errors.age && <p className="text-red-600 text-xs mt-1">{errors.age}</p>}
               </div>
 
               {/* Mobile */}
               <div>
-                <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Number <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mobile Number <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="mobile"
                   name="mobile"
-                  type="tel"
                   value={formData.mobile}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("mobile", e.target.value)}
-                  placeholder="e.g., 0927 123 4567"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.mobile ? "border-red-500" : "border-gray-300"
                   }`}
+                  placeholder="e.g. 09123456789"
                 />
-                {errors.mobile && <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>}
+                {errors.mobile && <p className="text-red-600 text-xs mt-1">{errors.mobile}</p>}
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
+                  name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("email", e.target.value)}
-                  placeholder="you@example.com"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.email ? "border-red-500" : "border-gray-300"
                   }`}
+                  placeholder="email@example.com"
                 />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-red-600 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* Date */}
               <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Date <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Date <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="date"
-                  name="date"
                   type="date"
+                  name="date"
+                  min={today}
                   value={formData.date}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("date", e.target.value)}
-                  min={today}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.date ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
+                {errors.date && <p className="text-red-600 text-xs mt-1">{errors.date}</p>}
               </div>
 
               {/* Time */}
               <div>
-                <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Time <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Time (8AM-5PM) <span className="text-red-600">*</span>
                 </label>
                 <input
-                  id="time"
-                  name="time"
                   type="time"
+                  name="time"
                   value={formData.time}
                   onChange={handleChange}
-                  onBlur={(e) => validateField("time", e.target.value)}
-                  min="08:00"
-                  max="17:00"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition ${
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
                     errors.time ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                {errors.time && <p className="text-red-500 text-xs mt-1">{errors.time}</p>}
+                {errors.time && <p className="text-red-600 text-xs mt-1">{errors.time}</p>}
               </div>
 
-              {/* Working Hours Info */}
-              <div className="lg:col-span-2 flex items-center bg-blue-50 rounded-lg p-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-[#0a2e5c] mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="text-sm text-[#0a2e5c]">
-                  <span className="font-medium">Office Hours:</span> Monday–Friday, 8:00 AM – 5:00 PM
-                </span>
-              </div>
-
-              {/* Feedback */}
-              <div className="lg:col-span-3">
-                <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">
-                  Additional Notes (Optional)
+              {/* Preferred Meeting Setup - NEW SECTION */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Preferred Meeting Setup <span className="text-red-600">*</span>
                 </label>
-                <textarea
-                  id="feedback"
-                  name="feedback"
-                  rows="3"
-                  value={formData.feedback}
-                  onChange={handleChange}
-                  placeholder="Let us know how we can assist you..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3a5a99] focus:border-transparent outline-none transition resize-none"
-                ></textarea>
+                <div className="flex flex-wrap gap-6">
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="meetingSetup"
+                      value="Face to Face"
+                      checked={formData.meetingSetup === "Face to Face"}
+                      onChange={handleChange}
+                      className="w-5 h-5 text-[#0a2e5c] border-gray-300 focus:ring-[#0a2e5c]"
+                    />
+                    <span className="text-gray-700 group-hover:text-[#0a2e5c] transition-colors">Face to Face</span>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="meetingSetup"
+                      value="Online"
+                      checked={formData.meetingSetup === "Online"}
+                      onChange={handleChange}
+                      className="w-5 h-5 text-[#0a2e5c] border-gray-300 focus:ring-[#0a2e5c]"
+                    />
+                    <span className="text-gray-700 group-hover:text-[#0a2e5c] transition-colors">Online (Zoom/Google Meet)</span>
+                  </label>
+                </div>
+                {errors.meetingSetup && <p className="text-red-600 text-xs mt-2">{errors.meetingSetup}</p>}
               </div>
             </div>
 
-            {/* Consent Checkbox */}
-            <div className="mt-6 flex items-start gap-3">
+            {/* Purpose */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Purpose of Appointment <span className="text-red-600">*</span>
+              </label>
+              <select
+                name="purpose"
+                value={formData.purpose}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c] ${
+                  errors.purpose ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                 <option value="">Select purpose</option>
+                  <option value="Financial Advisor Program">Financial Advisor Program</option>
+                  <option value="Management Tainee Program">Management Trainee Program</option>
+                  <option value="Internship Program">Internship Program</option>
+                  <option value="Managing Partner">Managing Partner</option>
+                </select>
+                {errors.purpose && (
+                  <p className="text-red-600 text-xs mt-1">{errors.purpose}</p>
+                )}
+              </div>
+
+            {/* Feedback/Notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Additional Notes (Optional)
+              </label>
+              <textarea
+                name="feedback"
+                value={formData.feedback}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a2e5c]"
+                placeholder="Anything else we should know?"
+              ></textarea>
+            </div>
+
+            {/* Consent */}
+            <div className="flex items-start gap-3">
               <input
                 type="checkbox"
-                id="consent"
                 name="consent"
+                id="consent"
                 checked={formData.consent}
                 onChange={handleChange}
-                onBlur={() => validateField("consent", formData.consent)}
-                className="mt-1 h-5 w-5 text-[#3a5a99] rounded focus:ring-[#3a5a99] border-gray-300 cursor-pointer"
+                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#0a2e5c] focus:ring-[#0a2e5c]"
               />
-              <label htmlFor="consent" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-                I understand that personal information will be needed to complete my Financial Needs Analysis. I authorize Caelum Financial Solution to use and process my personal information, including contacting me regarding insurance and related services.
+              <label htmlFor="consent" className="text-sm text-gray-600 leading-relaxed">
+                I agree to the collection and processing of my personal data for the purpose of scheduling this appointment. <span className="text-red-600">*</span>
               </label>
             </div>
-            {errors.consent && <p className="text-red-500 text-xs mt-1 ml-8">{errors.consent}</p>}
+            {errors.consent && <p className="text-red-600 text-xs">{errors.consent}</p>}
 
-            {/* Submit Button */}
-            <div className="flex justify-center mt-8">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`${
-                  isSubmitting ? "bg-gray-400" : "bg-[#0a2e5c] hover:bg-[#0d3a75]"
-                } text-white font-semibold px-8 py-3.5 rounded-lg text-base shadow-md transition duration-200 w-full max-w-xs cursor-pointer`}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-[#0a2e5c] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#08244a] transition-all transform hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            >
+              {isSubmitting ? "Processing..." : "Schedule Appointment"}
+            </button>
           </form>
         </div>
       </main>
